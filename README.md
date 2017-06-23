@@ -11,7 +11,14 @@ A script used to operate the youtube-dl command line program.
 https://github.com/ForestFrog/PowerShell-Youtube-dl
 
 
-# Installation
+ - [INSTALLATION](#installation)
+ - [USAGE](#usage)
+ - [CHANGE LOG](#change-log)
+ - [ADDITIONAL NOTES](#additional-notes)
+ 
+
+
+# INSTALLATION
 
 These scripts require Windows PowerShell to function. PowerShell can be downloaded
 here: https://www.microsoft.com/en-us/download/details.aspx?id=50395
@@ -23,7 +30,7 @@ A folder named `\Youtube-dl` will be created in the user's profile folder as wel
 To uninstall these scripts and youtube-dl, delete the Youtube-dl folders located in `C:\Users\%USERNAME%\Youtube-dl` and `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Youtube-dl`, as well as the desktop shortcut.
 
 
-# Usage
+# USAGE
 
 Run either the desktop shortcut or the Start Menu shortcut. Choose to download either video or audio, and then right click and paste the URL into the prompt. The URL you provide it can either be the URL of a video or the URL of a playlist.
 
@@ -54,7 +61,7 @@ For advanced users, the youtube-dl.ps1 script, which is found in the folder `C:\
 		(Optional) The location to which the file will be downloaded to.
 
 
-# Change Log
+# CHANGE LOG
 
 	1.2.1	June 22nd, 2017
 		Uploaded the project to Github.
@@ -68,7 +75,7 @@ For advanced users, the youtube-dl.ps1 script, which is found in the folder `C:\
 		Implemented videoplaylist.txt and audioplaylist.txt downloading.
 
 
-# Additonal Notes
+# ADDITIONAL NOTES
 
 Please support the development of youtube-dl and ffmpeg. They are fantastic programs. Youtube-dl and ffmpeg can be found at the following links:
 
