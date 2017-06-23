@@ -29,7 +29,7 @@ https://github.com/ForestFrog/PowerShell-Youtube-dl/archive/master.zip
 
 Download the project .zip file, extract it to a folder, and run the `Youtube-dl_Installer.ps1` shortcut. The script will be installed to the folder `C:\Users\%USERNAME%\Youtube-dl`. A desktop shortcut and a Start Menu shortcut will be created. Run either of these to use the script. 
 
-To update the script, delete the following folders and files, download the new version, and install it:
+To update the script, delete the following files and folders, download the new version and install it:
 
 	C:\Users\%USERNAME%\Youtube-dl\bin
 	C:\Users\%USERNAME%\Youtube-dl\scripts
