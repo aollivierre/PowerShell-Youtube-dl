@@ -4,6 +4,7 @@ A script used to operate the youtube-dl command line program.
 # Scripts written by ForestFrog
 # June 22th, 2017
 # v1.2.1
+https://github.com/ForestFrog/PowerShell-Youtube-dl
 
 
 # Installation
