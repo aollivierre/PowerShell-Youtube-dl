@@ -23,7 +23,7 @@ A script used to operate the youtube-dl command line program.
 These scripts require Windows PowerShell to function. PowerShell can be downloaded
 here: https://www.microsoft.com/en-us/download/details.aspx?id=50395
 
-**Download PowerShell-Youtube-dl script:**
+**Download PowerShell-Youtube-dl script here:**
 
 https://github.com/ForestFrog/PowerShell-Youtube-dl/archive/master.zip
 
