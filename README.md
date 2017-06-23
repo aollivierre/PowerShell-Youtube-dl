@@ -35,7 +35,7 @@ Make sure you don't delete any of the .txt files!
 
 #
 
-To uninstall these scripts and youtube-dl, delete the Youtube-dl folders located in `C:\Users\%USERNAME%\Youtube-dl` and `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Youtube-dl`, as well as the desktop shortcut.
+To uninstall these scripts and youtube-dl, delete the Youtube-dl folders located at `C:\Users\%USERNAME%\Youtube-dl` and `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Youtube-dl`, as well as the desktop shortcut.
 
 
 # USAGE
