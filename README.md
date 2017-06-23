@@ -27,11 +27,10 @@ here: https://www.microsoft.com/en-us/download/details.aspx?id=50395
 
 Download the project .zip file, extract it to a folder, and run the `Youtube-dl_Installer.ps1` shortcut. The script will be installed to the folder `C:\Users\%USERNAME%\Youtube-dl`. A desktop shortcut and a Start Menu shortcut will be created. Run either of these to use the script. 
 
-To update the script, delete the following files and folders, download the new version and install it:
+To update the script, delete the following folders, download the new version and install it:
 
 	C:\Users\%USERNAME%\Youtube-dl\bin
 	C:\Users\%USERNAME%\Youtube-dl\scripts
-	C:\Users\%USERNAME%\Youtube-dl\README.md\
 Make sure you don't delete any of the .txt files!
 
 #
