@@ -9,12 +9,10 @@ A script used to operate the youtube-dl command line program.
 **v1.2.1**
 
 
-
  - [INSTALLATION](#installation)
  - [USAGE](#usage)
  - [CHANGE LOG](#change-log)
  - [ADDITIONAL NOTES](#additional-notes)
- 
 
 
 # INSTALLATION
