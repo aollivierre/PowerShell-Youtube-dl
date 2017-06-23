@@ -33,7 +33,8 @@ To update the script, delete the following files and folders, download the new v
 
 	C:\Users\%USERNAME%\Youtube-dl\bin
 	C:\Users\%USERNAME%\Youtube-dl\scripts
-	C:\Users\%USERNAME%\Youtube-dl\README.md
+	C:\Users\%USERNAME%\Youtube-dl\README.md\
+Make sure you don't delete any of the .txt files!
 
 #
 
