@@ -20,7 +20,7 @@ A script used to operate the youtube-dl command line program.
 These scripts require Windows PowerShell to function. PowerShell can be downloaded
 here: https://www.microsoft.com/en-us/download/details.aspx?id=50395
 
-Run the `Youtube-dl_Installer.ps1` shortcut. A desktop shortcut and a Start Menu shortcut will be created. Run either of these to use the script.
+Download the project .zip file, extract it to a folder, and run the `Youtube-dl_Installer.ps1` shortcut. A desktop shortcut and a Start Menu shortcut will be created. Run either of these to use the script.
 
 A folder named `\Youtube-dl` will be created in the user's profile folder as well. This folder contains .exe files used by youtube-dl and ffmpeg. Additionally, the `downloadarchive.txt` file is stored here. The `downloadarchive.txt` file keeps a record of videos that have been downloaded from playlists. Any videos that the user downloads from a playlist will be added to this file and will be skipped if the playlist is downloaded again.
 
