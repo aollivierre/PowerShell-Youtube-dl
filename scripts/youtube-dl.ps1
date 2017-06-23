@@ -25,8 +25,9 @@
 .EXTERNALSCRIPTDEPENDENCIES 
  
 .RELEASENOTES 
-	1.2.1 - 22-Jun-2017 - Created new installer script in PowerShell. Uploaded to Github.
-	1.2.0 - 20-Jun-2017 - Added documentation and worked on installer script.
+	1.2.1	22-Jun-2017 - Uploaded the project to Github. Uploaded to Github. Condensed installer to one PowerShell script. Edited documentation.
+	1.2.0	30-May-2017 - Implemented ffmpeg video conversion.
+	1.1.0	27-May-2017 - Implemented videoplaylist.txt and audioplaylist.txt downloading.
  
 #>
 
@@ -229,7 +230,7 @@ Function MainMenu {
 	While ($MenuOption -ne 1 -and $MenuOption -ne 2 -and $MenuOption -ne 3 -and $MenuOption -ne 4 -and $MenuOption -ne 0) {
 		Clear-Host
 		Write-Host "================================================================" -BackgroundColor "Black"
-		Write-Host "                 Youtube-dl Download Script v1.2                " -ForegroundColor "Yellow" -BackgroundColor "Black"
+		Write-Host "                Youtube-dl Download Script v1.2.1               " -ForegroundColor "Yellow" -BackgroundColor "Black"
 		Write-Host "================================================================" -BackgroundColor "Black"
 		Write-Host ""
 		Write-Host "Please select an option: " -ForegroundColor "Yellow"
