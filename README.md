@@ -1,9 +1,13 @@
 # PowerShell-Youtube-dl
 A script used to operate the youtube-dl command line program.
 
-# Scripts written by ForestFrog
-# June 22th, 2017
-# v1.2.1
+
+**Scripts written by ForestFrog**
+
+**June 22th, 2017**
+
+**v1.2.1**
+
 https://github.com/ForestFrog/PowerShell-Youtube-dl
 
 
@@ -25,9 +29,9 @@ Run either the desktop shortcut or the Start Menu shortcut. Choose to download e
 
 Video files are downloaded to `C:\Users\%USERNAME%\Videos\Youtube-dl` and audio files are downloaded to `C:\Users\%USERNAME%\Music\Youtube-dl`. Playlists will be downloaded into their own subfolders.
 
-New in version 1.1, users can list playlists in the "audioplaylist.txt" and "videoplaylist.txt" files located in `C:\Users\%USERNAME%\Youtube-dl`. List any playlist URL's one line at a time that you would like to download video from in the `videoplaylist.txt` file. The same goes for the `audioplaylist.txt` file. To download from these files, choose option `3` in the main menu or use the -FromFiles parameter switch if calling the script from the command line. Currently, playlists downloaded form the video playlist will be automatically converted to .webm
+**New in version 1.1**, users can list playlists in the "audioplaylist.txt" and "videoplaylist.txt" files located in `C:\Users\%USERNAME%\Youtube-dl`. List any playlist URL's one line at a time that you would like to download video from in the `videoplaylist.txt` file. The same goes for the `audioplaylist.txt` file. To download from these files, choose option `3` in the main menu or use the -FromFiles parameter switch if calling the script from the command line. Currently, playlists downloaded form the video playlist will be automatically converted to .webm
 
-New in version 1.2, users can convert downloaded videos to other formats using  ffmpeg options which can be modified in option `4` of the main menu, "Settings". Only videos being downloaded will be converted, not audio downloads. This feature has not yet been implemented into the parameters that can be passed to the script.
+**New in version 1.2**, users can convert downloaded videos to other formats using  ffmpeg options which can be modified in option `4` of the main menu, "Settings". Only videos being downloaded will be converted, not audio downloads. This feature has not yet been implemented into the parameters that can be passed to the script.
 
 For advanced users, the youtube-dl.ps1 script, which is found in the folder `C:\Users\%USERNAME%\Youtube-dl\scripts`, can be passed parameters so that this script can be used in conjunction with other scripts or forms of automation. Make sure to add the `C:\Users\%USERNAME%\Youtube-dl\bin` folder to your PATH.
 
@@ -50,14 +54,27 @@ For advanced users, the youtube-dl.ps1 script, which is found in the folder `C:\
 		(Optional) The location to which the file will be downloaded to.
 
 
+# Change Log
+
+	1.2.1	June 22nd, 2017
+		Uploaded the project to Github.
+		Condensed installer to one PowerShell script
+		Edited documentation
+		
+	1.2.0	March 30th, 2017
+		Implemented ffmpeg video conversion.
+		
+	1.1.0	March 27th, 2017
+		Implemented videoplaylist.txt and audioplaylist.txt downloading.
+
+
 # Additonal Notes
 
-The youtube-dl_installation_files folder contains a folder named "bin". This folder contains the .exe files of youtube-dl and ffmpeg in case the current versions cannot be downloaded during the installation process. If your folder "C:\Users\%USERNAME%\Youtube-dl\bin\" does not have four .exe files in it, then download them from their respective sites or copy the .exe files from the  installation file's bin folder to "C:\Users\%USERNAME%\Youtube-dl\bin\". Youtube-dl and ffmpeg can be downloaded from the following links:
+Please support the development of youtube-dl and ffmpeg. They are fantastic programs. Youtube-dl and ffmpeg can be found at the following links:
 
 https://youtube-dl.org/
+
 https://www.ffmpeg.org/
 
-
-Additionally, I do not claim to own the code to youtube-dl or ffmpeg or claim to have written any of it. I simply wrote the powershell scripts that utilize these fantastic pieces of software. Please support the development of youtube-dl and ffmpeg if you find them useful. Thank you.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
