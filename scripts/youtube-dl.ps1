@@ -60,7 +60,7 @@
     Downloads video URL's listed in videoplaylists.txt and audioplaylists.txt files. These files are generated when the script is ran for the first time.
 .EXAMPLE 
     C:\Users\%USERNAME%\Youtube-dl\scripts\youtube-dl.ps1 -Audio -URL "https://www.youtube.com/watch?v=oHg5SJYRHA0" -OutputPath "C:\Users\%USERNAME%\Desktop"
-    Downloads only the audio of the specified video URL to the desktop.
+    Only downloads the audio of the specified video URL to the desktop.
 .NOTES 
     Requires Windows 7 or higher 
     Author: ForestFrog
