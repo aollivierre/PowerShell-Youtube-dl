@@ -8,7 +8,6 @@ A script used to operate the youtube-dl command line program.
 
 **v1.2.1**
 
-https://github.com/ForestFrog/PowerShell-Youtube-dl
 
 
  - [INSTALLATION](#installation)
