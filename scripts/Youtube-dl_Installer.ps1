@@ -95,14 +95,11 @@ GetFfmpeg
 
 Write-Host "Copying install files ..."
 
-Copy-Item ".\youtube-dl.ps1" -Destination "$ScriptsFolder"
-Copy-Item ".\Youtube-dl.lnk" -Destination "$ScriptsFolder"
-Copy-Item ".\Youtube-dl.lnk" -Destination "$DesktopFolder"
-Copy-Item ".\Youtube-dl.lnk" -Destination "$StartFolder"
-#Copy-Item ".\update_youtube-dl.ps1" -Destination "$ScriptsFolder"
-#Copy-Item ".\Update Youtube-dl.lnk" -Destination "$ScriptsFolder"
-#Copy-Item ".\Update Youtube-dl.lnk" -Destination "$StartFolder"
-Copy-Item "..\README.md" -Destination "$SettingsFolder"
+Copy-Item ".\scripts\youtube-dl.ps1" -Destination "$ScriptsFolder"
+Copy-Item ".\scripts\Youtube-dl.lnk" -Destination "$ScriptsFolder"
+Copy-Item ".\scripts\Youtube-dl.lnk" -Destination "$DesktopFolder"
+Copy-Item ".\scripts\Youtube-dl.lnk" -Destination "$StartFolder"
+Copy-Item ".\README.md" -Destination "$SettingsFolder"
 
 Write-Host "Installation complete.`n" -ForegroundColor "Yellow"
 
