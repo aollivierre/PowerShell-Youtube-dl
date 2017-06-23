@@ -34,7 +34,7 @@
 .SYNOPSIS 
     Download audio and video from the internet, mainly from youtube.com
 .DESCRIPTION 
-    This script downloads audio and video from the internet using the programs youtube-dl and ffmpeg. This script can be run as a single command using parameters or it can be ran without parameters to use its GUI. Files are downloaded to the user's "Videos" and "Music" folders by default. See README.md for more information.
+    This script downloads audio and video from the internet using the programs youtube-dl and ffmpeg. This script can be ran as a single command using parameters or it can be ran without parameters to use its GUI. Files are downloaded to the user's "Videos" and "Music" folders by default. See README.md for more information.
 .PARAMETER Video 
     Download the video of the provided URL. Output file formats will vary.
 .PARAMETER Audio 
