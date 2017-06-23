@@ -101,11 +101,9 @@ Copy-Item ".\scripts\Youtube-dl.lnk" -Destination "$DesktopFolder"
 Copy-Item ".\scripts\Youtube-dl.lnk" -Destination "$StartFolder"
 Copy-Item ".\README.md" -Destination "$SettingsFolder"
 
-Write-Host "Installation complete.`n" -ForegroundColor "Yellow"
+Write-Host "`nInstallation complete.`n" -ForegroundColor "Yellow"
 
 PauseScript
-
-start notepad "$SettingsFolder\README.md"
 
 Exit
 
