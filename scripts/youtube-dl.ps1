@@ -25,7 +25,7 @@
 .EXTERNALSCRIPTDEPENDENCIES 
  
 .RELEASENOTES 
-	1.2.1	22-Jun-2017 - Uploaded the project to Github. Uploaded to Github. Condensed installer to one PowerShell script. Edited documentation.
+	1.2.1	22-Jun-2017 - Uploaded project to Github. Condensed installer to one PowerShell script. Edited documentation.
 	1.2.0	30-May-2017 - Implemented ffmpeg video conversion.
 	1.1.0	27-May-2017 - Implemented videoplaylist.txt and audioplaylist.txt downloading.
  
@@ -35,7 +35,7 @@
 .SYNOPSIS 
     Download audio and video from the internet, mainly from youtube.com
 .DESCRIPTION 
-    This script downloads audio and video from the internet using the programs youtube-dl and ffmpeg. This script can be ran as a single command using parameters or it can be ran without parameters to use its GUI. Files are downloaded to the user's "Videos" and "Music" folders by default. See README.md for more information.
+    This script downloads audio and video from the internet using the programs youtube-dl and ffmpeg. This script can be ran as a command using parameters or it can be ran without parameters to use its GUI. Files are downloaded to the user's "Videos" and "Music" folders by default. See README.md for more information.
 .PARAMETER Video 
     Download the video of the provided URL. Output file formats will vary.
 .PARAMETER Audio 
@@ -49,7 +49,7 @@
  
 .EXAMPLE 
     C:\Users\%USERNAME%\Youtube-dl\scripts\youtube-dl.ps1
-	Runs the script in GUI mode.
+    Runs the script in GUI mode.
 .EXAMPLE 
     C:\Users\%USERNAME%\Youtube-dl\scripts\youtube-dl.ps1 -Video -URL "https://www.youtube.com/watch?v=oHg5SJYRHA0"
     Downloads the video at the specified URL.
