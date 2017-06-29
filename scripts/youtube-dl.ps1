@@ -417,7 +417,7 @@ Function DownloadPlaylists {
 		+ $ResolutionValue + $StartTimeValue + $StopTimeValue + $StripAudioValue + $StripVideoValue + """" + " --prefer-ffmpeg"
 	}
 	Else {
-		$ffmpegConversion = ""
+		$Script:ffmpegConversion = ""
 	}
 	
 	Get-Content $VideoPlaylistFile | ForEach-Object {
