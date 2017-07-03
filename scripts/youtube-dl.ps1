@@ -110,33 +110,33 @@ $BinFolder = $SettingsFolder + "\bin"
 $ENV:Path += ";$BinFolder"
 
 $ArchiveFile = $SettingsFolder + "\downloadarchive.txt"
-$ArchiveFileCheck = Test-Path $ArchiveFile
+$ArchiveFileCheck = Test-Path "$ArchiveFile"
 If ($ArchiveFileCheck -eq $False) {
-	New-Item -Type file -Path $ArchiveFile
+	New-Item -Type file -Path "$ArchiveFile"
 }
 
 $VideoPlaylistFile = $SettingsFolder + "\videoplaylists.txt"
-$VideoPlaylistFileCheck = Test-Path $VideoPlaylistFile
+$VideoPlaylistFileCheck = Test-Path "$VideoPlaylistFile"
 If ($VideoPlaylistFileCheck -eq $False) {
-	New-Item -Type file -Path $VideoPlaylistFile
+	New-Item -Type file -Path "$VideoPlaylistFile"
 }
 
 $AudioPlaylistFile = $SettingsFolder + "\audioplaylists.txt"
-$AudioPlaylistFileCheck = Test-Path $AudioPlaylistFile
+$AudioPlaylistFileCheck = Test-Path "$AudioPlaylistFile"
 If ($AudioPlaylistFileCheck -eq $False) {
-	New-Item -Type file -Path $AudioPlaylistFile
+	New-Item -Type file -Path "$AudioPlaylistFile"
 }
 
 $YoutubeMusicFolder = $ENV:USERPROFILE + "\Music\Youtube-dl"
-$YoutubeMusicFolderCheck = Test-Path $YoutubeMusicFolder
+$YoutubeMusicFolderCheck = Test-Path "$YoutubeMusicFolder"
 If ($YoutubeMusicFolderCheck -eq $False) {
-	New-Item -Type directory -Path $YoutubeMusicFolder
+	New-Item -Type directory -Path "$YoutubeMusicFolder"
 }
 
 $YoutubeVideoFolder = $ENV:USERPROFILE + "\Videos\Youtube-dl"
-$YoutubeVideoFolderCheck = Test-Path $YoutubeVideoFolder
+$YoutubeVideoFolderCheck = Test-Path "$YoutubeVideoFolder"
 If ($YoutubeVideoFolderCheck -eq $False) {
-	New-Item -Type directory -Path $YoutubeVideoFolder
+	New-Item -Type directory -Path "$YoutubeVideoFolder"
 }
 
 $ffmpegConversion = ""
@@ -668,15 +668,15 @@ If ($ParameterMode -eq $True) {
 		# Setting output path location
 		If ($OutputPath.Length -gt 0) {
 			$YoutubeVideoFolder = $OutputPath
-			$YoutubeVideoFolderCheck = Test-Path $YoutubeVideoFolder
+			$YoutubeVideoFolderCheck = Test-Path "$YoutubeVideoFolder"
 			If ($YoutubeVideoFolderCheck -eq $False) {
-				New-Item -Type directory -Path $YoutubeVideoFolder
+				New-Item -Type directory -Path "$YoutubeVideoFolder"
 			}
 			
 			$YoutubeMusicFolder = $OutputPath
-			$YoutubeMusicFolderCheck = Test-Path $YoutubeMusicFolder
+			$YoutubeMusicFolderCheck = Test-Path "$YoutubeMusicFolder"
 			If ($YoutubeMusicFolderCheck -eq $False) {
-				New-Item -Type directory -Path $YoutubeMusicFolder
+				New-Item -Type directory -Path "$YoutubeMusicFolder"
 			}
 		}
 		DownloadPlaylists
@@ -688,9 +688,9 @@ If ($ParameterMode -eq $True) {
 		# Setting output path location
 		If ($OutputPath.Length -gt 0) {
 			$YoutubeVideoFolder = $OutputPath
-			$YoutubeVideoFolderCheck = Test-Path $YoutubeVideoFolder
+			$YoutubeVideoFolderCheck = Test-Path "$YoutubeVideoFolder"
 			If ($YoutubeVideoFolderCheck -eq $False) {
-				New-Item -Type directory -Path $YoutubeVideoFolder
+				New-Item -Type directory -Path "$YoutubeVideoFolder"
 			}
 		}
 		DownloadUrlVideo $URL
@@ -702,9 +702,9 @@ If ($ParameterMode -eq $True) {
 		# Setting output path location
 		If ($OutputPath.Length -gt 0) {
 			$YoutubeMusicFolder = $OutputPath
-			$YoutubeMusicFolderCheck = Test-Path $YoutubeMusicFolder
+			$YoutubeMusicFolderCheck = Test-Path "$YoutubeMusicFolder"
 			If ($YoutubeMusicFolderCheck -eq $False) {
-				New-Item -Type directory -Path $YoutubeMusicFolder
+				New-Item -Type directory -Path "$YoutubeMusicFolder"
 			}
 		}
 		DownloadUrlAudio $URL
