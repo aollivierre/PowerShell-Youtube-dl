@@ -24,14 +24,17 @@
  
 .EXTERNALSCRIPTDEPENDENCIES 
  
-.RELEASENOTES 
+.RELEASENOTES
+	1.2.2	03-Jul-2017 - Cleaned up code.
 	1.2.1	22-Jun-2017 - Uploaded project to Github. Condensed installer to one PowerShell script. Edited documentation.
 	1.2.0	30-May-2017 - Implemented ffmpeg video conversion.
 	1.1.0	27-May-2017 - Implemented videoplaylist.txt and audioplaylist.txt downloading.
  
 #>
 
-<# 
+<#
+.NAME
+    PowerShell-Youtube-dl
 .SYNOPSIS 
     Download audio and video from the internet, mainly from youtube.com
 .DESCRIPTION 
@@ -65,7 +68,7 @@
 .NOTES 
     Requires Windows 7 or higher 
     Author: ForestFrog
-    Updated: June 20th, 2017 
+    Updated: July 3rd, 2017 
     
 .LINK 
     https://github.com/ForestFrog/PowerShell-Youtube-dl
@@ -96,21 +99,15 @@ Else {
 }
 
 Function PauseScript {
-	Write-Host "Press any key to continue ..." -ForegroundColor "Gray"
+	Write-Host "Press any key to continue ...`n" -ForegroundColor "Gray"
 	$x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 }
 
 
 $SettingsFolder = $ENV:USERPROFILE + "\Youtube-dl"
-$SettingsFolderCheck = Test-Path $SettingsFolder
-If ($SettingsFolderCheck -eq $False) {
-	New-Item -Type directory -Path $SettingsFolder
-}
 
-
-$BinFolder = $ENV:USERPROFILE + "\Youtube-dl\bin"
+$BinFolder = $SettingsFolder + "\bin"
 $ENV:Path += ";$BinFolder"
-
 
 $ArchiveFile = $SettingsFolder + "\downloadarchive.txt"
 $ArchiveFileCheck = Test-Path $ArchiveFile
@@ -232,38 +229,29 @@ Function MainMenu {
 		Write-Host "================================================================" -BackgroundColor "Black"
 		Write-Host "                Youtube-dl Download Script v1.2.1               " -ForegroundColor "Yellow" -BackgroundColor "Black"
 		Write-Host "================================================================" -BackgroundColor "Black"
-		Write-Host ""
-		Write-Host "Please select an option: " -ForegroundColor "Yellow"
-		Write-Host ""
+		Write-Host "`nPlease select an option:`n" -ForegroundColor "Yellow"
 		Write-Host "  1   - Download video"
 		Write-Host "  2   - Download audio"
 		Write-Host "  3   - Download predefined playlists"
 		Write-Host "  4   - Settings"
-		Write-Host ""
-		Write-Host "  0   - Exit" -ForegroundColor "Gray"
-		Write-Host ""
+		Write-Host "`n  0   - Exit`n" -ForegroundColor "Gray"
 		$MenuOption = Read-Host "Option"
-		Write-Host ""
 		
 		If ($MenuOption -eq 1) {			
 			$url = ""
 			While (! ($url -like "http*")) {
 				Clear-Host
-				Write-Host "Please enter the URL you would like to download from:" -ForegroundColor "Yellow"
-				Write-Host ""
+				Write-Host "Please enter the URL you would like to download from:`n" -ForegroundColor "Yellow"
 				$url = Read-Host "URL"
-				Write-Host ""
 				If ($url -like "http*") {
 					DownloadUrlVideo $url
 				}
 				Else {
-					Write-Host "[ERROR]: Provided parameter is not a valid URL." -ForegroundColor "Red" -BackgroundColor "Black"
-					Write-Host ""
+					Write-Host "[ERROR]: Provided parameter is not a valid URL.`n" -ForegroundColor "Red" -BackgroundColor "Black"
 					PauseScript
 				}
 			}
 			
-			Write-Host ""
 			EndMenu
 			$MenuOption = 99
 		}
@@ -271,21 +259,17 @@ Function MainMenu {
 			$url = ""
 			While (! ($url -like "http*")) {
 				Clear-Host
-				Write-Host "Please enter the URL you would like to download from:" -ForegroundColor "Yellow"
-				Write-Host ""
+				Write-Host "Please enter the URL you would like to download from:`n" -ForegroundColor "Yellow"
 				$url = Read-Host "URL"
-				Write-Host ""
 				If ($url -like "http*") {
 					DownloadUrlAudio $url
 				}
 				Else {
-					Write-Host "[ERROR]: Provided parameter is not a valid URL." -ForegroundColor "Red" -BackgroundColor "Black"
-					Write-Host ""
+					Write-Host "[ERROR]: Provided parameter is not a valid URL.`n" -ForegroundColor "Red" -BackgroundColor "Black"
 					PauseScript
 				}
 			}
 			
-			Write-Host ""
 			EndMenu
 			$MenuOption = 99
 		}
@@ -305,10 +289,8 @@ Function MainMenu {
 			Exit
 		}
 		Else {
-			Write-Host "Please enter a valid option." -ForegroundColor "Red" -BackgroundColor "Black"
-			Write-Host ""
+			Write-Host "`nPlease enter a valid option.`n" -ForegroundColor "Red" -BackgroundColor "Black"
 			PauseScript
-			Write-Host ""
 		}
 	}
 }
@@ -327,23 +309,21 @@ Function DownloadUrlVideo {
 		+ $ResolutionValue + $StartTimeValue + $StopTimeValue + $StripAudioValue + $StripVideoValue + """" + " --prefer-ffmpeg"
 	}
 	Else {
-		$ffmpegConversion = ""
+		$Script:ffmpegConversion = ""
 	}
 	
 	If ($url -like "*youtube.com/playlist*") {
 		$VideoPath = $YoutubeVideoFolder + "\%(playlist)s\%(title)s.%(ext)s"
 		$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors $ffmpegConversion --yes-playlist ""$url"""
-		Write-Host "$YoutubedlCommand`n" -ForegroundColor "Gray"
+		Write-Host "`n$YoutubedlCommand`n" -ForegroundColor "Gray"
 		Invoke-Expression $YoutubedlCommand
 	}
 	Else {
 		$VideoPath = $YoutubeVideoFolder + "\%(title)s.%(ext)s"
 		$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors $ffmpegConversion --no-playlist ""$url"""
-		Write-Host "$YoutubedlCommand`n" -ForegroundColor "Gray"
+		Write-Host "`n$YoutubedlCommand`n" -ForegroundColor "Gray"
 		Invoke-Expression $YoutubedlCommand
 	}
-	
-	Write-Host ""
 }
 
 
@@ -352,96 +332,94 @@ Function DownloadUrlVideo {
 Function DownloadUrlAudio {
 	Param($url)
 	
+	If ($ConvertOutputValue -eq $True) {
+		Write-Host "`n[NOTE]: The output file is currently set to be converted." -ForegroundColor "Red" -BackgroundColor "Black"
+		Write-Host "        Only option ""1   - Download Video"" will convert output." -ForegroundColor "Red" -BackgroundColor "Black"
+		If ($ParameterMode -eq $False) {
+			PauseScript
+		}
+	}
+	
 	If ($url -like "*youtube.com/playlist*") {
 		$VideoPath = $YoutubeMusicFolder + "\%(playlist)s\%(title)s.%(ext)s"
 		$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg --yes-playlist ""$url"""
-		Write-Host "$YoutubedlCommand`n" -ForegroundColor "Gray"
+		Write-Host "`n$YoutubedlCommand`n" -ForegroundColor "Gray"
 		Invoke-Expression $YoutubedlCommand
 	}
 	Else {
 		$VideoPath = $YoutubeMusicFolder + "\%(title)s.%(ext)s"
 		$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg --no-playlist ""$url"""
-		Write-Host "$YoutubedlCommand`n" -ForegroundColor "Gray"
+		Write-Host "`n$YoutubedlCommand`n" -ForegroundColor "Gray"
 		Invoke-Expression $YoutubedlCommand
 	}
-	
-	Write-Host ""
 }
 
 
 
 Function DownloadPlaylists {
-	Write-Host "Downloading playlist URL's listed in:"
-	Write-Host "   $VideoPlaylistFile"
-	Write-Host "   $AudioPlaylistFile"
-	Write-Host ""
+	Write-Host "Downloading playlist URL's listed in:`n   $VideoPlaylistFile`n   $AudioPlaylistFile"
 	$VideoPlaylistFileLength = Get-ChildItem $VideoPlaylistFile | ForEach-Object {$_.Length}
 	$AudioPlaylistFileLength = Get-ChildItem $AudioPlaylistFile | ForEach-Object {$_.Length}
 	
 	If ($VideoPlaylistFileLength -eq 0 -and $AudioPlaylistFileLength -eq 0) {
-		Write-Host "[ERROR]: Both predefined playlist files are empty." -ForegroundColor "Red" -BackgroundColor "Black"
+		Write-Host "`n[ERROR]: Both predefined playlist files are empty." -ForegroundColor "Red" -BackgroundColor "Black"
 		Write-Host "         Please put playlist URL's inside them, one on each line." -ForegroundColor "Red" -BackgroundColor "Black"
-		Write-Host "         Playlist files are located in: $SettingsFolder" -ForegroundColor "Red" -BackgroundColor "Black"
-		Write-Host ""
+		Write-Host "         Playlist files are located in: $SettingsFolder`n" -ForegroundColor "Red" -BackgroundColor "Black"
 		If ($ParameterMode -eq $False) {
 			PauseScript
 		}
 		Return
 	}
-	ElseIf ($VideoPlaylistFileLength -eq 0) {
-		Write-Host "[ERROR]: Predefined video playlist file is empty." -ForegroundColor "Red" -BackgroundColor "Black"
-		Write-Host "         Please put playlist URL's inside it, one on each line." -ForegroundColor "Red" -BackgroundColor "Black"
-		Write-Host "         Playlist file is located at: $VideoPlaylistFile" -ForegroundColor "Red" -BackgroundColor "Black"
-		Write-Host ""
-		If ($ParameterMode -eq $False) {
-			PauseScript
-			Write-Host ""
+	Else {
+		If ($ConvertOutputValue -eq $True -and $OriginalQualityValue -eq $True) {
+			$Script:ffmpegConversion = $OutputFileTypeValue + " --prefer-ffmpeg"
 		}
-	}
-	ElseIf ($AudioPlaylistFileLength -eq 0) {
-		Write-Host "[ERROR]: Predefined audio playlist file is empty." -ForegroundColor "Red" -BackgroundColor "Black"
-		Write-Host "         Please put playlist URL's inside it, one on each line." -ForegroundColor "Red" -BackgroundColor "Black"
-		Write-Host "         Playlist file is located at: $AudioPlaylistFile" -ForegroundColor "Red" -BackgroundColor "Black"
-		Write-Host ""
-		If ($ParameterMode -eq $False) {
-			PauseScript
-			Write-Host ""
+		ElseIf ($ConvertOutputValue -eq $True -and $OriginalQualityValue -eq $False) {
+			$Script:ffmpegConversion = $OutputFileTypeValue + " --postprocessor-args """ + $VideoBitRateValue + $AudioBitRateValue `
+			+ $ResolutionValue + $StartTimeValue + $StopTimeValue + $StripAudioValue + $StripVideoValue + """" + " --prefer-ffmpeg"
+		}
+		Else {
+			$Script:ffmpegConversion = ""
 		}
 	}
 	
-	If ($ConvertOutputValue -eq $True -and $OriginalQualityValue -eq $True) {
-		$Script:ffmpegConversion = $OutputFileTypeValue + " --prefer-ffmpeg"
-	}
-	ElseIf ($ConvertOutputValue -eq $True -and $OriginalQualityValue -eq $False) {
-		$Script:ffmpegConversion = $OutputFileTypeValue + " --postprocessor-args """ + $VideoBitRateValue + $AudioBitRateValue `
-		+ $ResolutionValue + $StartTimeValue + $StopTimeValue + $StripAudioValue + $StripVideoValue + """" + " --prefer-ffmpeg"
+	If ($VideoPlaylistFileLength -eq 0) {
+		Write-Host "`n[NOTE]: Predefined video playlist file is empty." -ForegroundColor "Red" -BackgroundColor "Black"
+		Write-Host "        Please put playlist URL's inside it, one on each line." -ForegroundColor "Red" -BackgroundColor "Black"
+		Write-Host "        Playlist file is located at: $VideoPlaylistFile`n" -ForegroundColor "Red" -BackgroundColor "Black"
+		If ($ParameterMode -eq $False) {
+			PauseScript
+		}
 	}
 	Else {
-		$Script:ffmpegConversion = ""
+		Get-Content $VideoPlaylistFile | ForEach-Object {
+			Write-Host "`nDownloading playlist: $_" -ForegroundColor "Gray"
+			$VideoPath = $YoutubeVideoFolder + "\%(playlist)s\%(title)s.%(ext)s"
+			$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors $ffmpegConversion --yes-playlist --download-archive $ArchiveFile ""$_"""
+			Write-Host "$YoutubedlCommand`n" -ForegroundColor "Gray"
+			Invoke-Expression $YoutubedlCommand
+		}
+		Write-Host "`nFinished downloading predefined video playlists.`n" -ForegroundColor "Yellow"
 	}
 	
-	Get-Content $VideoPlaylistFile | ForEach-Object {
-		Write-Host "Downloading playlist: $_" -ForegroundColor "Gray"
-		$VideoPath = $YoutubeVideoFolder + "\%(playlist)s\%(title)s.%(ext)s"
-		$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors $ffmpegConversion --yes-playlist --download-archive $ArchiveFile ""$_"""
-		Write-Host "$YoutubedlCommand`n" -ForegroundColor "Gray"
-		Invoke-Expression $YoutubedlCommand
-		Write-Host ""
+	If ($AudioPlaylistFileLength -eq 0) {
+		Write-Host "`n[NOTE]: Predefined audio playlist file is empty." -ForegroundColor "Red" -BackgroundColor "Black"
+		Write-Host "        Please put playlist URL's inside it, one on each line." -ForegroundColor "Red" -BackgroundColor "Black"
+		Write-Host "        Playlist file is located at: $AudioPlaylistFile`n" -ForegroundColor "Red" -BackgroundColor "Black"
+		If ($ParameterMode -eq $False) {
+			PauseScript
+		}
 	}
-	Write-Host "Finished downloading predefined video playlists." -ForegroundColor "Yellow"
-	Write-Host ""
-	
-	Get-Content $AudioPlaylistFile | ForEach-Object {
-		Write-Host "Downloading playlist: $_" -ForegroundColor "Gray"
-		$VideoPath = $YoutubeMusicFolder + "\%(playlist)s\%(title)s.%(ext)s"
-		$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg --yes-playlist --download-archive $ArchiveFile ""$_"""
-		Write-Host "$YoutubedlCommand`n" -ForegroundColor "Gray"
-		Invoke-Expression $YoutubedlCommand
-		Write-Host ""
+	Else {
+		Get-Content $AudioPlaylistFile | ForEach-Object {
+			Write-Host "`nDownloading playlist: $_" -ForegroundColor "Gray"
+			$VideoPath = $YoutubeMusicFolder + "\%(playlist)s\%(title)s.%(ext)s"
+			$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg --yes-playlist --download-archive $ArchiveFile ""$_"""
+			Write-Host "$YoutubedlCommand`n" -ForegroundColor "Gray"
+			Invoke-Expression $YoutubedlCommand
+		}
+		Write-Host "`nFinished downloading predefined audio playlists.`n" -ForegroundColor "Yellow"
 	}
-	Write-Host "Finished downloading predefined audio playlists." -ForegroundColor "Yellow"
-	Write-Host ""
-	
 	EndMenu
 }
 
@@ -453,7 +431,7 @@ function SettingsMenu {
 	$MenuOption -ne 6 -and $MenuOption -ne 7 -and $MenuOption -ne 8 -and $MenuOption -ne 9 -and $MenuOption -ne 10 -and $MenuOption -ne 0) {
 		Clear-Host
 		Write-Host "================================================================" -BackgroundColor "Black"
-		Write-Host "                        Youtube-dl Settings                         " -ForegroundColor "Yellow" -BackgroundColor "Black"
+		Write-Host "                       Youtube-dl Settings                      " -ForegroundColor "Yellow" -BackgroundColor "Black"
 		Write-Host "================================================================" -BackgroundColor "Black"
 		If ($ConvertOutputValue -eq $False) {
 			Write-Host ($ConvertOutput | Format-Table ID,SettingName,SettingValue -AutoSize | Out-String)
@@ -464,12 +442,9 @@ function SettingsMenu {
 		ElseIf ($ConvertOutputValue -eq $True -and $OriginalQualityValue -eq $False) {
 			Write-Host ($Settings | Format-Table ID,SettingName,SettingValue -AutoSize | Out-String)
 		}
-		Write-Host "Please select a variable to edit: " -ForegroundColor "Yellow"
-		Write-Host ""
-		Write-Host "  0   - Return to main menu." -ForegroundColor "Gray"
-		Write-Host ""
+		Write-Host "Please select a variable to edit:`n" -ForegroundColor "Yellow"
+		Write-Host "  0   - Return to main menu.`n" -ForegroundColor "Gray"
 		$MenuOption = Read-Host "Option"
-		Write-Host ""
 		
 		If ($MenuOption -eq 1) {
 			If ($ConvertOutputValue -eq $False) {
@@ -494,15 +469,14 @@ function SettingsMenu {
 			$MenuOption = 99
 		}
 		ElseIf ($MenuOption -eq 3) {
-			Write-Host "Please enter the file extension to convert the downloaded video to:" -ForegroundColor "Yellow"
+			Write-Host "`nPlease enter the file extension to convert the downloaded video to:" -ForegroundColor "Yellow"
 			Write-Host "Available options are: mp3 mp4 webm mkv avi`n" -ForegroundColor "Gray"
 			$UserAnswer = Read-Host "File Extension"
-			Write-Host ""
 			If ($UserAnswer -like "`.*") {
 				$UserAnswer = $UserAnswer.Substring(1)
 			}
 			If ($UserAnswer -notlike "mp3" -and $UserAnswer -notlike "mp4" -and $UserAnswer -notlike "webm" -and $UserAnswer -notlike "mkv" -and $UserAnswer -notlike "avi") {
-				Write-Host "[ERROR]: Please enter a valid file extension." -ForegroundColor "Red" -BackgroundColor "Black"
+				Write-Host "`n[ERROR]: Please enter a valid file extension." -ForegroundColor "Red" -BackgroundColor "Black"
 				Write-Host "         Defaulting file extension to: webm`n" -ForegroundColor "Red" -BackgroundColor "Black"
 				PauseScript
 				$UserAnswer = $OutputFileTypeDefault
@@ -512,7 +486,7 @@ function SettingsMenu {
 			$MenuOption = 99
 		}
 		ElseIf ($MenuOption -eq 4) {
-			Write-Host "Please enter the video conversion bitrate in kilobytes:`n" -ForegroundColor "Yellow"
+			Write-Host "`nPlease enter the video conversion bitrate in kilobytes:`n" -ForegroundColor "Yellow"
 			$UserAnswer = Read-Host "Video Bitrate"
 			If ($UserAnswer -like "*k") {
 				$UserAnswer = $UserAnswer.Substring(0,$UserAnswer.Length - 1)
@@ -522,7 +496,7 @@ function SettingsMenu {
 			$MenuOption = 99
 		}
 		ElseIf ($MenuOption -eq 5) {
-			Write-Host "Please enter the audio conversion bitrate in kilobytes:`n" -ForegroundColor "Yellow"
+			Write-Host "`nPlease enter the audio conversion bitrate in kilobytes:`n" -ForegroundColor "Yellow"
 			$UserAnswer = Read-Host "Audio Bitrate"
 			If ($UserAnswer -like "*k") {
 				$UserAnswer = $UserAnswer.Substring(0,$UserAnswer.Length - 1)
@@ -532,13 +506,12 @@ function SettingsMenu {
 			$MenuOption = 99
 		}
 		ElseIf ($MenuOption -eq 6) {
-			Write-Host "Please enter the video resolution:" -ForegroundColor "Yellow"
+			Write-Host "`nPlease enter the video resolution:" -ForegroundColor "Yellow"
 			Write-Host "Enter as WxH where W = width and H = height." -ForegroundColor "Gray"
 			Write-Host "Leave blank for original resolution.`n" -ForegroundColor "Gray"
 			$UserAnswer = Read-Host "Start Time"
-			Write-Host ""
 			If ($UserAnswer -notlike "*x*" -and $UserAnswer -notlike "") {
-				Write-Host "[ERROR]: Please enter a valid resolution." -ForegroundColor "Red" -BackgroundColor "Black"
+				Write-Host "`n[ERROR]: Please enter a valid resolution." -ForegroundColor "Red" -BackgroundColor "Black"
 				Write-Host "         Defaulting resolution to: 640x360`n" -ForegroundColor "Red" -BackgroundColor "Black"
 				PauseScript
 				$UserAnswer = $ResolutionDefault
@@ -554,13 +527,12 @@ function SettingsMenu {
 			$MenuOption = 99
 		}
 		ElseIf ($MenuOption -eq 7) {
-			Write-Host "Please enter the start time:" -ForegroundColor "Yellow"
+			Write-Host "`nPlease enter the start time:" -ForegroundColor "Yellow"
 			Write-Host "Enter as hh:mm:ss where h = hours, m = minutes, and s = seconds." -ForegroundColor "Gray"
 			Write-Host "Leave blank for no start time.`n" -ForegroundColor "Gray"
 			$UserAnswer = Read-Host "Start Time"
-			Write-Host ""
 			If ($UserAnswer -notlike "*:*:*" -and $UserAnswer -notlike "") {
-				Write-Host "[ERROR]: Please enter a valid start time." -ForegroundColor "Red" -BackgroundColor "Black"
+				Write-Host "`n[ERROR]: Please enter a valid start time." -ForegroundColor "Red" -BackgroundColor "Black"
 				Write-Host "         Defaulting start time to: 00:00:00`n" -ForegroundColor "Red" -BackgroundColor "Black"
 				PauseScript
 				$UserAnswer = $StartTimeDefault
@@ -577,13 +549,12 @@ function SettingsMenu {
 			$MenuOption = 99
 		}
 		ElseIf ($MenuOption -eq 8) {
-			Write-Host "Please enter the stop time:" -ForegroundColor "Yellow"
+			Write-Host "`nPlease enter the stop time:" -ForegroundColor "Yellow"
 			Write-Host "Enter as hh:mm:ss where h = hours, m = minutes, and s = seconds." -ForegroundColor "Gray"
 			Write-Host "Leave blank for no stop time.`n" -ForegroundColor "Gray"
 			$UserAnswer = Read-Host "Stop Time"
-			Write-Host ""
 			If ($UserAnswer -notlike "*:*:*" -and $UserAnswer -notlike "") {
-				Write-Host "[ERROR]: Please enter a valid stop time." -ForegroundColor "Red" -BackgroundColor "Black"
+				Write-Host "`n[ERROR]: Please enter a valid stop time." -ForegroundColor "Red" -BackgroundColor "Black"
 				Write-Host "         Defaulting to no stop time.`n" -ForegroundColor "Red" -BackgroundColor "Black"
 				PauseScript
 				$UserAnswer = $StopTimeDefault
@@ -625,10 +596,8 @@ function SettingsMenu {
 			Return
 		}
 		Else {
-			Write-Host "Please enter a valid option." -ForegroundColor "Red" -BackgroundColor "Black"
-			Write-Host ""
+			Write-Host "`nPlease enter a valid option.`n" -ForegroundColor "Red" -BackgroundColor "Black"
 			PauseScript
-			Write-Host ""
 		}
 	}
 }
@@ -636,23 +605,16 @@ function SettingsMenu {
 
 	
 Function EndMenu {
-	If ($ParameterMode -eq $True) {
-		Exit
-	}
-	Else {
+	If ($ParameterMode -eq $False) {
 		$MenuOption = 99
 		While ($MenuOption -ne 1 -and $MenuOption -ne 2) {
-			Write-Host "================================================================" -BackgroundColor "Black"
+			Write-Host "`n================================================================" -BackgroundColor "Black"
 			Write-Host "                        Script Complete                         " -ForegroundColor "Yellow" -BackgroundColor "Black"
 			Write-Host "================================================================" -BackgroundColor "Black"
-			Write-Host ""
-			Write-Host "Please select an option: " -ForegroundColor "Yellow"
-			Write-Host ""
+			Write-Host "`nPlease select an option:`n" -ForegroundColor "Yellow"
 			Write-Host "  1   - Run again"
-			Write-Host "  2   - Exit"
-			Write-Host ""
+			Write-Host "  2   - Exit`n"
 			$MenuOption = Read-Host "Option"
-			Write-Host ""
 			If ($MenuOption -eq 1) {
 			
 				$Script:YoutubedlCommand = ""
@@ -690,10 +652,8 @@ Function EndMenu {
 				Exit
 			}
 			Else {
-				Write-Host "Please enter a valid option." -ForegroundColor "Red" -BackgroundColor "Black"
-				Write-Host ""
+				Write-Host "`nPlease enter a valid option.`n" -ForegroundColor "Red" -BackgroundColor "Black"
 				PauseScript
-				Write-Host ""
 			}
 		}
 	}
@@ -724,23 +684,10 @@ If ($ParameterMode -eq $True) {
 				New-Item -Type directory -Path $YoutubeMusicFolder
 			}
 		}
-		Else{
-			$YoutubeVideoFolder = $ENV:USERPROFILE + "\Videos\Youtube-dl"
-			$YoutubeVideoFolderCheck = Test-Path $YoutubeVideoFolder
-			If ($YoutubeVideoFolderCheck -eq $False) {
-				New-Item -Type directory -Path $YoutubeVideoFolder
-			}
-			
-			$YoutubeMusicFolder = $ENV:USERPROFILE + "\Music\Youtube-dl"
-			$YoutubeMusicFolderCheck = Test-Path $YoutubeMusicFolder
-			If ($YoutubeMusicFolderCheck -eq $False) {
-				New-Item -Type directory -Path $YoutubeMusicFolder
-			}
-		}
 		
 		DownloadPlaylists
 		
-		Write-Host "Downloads complete." -ForegroundColor "Yellow"
+		Write-Host "`nDownloads complete.`n" -ForegroundColor "Yellow"
 		
 	}
 	ElseIf ($Video -eq $True -and $Audio -eq $False) {	# Download video code block
@@ -753,17 +700,10 @@ If ($ParameterMode -eq $True) {
 				New-Item -Type directory -Path $YoutubeVideoFolder
 			}
 		}
-		Else{
-			$YoutubeVideoFolder = $ENV:USERPROFILE + "\Videos\Youtube-dl"
-			$YoutubeVideoFolderCheck = Test-Path $YoutubeVideoFolder
-			If ($YoutubeVideoFolderCheck -eq $False) {
-				New-Item -Type directory -Path $YoutubeVideoFolder
-			}
-		}
 		
 		DownloadUrlVideo $URL
 		
-		Write-Host "Download complete.`nDownloaded to: $YoutubeVideoFolder" -ForegroundColor "Yellow"
+		Write-Host "`nDownload complete.`nDownloaded to: $YoutubeVideoFolder`n" -ForegroundColor "Yellow"
 		
 	}
 	ElseIf ($Audio -eq $True -and $Video -eq $False) {	# Download audio code block
@@ -776,26 +716,18 @@ If ($ParameterMode -eq $True) {
 				New-Item -Type directory -Path $YoutubeMusicFolder
 			}
 		}
-		Else{
-			$YoutubeMusicFolder = $ENV:USERPROFILE + "\Music\Youtube-dl"
-			$YoutubeMusicFolderCheck = Test-Path $YoutubeMusicFolder
-			If ($YoutubeMusicFolderCheck -eq $False) {
-				New-Item -Type directory -Path $YoutubeMusicFolder
-			}
-		}
 		
 		DownloadUrlAudio $URL
 		
-		Write-Host "Download complete.`nDownloaded to: $YoutubeMusicFolder" -ForegroundColor "Yellow"
+		Write-Host "`nDownload complete.`nDownloaded to: $YoutubeMusicFolder`n" -ForegroundColor "Yellow"
 		
 	}
 	ElseIf ($Video -eq $True -and $Audio -eq $True) {
-		Write-Host "[ERROR]: Please select either -Video or -Audio. Not Both.`n" -ForegroundColor "Red" -BackgroundColor "Black"
+		Write-Host "`n[ERROR]: Please select either -Video or -Audio. Not Both.`n" -ForegroundColor "Red" -BackgroundColor "Black"
 	}
 	
 	Exit
 }
-
 
 MainMenu
 
