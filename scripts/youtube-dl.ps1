@@ -101,7 +101,7 @@ Else {
 
 Function PauseScript {
 	Write-Host "Press any key to continue ...`n" -ForegroundColor "Gray"
-	$x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+	$x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp")
 }
 
 $SettingsFolder = $ENV:USERPROFILE + "\Youtube-dl"
