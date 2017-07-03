@@ -26,6 +26,7 @@
 .REQUIREDSCRIPTS 
 
 .EXTERNALSCRIPTDEPENDENCIES 
+	https://rg3.github.io/youtube-dl/
 
 .RELEASENOTES
 	1.2.2	03-Jul-2017 - Cleaned up code.
