@@ -33,8 +33,6 @@
 #>
 
 <#
-.NAME
-    PowerShell-Youtube-dl
 .SYNOPSIS 
     Download audio and video from the internet, mainly from youtube.com
 .DESCRIPTION 
