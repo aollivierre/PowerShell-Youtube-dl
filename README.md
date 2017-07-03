@@ -6,9 +6,9 @@ A PowerShell script used to operate the youtube-dl command line program.
 
 **Scripts written by ForestFrog**
 
-**June 22th, 2017**
+**July 3rd, 2017**
 
-**v1.2.1**
+**v1.2.2**
 #
 
  - [INSTALLATION](#installation)
@@ -77,10 +77,13 @@ For advanced users, the youtube-dl.ps1 script, which is found in the folder `C:\
 
 # CHANGE LOG
 
+	1.2.2	July 3rd, 2017
+		Cleaned up code.
+
 	1.2.1	June 22nd, 2017
 		Uploaded the project to Github.
-		Condensed installer to one PowerShell script
-		Edited documentation
+		Condensed installer to one PowerShell script.
+		Edited documentation.
 		
 	1.2.0	March 30th, 2017
 		Implemented ffmpeg video conversion.
