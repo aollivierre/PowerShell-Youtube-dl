@@ -1,75 +1,77 @@
 <#PSScriptInfo 
- 
-.VERSION 1.2.2 
- 
+
+.VERSION
+	1.2.2 
+
 .GUID  
- 
+
 .AUTHOR ForestFrog
- 
+
 .COMPANYNAME 
- 
+
 .COPYRIGHT 
- 
+
 .TAGS 
- 
-.LICENSEURI https://github.com/ForestFrog/PowerShell-Youtube-dl/blob/master/LICENSE
- 
-.PROJECTURI https://github.com/ForestFrog/PowerShell-Youtube-dl
- 
+
+.LICENSEURI
+	https://github.com/ForestFrog/PowerShell-Youtube-dl/blob/master/LICENSE
+
+.PROJECTURI
+	https://github.com/ForestFrog/PowerShell-Youtube-dl
+
 .ICONURI 
- 
+
 .EXTERNALMODULEDEPENDENCIES 
- 
+
 .REQUIREDSCRIPTS 
- 
+
 .EXTERNALSCRIPTDEPENDENCIES 
- 
+
 .RELEASENOTES
 	1.2.2	03-Jul-2017 - Cleaned up code.
 	1.2.1	22-Jun-2017 - Uploaded project to Github. Condensed installer to one PowerShell script. Edited documentation.
 	1.2.0	30-May-2017 - Implemented ffmpeg video conversion.
 	1.1.0	27-May-2017 - Implemented videoplaylist.txt and audioplaylist.txt downloading.
- 
 #>
 
 <#
 .SYNOPSIS 
-    Download audio and video from the internet, mainly from youtube.com
+	Download audio and video from the internet, mainly from youtube.com
 .DESCRIPTION 
-    This script downloads audio and video from the internet using the programs youtube-dl and ffmpeg. This script can be ran as a command using parameters or it can be ran without parameters to use its GUI. Files are downloaded to the user's "Videos" and "Music" folders by default. See README.md for more information.
+	This script downloads audio and video from the internet using the programs youtube-dl and ffmpeg. This script can be ran as a command using parameters or it can be ran without parameters to use its GUI. Files are downloaded to the user's "Videos" and "Music" folders by default. See README.md for more information.
 .PARAMETER Video 
-    Download the video of the provided URL. Output file formats will vary.
+	Download the video of the provided URL. Output file formats will vary.
 .PARAMETER Audio 
-    Only download the audio of the provided URL. Output file format will be mp3.
+	Only download the audio of the provided URL. Output file format will be mp3.
 .PARAMETER FromFiles 
-    Download playlist URL's listed in videoplaylists.txt and audioplaylists.txt 
+	Download playlist URL's listed in videoplaylists.txt and audioplaylists.txt 
 .PARAMETER URL 
-    The video URL to download from.
+	The video URL to download from.
 .PARAMETER OutputPath 
-    The directory where to save the output file.
- 
+	The directory where to save the output file.
+
 .EXAMPLE 
-    C:\Users\%USERNAME%\Youtube-dl\scripts\youtube-dl.ps1
-    Runs the script in GUI mode.
+	C:\Users\%USERNAME%\Youtube-dl\scripts\youtube-dl.ps1
+	Runs the script in GUI mode.
 .EXAMPLE 
-    C:\Users\%USERNAME%\Youtube-dl\scripts\youtube-dl.ps1 -Video -URL "https://www.youtube.com/watch?v=oHg5SJYRHA0"
-    Downloads the video at the specified URL.
+	C:\Users\%USERNAME%\Youtube-dl\scripts\youtube-dl.ps1 -Video -URL "https://www.youtube.com/watch?v=oHg5SJYRHA0"
+	Downloads the video at the specified URL.
 .EXAMPLE 
-    C:\Users\%USERNAME%\Youtube-dl\scripts\youtube-dl.ps1 -Audio -URL "https://www.youtube.com/watch?v=oHg5SJYRHA0"
-    Downloads only the audio of the specified video URL.
+	C:\Users\%USERNAME%\Youtube-dl\scripts\youtube-dl.ps1 -Audio -URL "https://www.youtube.com/watch?v=oHg5SJYRHA0"
+	Downloads only the audio of the specified video URL.
 .EXAMPLE 
-    C:\Users\%USERNAME%\Youtube-dl\scripts\youtube-dl.ps1 -FromFiles
-    Downloads video URL's listed in videoplaylists.txt and audioplaylists.txt files. These files are generated when the script is ran for the first time.
+	C:\Users\%USERNAME%\Youtube-dl\scripts\youtube-dl.ps1 -FromFiles
+	Downloads video URL's listed in videoplaylists.txt and audioplaylists.txt files. These files are generated when the script is ran for the first time.
 .EXAMPLE 
-    C:\Users\%USERNAME%\Youtube-dl\scripts\youtube-dl.ps1 -Audio -URL "https://www.youtube.com/watch?v=oHg5SJYRHA0" -OutputPath "C:\Users\%USERNAME%\Desktop"
-    Only downloads the audio of the specified video URL to the desktop.
+	C:\Users\%USERNAME%\Youtube-dl\scripts\youtube-dl.ps1 -Audio -URL "https://www.youtube.com/watch?v=oHg5SJYRHA0" -OutputPath "C:\Users\%USERNAME%\Desktop"
+	Only downloads the audio of the specified video URL to the desktop.
 .NOTES 
-    Requires Windows 7 or higher 
-    Author: ForestFrog
-    Updated: July 3rd, 2017 
-    
+	Requires Windows 7 or higher 
+	Author: ForestFrog
+	Updated: July 3rd, 2017 
+
 .LINK 
-    https://github.com/ForestFrog/PowerShell-Youtube-dl
+	https://github.com/ForestFrog/PowerShell-Youtube-dl
 #>
 
 
