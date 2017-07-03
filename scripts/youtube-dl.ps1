@@ -75,6 +75,7 @@
 #>
 
 
+
 Param(
 	[Switch]$Video,
 	[Switch]$Audio,
@@ -102,7 +103,6 @@ Function PauseScript {
 	Write-Host "Press any key to continue ...`n" -ForegroundColor "Gray"
 	$x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 }
-
 
 $SettingsFolder = $ENV:USERPROFILE + "\Youtube-dl"
 
@@ -220,7 +220,6 @@ $Settings = $ConvertOutput,$OriginalQuality,$BlankLine,$OutputFileType,$VideoBit
 
 
 
-
 # In MainMenu, ask for audio or video, get url, then run either DownloadUrlAudio or DownloadUrlVideo.
 Function MainMenu {
 	$MenuOption = 99
@@ -251,7 +250,6 @@ Function MainMenu {
 					PauseScript
 				}
 			}
-			
 			EndMenu
 			$MenuOption = 99
 		}
@@ -269,7 +267,6 @@ Function MainMenu {
 					PauseScript
 				}
 			}
-			
 			EndMenu
 			$MenuOption = 99
 		}
@@ -616,9 +613,7 @@ Function EndMenu {
 			Write-Host "  2   - Exit`n"
 			$MenuOption = Read-Host "Option"
 			If ($MenuOption -eq 1) {
-			
 				$Script:YoutubedlCommand = ""
-				
 				$Script:ffmpegConversion = ""
 				
 				$Script:ConvertOutputValue = $False
@@ -684,11 +679,9 @@ If ($ParameterMode -eq $True) {
 				New-Item -Type directory -Path $YoutubeMusicFolder
 			}
 		}
-		
 		DownloadPlaylists
 		
 		Write-Host "`nDownloads complete.`n" -ForegroundColor "Yellow"
-		
 	}
 	ElseIf ($Video -eq $True -and $Audio -eq $False) {	# Download video code block
 		
@@ -700,11 +693,9 @@ If ($ParameterMode -eq $True) {
 				New-Item -Type directory -Path $YoutubeVideoFolder
 			}
 		}
-		
 		DownloadUrlVideo $URL
 		
 		Write-Host "`nDownload complete.`nDownloaded to: $YoutubeVideoFolder`n" -ForegroundColor "Yellow"
-		
 	}
 	ElseIf ($Audio -eq $True -and $Video -eq $False) {	# Download audio code block
 		
@@ -716,11 +707,9 @@ If ($ParameterMode -eq $True) {
 				New-Item -Type directory -Path $YoutubeMusicFolder
 			}
 		}
-		
 		DownloadUrlAudio $URL
 		
 		Write-Host "`nDownload complete.`nDownloaded to: $YoutubeMusicFolder`n" -ForegroundColor "Yellow"
-		
 	}
 	ElseIf ($Video -eq $True -and $Audio -eq $True) {
 		Write-Host "`n[ERROR]: Please select either -Video or -Audio. Not Both.`n" -ForegroundColor "Red" -BackgroundColor "Black"
