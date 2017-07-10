@@ -105,7 +105,6 @@ $SettingsFolder = $ENV:USERPROFILE + "\Youtube-dl"
 $BinFolder = $SettingsFolder + "\bin"
 $ENV:Path += ";$BinFolder"
 
-
 $ArchiveFile = $SettingsFolder + "\downloadarchive.txt"
 $ArchiveFileCheck = Test-Path $ArchiveFile
 If ($ArchiveFileCheck -eq $False) {
