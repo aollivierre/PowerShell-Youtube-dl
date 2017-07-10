@@ -100,15 +100,9 @@ Function PauseScript {
 	$x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 }
 
-
 $SettingsFolder = $ENV:USERPROFILE + "\Youtube-dl"
-$SettingsFolderCheck = Test-Path $SettingsFolder
-If ($SettingsFolderCheck -eq $False) {
-	New-Item -Type directory -Path $SettingsFolder
-}
 
-
-$BinFolder = $ENV:USERPROFILE + "\Youtube-dl\bin"
+$BinFolder = $SettingsFolder + "\bin"
 $ENV:Path += ";$BinFolder"
 
 
@@ -220,7 +214,6 @@ $StripVideo | Add-Member -MemberType NoteProperty -Name SettingName -Value "Stri
 $StripVideo | Add-Member -MemberType NoteProperty -Name SettingValue -Value $StripVideoDefault
 
 $Settings = $ConvertOutput,$OriginalQuality,$BlankLine,$OutputFileType,$VideoBitRate,$AudioBitRate,$Resolution,$StartTime,$StopTime,$StripAudio,$StripVideo
-
 
 
 
