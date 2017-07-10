@@ -6,9 +6,9 @@ A PowerShell script used to operate the youtube-dl command line program.
 
 **Scripts written by ForestFrog**
 
-**June 22th, 2017**
+**July 3rd, 2017**
 
-**v1.2.1**
+**v1.2.2**
 #
 
  - [INSTALLATION](#installation)
@@ -48,7 +48,7 @@ Upon being ran for the first time, the script will generate the `downloadarchive
 
 #
 
-**New in version 1.1.0**, users can list playlists in the `audioplaylist.txt` and `videoplaylist.txt` files located in `C:\Users\%USERNAME%\Youtube-dl`. List any playlist URL's one line at a time that you would like to download video from in the `videoplaylist.txt` file. The same goes for the `audioplaylist.txt` file. To download from these files, choose option `3` in the main menu or use the `-FromFiles` parameter switch if calling the script from the command line. Currently, playlists downloaded from the video playlist will be automatically converted to .webm
+**New in version 1.1.0**, users can list playlists in the `audioplaylist.txt` and `videoplaylist.txt` files located in `C:\Users\%USERNAME%\Youtube-dl`. List any playlist URL's one line at a time that you would like to download video from in the `videoplaylist.txt` file. The same goes for the `audioplaylist.txt` file. To download from these files, choose option `3` in the main menu or use the `-FromFiles` parameter switch if calling the script from the command line. When downloading from the `videoplaylist.txt` file, use the conversion options in the Settings menu to convert all of the videos to one single file type.
 
 **New in version 1.2.0**, users can convert downloaded videos to other formats using  ffmpeg options which can be modified in option `4` of the main menu, "Settings". Only videos being downloaded will be converted, not audio downloads. This feature has not yet been implemented into the parameters that can be passed to the script.
 
@@ -77,10 +77,13 @@ For advanced users, the youtube-dl.ps1 script, which is found in the folder `C:\
 
 # CHANGE LOG
 
+	1.2.2	July 3rd, 2017
+		Cleaned up code.
+
 	1.2.1	June 22nd, 2017
 		Uploaded the project to Github.
-		Condensed installer to one PowerShell script
-		Edited documentation
+		Condensed installer to one PowerShell script.
+		Edited documentation.
 		
 	1.2.0	March 30th, 2017
 		Implemented ffmpeg video conversion.

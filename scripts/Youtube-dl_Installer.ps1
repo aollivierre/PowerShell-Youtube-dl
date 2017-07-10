@@ -1,7 +1,7 @@
 
 Function PauseScript {
 	Write-Host "Press any key to continue ..." -ForegroundColor "Gray"
-	$x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+	$x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp")
 }
 
 Write-Host "Beginning Youtube-dl script installation ..."
