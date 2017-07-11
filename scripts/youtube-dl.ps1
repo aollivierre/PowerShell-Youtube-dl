@@ -112,114 +112,111 @@ $BinFolder = $SettingsFolder + "\bin"
 $ENV:Path += ";$BinFolder"
 
 $ArchiveFile = $SettingsFolder + "\downloadarchive.txt"
-$ArchiveFileCheck = Test-Path "$ArchiveFile"
-If ($ArchiveFileCheck -eq $False) {
+If ((Test-Path "$ArchiveFile") -eq $False) {
 	New-Item -Type file -Path "$ArchiveFile"
 }
 
 $VideoPlaylistFile = $SettingsFolder + "\videoplaylists.txt"
-$VideoPlaylistFileCheck = Test-Path "$VideoPlaylistFile"
-If ($VideoPlaylistFileCheck -eq $False) {
+If ((Test-Path "$VideoPlaylistFile") -eq $False) {
 	New-Item -Type file -Path "$VideoPlaylistFile"
 }
 
 $AudioPlaylistFile = $SettingsFolder + "\audioplaylists.txt"
-$AudioPlaylistFileCheck = Test-Path "$AudioPlaylistFile"
-If ($AudioPlaylistFileCheck -eq $False) {
+If ((Test-Path "$AudioPlaylistFile") -eq $False) {
 	New-Item -Type file -Path "$AudioPlaylistFile"
 }
 
 $YoutubeMusicFolder = $ENV:USERPROFILE + "\Music\Youtube-dl"
-$YoutubeMusicFolderCheck = Test-Path "$YoutubeMusicFolder"
-If ($YoutubeMusicFolderCheck -eq $False) {
+If ((Test-Path "$YoutubeMusicFolder") -eq $False) {
 	New-Item -Type directory -Path "$YoutubeMusicFolder"
 }
 
 $YoutubeVideoFolder = $ENV:USERPROFILE + "\Videos\Youtube-dl"
-$YoutubeVideoFolderCheck = Test-Path "$YoutubeVideoFolder"
-If ($YoutubeVideoFolderCheck -eq $False) {
+If ((Test-Path "$YoutubeVideoFolder") -eq $False) {
 	New-Item -Type directory -Path "$YoutubeVideoFolder"
 }
 
-$ffmpegConversion = ""
 
-$ConvertOutputDefault = $False
-$ConvertOutputValue = $False
-$ConvertOutput = New-Object Object
-$ConvertOutput | Add-Member -MemberType NoteProperty -Name ID -Value 1
-$ConvertOutput | Add-Member -MemberType NoteProperty -Name SettingName -Value "Convert output?"
-$ConvertOutput | Add-Member -MemberType NoteProperty -Name SettingValue -Value $ConvertOutputDefault
+If ($PSBoundParameters.Count -eq 0) {
+	$ffmpegConversion = ""
 
-$OriginalQualityDefault = $True
-$OriginalQualityValue = $True
-$OriginalQuality = New-Object Object
-$OriginalQuality | Add-Member -MemberType NoteProperty -Name ID -Value 2
-$OriginalQuality | Add-Member -MemberType NoteProperty -Name SettingName -Value "Keep original quality?"
-$OriginalQuality | Add-Member -MemberType NoteProperty -Name SettingValue -Value $OriginalQualityDefault
+	$ConvertOutputDefault = $False
+	$ConvertOutputValue = $False
+	$ConvertOutput = New-Object Object
+	$ConvertOutput | Add-Member -MemberType NoteProperty -Name ID -Value 1
+	$ConvertOutput | Add-Member -MemberType NoteProperty -Name SettingName -Value "Convert output?"
+	$ConvertOutput | Add-Member -MemberType NoteProperty -Name SettingValue -Value $ConvertOutputDefault
 
-$BlankLine = New-Object Object
-$BlankLine | Add-Member -MemberType NoteProperty -Name ID -Value ""
-$BlankLine | Add-Member -MemberType NoteProperty -Name SettingName -Value ""
-$BlankLine | Add-Member -MemberType NoteProperty -Name SettingValue -Value ""
+	$OriginalQualityDefault = $True
+	$OriginalQualityValue = $True
+	$OriginalQuality = New-Object Object
+	$OriginalQuality | Add-Member -MemberType NoteProperty -Name ID -Value 2
+	$OriginalQuality | Add-Member -MemberType NoteProperty -Name SettingName -Value "Keep original quality?"
+	$OriginalQuality | Add-Member -MemberType NoteProperty -Name SettingValue -Value $OriginalQualityDefault
 
-$OutputFileTypeDefault = "webm"
-$OutputFileTypeValue = "--recode-video webm"
-$OutputFileType = New-Object Object
-$OutputFileType | Add-Member -MemberType NoteProperty -Name ID -Value 3
-$OutputFileType | Add-Member -MemberType NoteProperty -Name SettingName -Value "Output file extension"
-$OutputFileType | Add-Member -MemberType NoteProperty -Name SettingValue -Value $OutputFileTypeDefault
+	$BlankLine = New-Object Object
+	$BlankLine | Add-Member -MemberType NoteProperty -Name ID -Value ""
+	$BlankLine | Add-Member -MemberType NoteProperty -Name SettingName -Value ""
+	$BlankLine | Add-Member -MemberType NoteProperty -Name SettingValue -Value ""
 
-$VideoBitRateDefault = "800k"
-$VideoBitRateValue = " -b:v 800k"
-$VideoBitRate = New-Object Object
-$VideoBitRate | Add-Member -MemberType NoteProperty -Name ID -Value 4
-$VideoBitRate | Add-Member -MemberType NoteProperty -Name SettingName -Value "Video bitrate"
-$VideoBitRate | Add-Member -MemberType NoteProperty -Name SettingValue -Value $VideoBitRateDefault #In kilobytes
+	$OutputFileTypeDefault = "webm"
+	$OutputFileTypeValue = "--recode-video webm"
+	$OutputFileType = New-Object Object
+	$OutputFileType | Add-Member -MemberType NoteProperty -Name ID -Value 3
+	$OutputFileType | Add-Member -MemberType NoteProperty -Name SettingName -Value "Output file extension"
+	$OutputFileType | Add-Member -MemberType NoteProperty -Name SettingValue -Value $OutputFileTypeDefault
 
-$AudioBitRateDefault = "128k"
-$AudioBitRateValue = " -b:a 128k"
-$AudioBitRate = New-Object Object
-$AudioBitRate | Add-Member -MemberType NoteProperty -Name ID -Value 5
-$AudioBitRate | Add-Member -MemberType NoteProperty -Name SettingName -Value "Audio bitrate"
-$AudioBitRate | Add-Member -MemberType NoteProperty -Name SettingValue -Value $AudioBitRateDefault #In kilobytes
+	$VideoBitRateDefault = "800k"
+	$VideoBitRateValue = " -b:v 800k"
+	$VideoBitRate = New-Object Object
+	$VideoBitRate | Add-Member -MemberType NoteProperty -Name ID -Value 4
+	$VideoBitRate | Add-Member -MemberType NoteProperty -Name SettingName -Value "Video bitrate"
+	$VideoBitRate | Add-Member -MemberType NoteProperty -Name SettingValue -Value $VideoBitRateDefault #In kilobytes
 
-$ResolutionDefault = "640x360"
-$ResolutionValue = " -s 640x360"
-$Resolution = New-Object Object
-$Resolution | Add-Member -MemberType NoteProperty -Name ID -Value 6
-$Resolution | Add-Member -MemberType NoteProperty -Name SettingName -Value "Resolution"
-$Resolution | Add-Member -MemberType NoteProperty -Name SettingValue -Value $ResolutionDefault #360p = 480:360, 480p = 640:480, 720p = 1280:720, 1080p = 1920:1080
+	$AudioBitRateDefault = "128k"
+	$AudioBitRateValue = " -b:a 128k"
+	$AudioBitRate = New-Object Object
+	$AudioBitRate | Add-Member -MemberType NoteProperty -Name ID -Value 5
+	$AudioBitRate | Add-Member -MemberType NoteProperty -Name SettingName -Value "Audio bitrate"
+	$AudioBitRate | Add-Member -MemberType NoteProperty -Name SettingValue -Value $AudioBitRateDefault #In kilobytes
 
-$StartTimeDefault = "00:00:00"
-$StartTimeValue = ""
-$StartTime = New-Object Object
-$StartTime | Add-Member -MemberType NoteProperty -Name ID -Value 7
-$StartTime | Add-Member -MemberType NoteProperty -Name SettingName -Value "Start time"
-$StartTime | Add-Member -MemberType NoteProperty -Name SettingValue -Value $StartTimeDefault #format as 00:00:00
+	$ResolutionDefault = "640x360"
+	$ResolutionValue = " -s 640x360"
+	$Resolution = New-Object Object
+	$Resolution | Add-Member -MemberType NoteProperty -Name ID -Value 6
+	$Resolution | Add-Member -MemberType NoteProperty -Name SettingName -Value "Resolution"
+	$Resolution | Add-Member -MemberType NoteProperty -Name SettingValue -Value $ResolutionDefault #360p = 480:360, 480p = 640:480, 720p = 1280:720, 1080p = 1920:1080
 
-$StopTimeDefault = "No stop time"
-$StopTimeValue = ""
-$StopTime = New-Object Object
-$StopTime | Add-Member -MemberType NoteProperty -Name ID -Value 8
-$StopTime | Add-Member -MemberType NoteProperty -Name SettingName -Value "Stop time"
-$StopTime | Add-Member -MemberType NoteProperty -Name SettingValue -Value $StopTimeDefault #In seconds
+	$StartTimeDefault = "00:00:00"
+	$StartTimeValue = ""
+	$StartTime = New-Object Object
+	$StartTime | Add-Member -MemberType NoteProperty -Name ID -Value 7
+	$StartTime | Add-Member -MemberType NoteProperty -Name SettingName -Value "Start time"
+	$StartTime | Add-Member -MemberType NoteProperty -Name SettingValue -Value $StartTimeDefault #format as 00:00:00
 
-$StripAudioDefault = $False
-$StripAudioValue = ""
-$StripAudio = New-Object Object
-$StripAudio | Add-Member -MemberType NoteProperty -Name ID -Value 9
-$StripAudio | Add-Member -MemberType NoteProperty -Name SettingName -Value "Strip audio?"
-$StripAudio | Add-Member -MemberType NoteProperty -Name SettingValue -Value $StripAudioDefault
+	$StopTimeDefault = "No stop time"
+	$StopTimeValue = ""
+	$StopTime = New-Object Object
+	$StopTime | Add-Member -MemberType NoteProperty -Name ID -Value 8
+	$StopTime | Add-Member -MemberType NoteProperty -Name SettingName -Value "Stop time"
+	$StopTime | Add-Member -MemberType NoteProperty -Name SettingValue -Value $StopTimeDefault #In seconds
 
-$StripVideoDefault = $False
-$StripVideoValue = ""
-$StripVideo = New-Object Object
-$StripVideo | Add-Member -MemberType NoteProperty -Name ID -Value 10
-$StripVideo | Add-Member -MemberType NoteProperty -Name SettingName -Value "Strip video?"
-$StripVideo | Add-Member -MemberType NoteProperty -Name SettingValue -Value $StripVideoDefault
+	$StripAudioDefault = $False
+	$StripAudioValue = ""
+	$StripAudio = New-Object Object
+	$StripAudio | Add-Member -MemberType NoteProperty -Name ID -Value 9
+	$StripAudio | Add-Member -MemberType NoteProperty -Name SettingName -Value "Strip audio?"
+	$StripAudio | Add-Member -MemberType NoteProperty -Name SettingValue -Value $StripAudioDefault
 
-$Settings = $ConvertOutput,$OriginalQuality,$BlankLine,$OutputFileType,$VideoBitRate,$AudioBitRate,$Resolution,$StartTime,$StopTime,$StripAudio,$StripVideo
+	$StripVideoDefault = $False
+	$StripVideoValue = ""
+	$StripVideo = New-Object Object
+	$StripVideo | Add-Member -MemberType NoteProperty -Name ID -Value 10
+	$StripVideo | Add-Member -MemberType NoteProperty -Name SettingName -Value "Strip video?"
+	$StripVideo | Add-Member -MemberType NoteProperty -Name SettingValue -Value $StripVideoDefault
 
+	$Settings = $ConvertOutput,$OriginalQuality,$BlankLine,$OutputFileType,$VideoBitRate,$AudioBitRate,$Resolution,$StartTime,$StopTime,$StripAudio,$StripVideo
+}
 
 
 # In MainMenu, ask for audio or video, get url, then run either DownloadUrlAudio or DownloadUrlVideo.
