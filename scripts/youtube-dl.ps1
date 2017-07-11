@@ -1,11 +1,12 @@
 <#PSScriptInfo 
 
 .VERSION
-	1.2.2 
+	1.2.3 
 
 .GUID  
 
-.AUTHOR ForestFrog
+.AUTHOR
+	ForestFrog
 
 .COMPANYNAME 
 
@@ -30,6 +31,7 @@
 	https://ffmpeg.org/
 
 .RELEASENOTES
+	1.2.3	11-Jul-2017 - Edited Youtube-dl_Installer.ps1 to uninstall the script using the -Uninstall parameter. Added a shortcut for uninstalling the script and its files.
 	1.2.2	03-Jul-2017 - Cleaned up code.
 	1.2.1	22-Jun-2017 - Uploaded project to Github. Condensed installer to one PowerShell script. Edited documentation.
 	1.2.0	30-May-2017 - Implemented ffmpeg video conversion.
@@ -70,7 +72,7 @@
 .NOTES 
 	Requires Windows 7 or higher 
 	Author: ForestFrog
-	Updated: July 3rd, 2017 
+	Updated: July 11th, 2017 
 
 .LINK 
 	https://github.com/ForestFrog/PowerShell-Youtube-dl
