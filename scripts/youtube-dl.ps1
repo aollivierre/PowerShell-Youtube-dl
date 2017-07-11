@@ -104,8 +104,10 @@ Else {
 }
 
 Function PauseScript {
-	Write-Host "Press any key to continue ...`n" -ForegroundColor "Gray"
-	$x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp")
+	If (PSBoundParameters.Count -eq 0) {
+		Write-Host "Press any key to continue ...`n" -ForegroundColor "Gray"
+		$Wait = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp")
+	}
 }
 
 $SettingsFolder = $ENV:USERPROFILE + "\Youtube-dl"
@@ -139,7 +141,7 @@ If ((Test-Path "$YoutubeVideoFolder") -eq $False) {
 }
 
 
-If ($PSBoundParameters.Count -eq 0) {
+If ($ParameterMode -eq $False) {
 	$ffmpegConversion = ""
 
 	$ConvertOutputDefault = $False
@@ -227,7 +229,7 @@ Function MainMenu {
 	While ($MenuOption -ne 1 -and $MenuOption -ne 2 -and $MenuOption -ne 3 -and $MenuOption -ne 4 -and $MenuOption -ne 0) {
 		Clear-Host
 		Write-Host "================================================================" -BackgroundColor "Black"
-		Write-Host "                Youtube-dl Download Script v1.2.1               " -ForegroundColor "Yellow" -BackgroundColor "Black"
+		Write-Host "                Youtube-dl Download Script v1.2.3               " -ForegroundColor "Yellow" -BackgroundColor "Black"
 		Write-Host "================================================================" -BackgroundColor "Black"
 		Write-Host "`nPlease select an option:`n" -ForegroundColor "Yellow"
 		Write-Host "  1   - Download video"
@@ -333,9 +335,7 @@ Function DownloadUrlAudio {
 	If ($ConvertOutputValue -eq $True) {
 		Write-Host "`n[NOTE]: The output file is currently set to be converted." -ForegroundColor "Red" -BackgroundColor "Black"
 		Write-Host "        Only option ""1   - Download Video"" will convert output." -ForegroundColor "Red" -BackgroundColor "Black"
-		If ($ParameterMode -eq $False) {
-			PauseScript
-		}
+		PauseScript
 	}
 	
 	If ($url -like "*youtube.com/playlist*") {
@@ -363,9 +363,7 @@ Function DownloadPlaylists {
 		Write-Host "`n[ERROR]: Both predefined playlist files are empty." -ForegroundColor "Red" -BackgroundColor "Black"
 		Write-Host "         Please put playlist URL's inside them, one on each line." -ForegroundColor "Red" -BackgroundColor "Black"
 		Write-Host "         Playlist files are located in: $SettingsFolder`n" -ForegroundColor "Red" -BackgroundColor "Black"
-		If ($ParameterMode -eq $False) {
-			PauseScript
-		}
+		PauseScript
 		Return
 	}
 	Else {
@@ -385,9 +383,7 @@ Function DownloadPlaylists {
 		Write-Host "`n[NOTE]: Predefined video playlist file is empty." -ForegroundColor "Red" -BackgroundColor "Black"
 		Write-Host "        Please put playlist URL's inside it, one on each line." -ForegroundColor "Red" -BackgroundColor "Black"
 		Write-Host "        Playlist file is located at: $VideoPlaylistFile`n" -ForegroundColor "Red" -BackgroundColor "Black"
-		If ($ParameterMode -eq $False) {
-			PauseScript
-		}
+		PauseScript
 	}
 	Else {
 		Get-Content $VideoPlaylistFile | ForEach-Object {
@@ -404,9 +400,7 @@ Function DownloadPlaylists {
 		Write-Host "`n[NOTE]: Predefined audio playlist file is empty." -ForegroundColor "Red" -BackgroundColor "Black"
 		Write-Host "        Please put playlist URL's inside it, one on each line." -ForegroundColor "Red" -BackgroundColor "Black"
 		Write-Host "        Playlist file is located at: $AudioPlaylistFile`n" -ForegroundColor "Red" -BackgroundColor "Black"
-		If ($ParameterMode -eq $False) {
-			PauseScript
-		}
+		PauseScript
 	}
 	Else {
 		Get-Content $AudioPlaylistFile | ForEach-Object {
@@ -668,29 +662,25 @@ If ($ParameterMode -eq $True) {
 		
 		# Setting output path location
 		If ($OutputPath.Length -gt 0) {
-			$YoutubeVideoFolder = $OutputPath
-			$YoutubeVideoFolderCheck = Test-Path "$YoutubeVideoFolder"
-			If ($YoutubeVideoFolderCheck -eq $False) {
-				New-Item -Type directory -Path "$YoutubeVideoFolder"
-			}
-			
 			$YoutubeMusicFolder = $OutputPath
-			$YoutubeMusicFolderCheck = Test-Path "$YoutubeMusicFolder"
-			If ($YoutubeMusicFolderCheck -eq $False) {
-				New-Item -Type directory -Path "$YoutubeMusicFolder"
+			$YoutubeVideoFolder = $OutputPath
+			If ((Test-Path "$YoutubeVideoFolder") -eq $False) {
+				New-Item -Type directory -Path "$YoutubeVideoFolder"
 			}
 		}
 		DownloadPlaylists
 		
 		Write-Host "`nDownloads complete.`n" -ForegroundColor "Yellow"
 	}
+	ElseIf ($FromFiles -eq $True -and ($Video -eq $True -or $Audio -eq $True)) {
+		Write-Host "`n[ERROR]: Parameter -FromFiles can't be used with -Video or -Audio.`n" -ForegroundColor "Red" -BackgroundColor "Black"
+	}
 	ElseIf ($Video -eq $True -and $Audio -eq $False) {	# Download video code block
 		
 		# Setting output path location
 		If ($OutputPath.Length -gt 0) {
 			$YoutubeVideoFolder = $OutputPath
-			$YoutubeVideoFolderCheck = Test-Path "$YoutubeVideoFolder"
-			If ($YoutubeVideoFolderCheck -eq $False) {
+			If ((Test-Path "$YoutubeVideoFolder") -eq $False) {
 				New-Item -Type directory -Path "$YoutubeVideoFolder"
 			}
 		}
@@ -703,8 +693,7 @@ If ($ParameterMode -eq $True) {
 		# Setting output path location
 		If ($OutputPath.Length -gt 0) {
 			$YoutubeMusicFolder = $OutputPath
-			$YoutubeMusicFolderCheck = Test-Path "$YoutubeMusicFolder"
-			If ($YoutubeMusicFolderCheck -eq $False) {
+			If ((Test-Path "$YoutubeMusicFolder") -eq $False) {
 				New-Item -Type directory -Path "$YoutubeMusicFolder"
 			}
 		}
@@ -719,6 +708,10 @@ If ($ParameterMode -eq $True) {
 	Exit
 }
 
-MainMenu
+If ($ParameterMode -eq $False) {
+	MainMenu
+}
+
+Exit
 
 
