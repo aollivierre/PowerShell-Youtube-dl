@@ -1,6 +1,3 @@
-### Check if having extra spaces in youtube-dl command causes an error
-### check line 648 resolution variable. Running the script a second time might cause an error because missing -s
-
 <#PSScriptInfo 
 
 .VERSION
