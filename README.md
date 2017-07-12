@@ -6,9 +6,9 @@ A PowerShell script used to operate the youtube-dl command line program.
 
 **Author: ForestFrog**
 
-**July 11th, 2017**
+**July 12th, 2017**
 
-**v1.2.3**
+**v1.2.4**
 #
 
  - [INSTALLATION](#installation)
@@ -44,7 +44,7 @@ Run either the desktop shortcut or the Start Menu shortcut. Choose to download e
 
 Video files are downloaded to `C:\Users\%USERNAME%\Videos\Youtube-dl` and audio files are downloaded to `C:\Users\%USERNAME%\Music\Youtube-dl`. Playlists will be downloaded into their own subfolders.
 
-Upon being ran for the first time, the script will generate the `downloadarchive.txt`, `audioplaylist.txt`, and `videoplaylist.txt` files. The `downloadarchive.txt` file keeps a record of videos that have been downloaded from playlists. Any videos that the user downloads from a playlist will be added to this file and will be skipped if the playlist is downloaded again.
+Upon being ran for the first time, the script will generate the `downloadarchive.txt`, `audioplaylist.txt`, and `videoplaylist.txt` files. The `downloadarchive.txt` file keeps a record of videos that have been downloaded from playlists. Any videos that the user downloads from a playlist will be added to this file and will be skipped if the playlist is downloaded again, provided that the "UseArchive" variable is set to `True` in the settings menu.
 
 #
 
@@ -76,6 +76,9 @@ For advanced users, the youtube-dl.ps1 script, which is found in the folder `C:\
 
 
 # CHANGE LOG
+
+	1.2.4	July 12th, 2017
+		Added ability to choose whether to use the youtube-dl download archive when downloading playlists.
 
 	1.2.3	July 11th, 2017
 		Edited Youtube-dl_Installer.ps1 to uninstall the script using the -Uninstall parameter.
