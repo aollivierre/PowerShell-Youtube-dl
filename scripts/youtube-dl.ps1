@@ -519,7 +519,7 @@ function SettingsMenu {
 			Write-Host "`nPlease enter the video resolution:" -ForegroundColor "Yellow"
 			Write-Host "Enter as WxH where W = width and H = height." -ForegroundColor "Gray"
 			Write-Host "Leave blank for original resolution.`n" -ForegroundColor "Gray"
-			$UserAnswer = Read-Host "Start Time"
+			$UserAnswer = Read-Host "Resolution"
 			If ($UserAnswer -notlike "*x*" -and $UserAnswer -notlike "") {
 				Write-Host "`n[ERROR]: Please enter a valid resolution." -ForegroundColor "Red" -BackgroundColor "Black"
 				Write-Host "         Defaulting resolution to: 640x360`n" -ForegroundColor "Red" -BackgroundColor "Black"
