@@ -1,7 +1,10 @@
+### Check if having extra spaces in youtube-dl command causes an error
+### check line 648 resolution variable. Running the script a second time might cause an error because missing -s
+
 <#PSScriptInfo 
 
 .VERSION
-	1.2.3 
+	1.2.4 
 
 .GUID  
 
@@ -31,6 +34,7 @@
 	https://ffmpeg.org/
 
 .RELEASENOTES
+	1.2.4	12-Jul-2017 - Added ability to choose whether to use the youtube-dl download archive when downloading playlists.
 	1.2.3	11-Jul-2017 - Edited Youtube-dl_Installer.ps1 to uninstall the script using the -Uninstall parameter. Added a shortcut for uninstalling the script and its files.
 	1.2.2	03-Jul-2017 - Cleaned up code.
 	1.2.1	22-Jun-2017 - Uploaded project to Github. Condensed installer to one PowerShell script. Edited documentation.
@@ -72,7 +76,7 @@
 .NOTES 
 	Requires Windows 7 or higher 
 	Author: ForestFrog
-	Updated: July 11th, 2017 
+	Updated: July 12th, 2017 
 
 .LINK 
 	https://github.com/ForestFrog/PowerShell-Youtube-dl
@@ -218,8 +222,15 @@ If ($ParameterMode -eq $False) {
 	$StripVideo | Add-Member -MemberType NoteProperty -Name ID -Value 10
 	$StripVideo | Add-Member -MemberType NoteProperty -Name SettingName -Value "Strip video?"
 	$StripVideo | Add-Member -MemberType NoteProperty -Name SettingValue -Value $StripVideoDefault
-
-	$Settings = $ConvertOutput,$OriginalQuality,$BlankLine,$OutputFileType,$VideoBitRate,$AudioBitRate,$Resolution,$StartTime,$StopTime,$StripAudio,$StripVideo
+	
+	$UseArchiveDefault = $True
+	$UseArchiveValue = "--download-archive $ArchiveFile"
+	$UseArchive = New-Object Object
+	$UseArchive | Add-Member -MemberType NoteProperty -Name ID -Value 11
+	$UseArchive | Add-Member -MemberType NoteProperty -Name SettingName -Value "Use archive file?"
+	$UseArchive | Add-Member -MemberType NoteProperty -Name SettingValue -Value $UseArchiveDefault
+	
+	$Settings = $ConvertOutput,$OriginalQuality,$BlankLine,$OutputFileType,$VideoBitRate,$AudioBitRate,$Resolution,$StartTime,$StopTime,$StripAudio,$StripVideo,$BlankLine,$UseArchive
 }
 
 
@@ -229,7 +240,7 @@ Function MainMenu {
 	While ($MenuOption -ne 1 -and $MenuOption -ne 2 -and $MenuOption -ne 3 -and $MenuOption -ne 4 -and $MenuOption -ne 0) {
 		Clear-Host
 		Write-Host "================================================================" -BackgroundColor "Black"
-		Write-Host "                Youtube-dl Download Script v1.2.3               " -ForegroundColor "Yellow" -BackgroundColor "Black"
+		Write-Host "                Youtube-dl Download Script v1.2.4               " -ForegroundColor "Yellow" -BackgroundColor "Black"
 		Write-Host "================================================================" -BackgroundColor "Black"
 		Write-Host "`nPlease select an option:`n" -ForegroundColor "Yellow"
 		Write-Host "  1   - Download video"
@@ -248,6 +259,9 @@ Function MainMenu {
 				If ($url -like "http*") {
 					DownloadUrlVideo $url
 				}
+				ElseIf ($url.Trim() -eq "") {
+					# Cancel
+				}
 				Else {
 					Write-Host "[ERROR]: Provided parameter is not a valid URL.`n" -ForegroundColor "Red" -BackgroundColor "Black"
 					PauseScript
@@ -264,6 +278,9 @@ Function MainMenu {
 				$url = Read-Host "URL"
 				If ($url -like "http*") {
 					DownloadUrlAudio $url
+				}
+				ElseIf ($url.Trim() -eq "") {
+					# Cancel
 				}
 				Else {
 					Write-Host "[ERROR]: Provided parameter is not a valid URL.`n" -ForegroundColor "Red" -BackgroundColor "Black"
@@ -314,7 +331,7 @@ Function DownloadUrlVideo {
 	
 	If ($url -like "*youtube.com/playlist*") {
 		$VideoPath = $YoutubeVideoFolder + "\%(playlist)s\%(title)s.%(ext)s"
-		$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors $ffmpegConversion --yes-playlist ""$url"""
+		$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors $ffmpegConversion --yes-playlist $UseArchiveValue ""$url"""
 		Write-Host "`n$YoutubedlCommand`n" -ForegroundColor "Gray"
 		Invoke-Expression $YoutubedlCommand
 	}
@@ -340,7 +357,7 @@ Function DownloadUrlAudio {
 	
 	If ($url -like "*youtube.com/playlist*") {
 		$VideoPath = $YoutubeMusicFolder + "\%(playlist)s\%(title)s.%(ext)s"
-		$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg --yes-playlist ""$url"""
+		$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg --yes-playlist $UseArchiveValue ""$url"""
 		Write-Host "`n$YoutubedlCommand`n" -ForegroundColor "Gray"
 		Invoke-Expression $YoutubedlCommand
 	}
@@ -389,7 +406,7 @@ Function DownloadPlaylists {
 		Get-Content $VideoPlaylistFile | ForEach-Object {
 			Write-Host "`nDownloading playlist: $_" -ForegroundColor "Gray"
 			$VideoPath = $YoutubeVideoFolder + "\%(playlist)s\%(title)s.%(ext)s"
-			$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors $ffmpegConversion --yes-playlist --download-archive $ArchiveFile ""$_"""
+			$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors $ffmpegConversion --yes-playlist $UseArchiveValue ""$_"""
 			Write-Host "$YoutubedlCommand`n" -ForegroundColor "Gray"
 			Invoke-Expression $YoutubedlCommand
 		}
@@ -420,22 +437,23 @@ Function DownloadPlaylists {
 function SettingsMenu {
 	$MenuOption = 99
 	While ($MenuOption -ne 1 -and $MenuOption -ne 2 -and $MenuOption -ne 3 -and $MenuOption -ne 4 -and $MenuOption -ne 5 -and `
-	$MenuOption -ne 6 -and $MenuOption -ne 7 -and $MenuOption -ne 8 -and $MenuOption -ne 9 -and $MenuOption -ne 10 -and $MenuOption -ne 0) {
+	$MenuOption -ne 6 -and $MenuOption -ne 7 -and $MenuOption -ne 8 -and $MenuOption -ne 9 -and $MenuOption -ne 10 -and `
+	$MenuOption -ne 11 -and $MenuOption -ne 0) {
 		Clear-Host
 		Write-Host "================================================================" -BackgroundColor "Black"
 		Write-Host "                       Youtube-dl Settings                      " -ForegroundColor "Yellow" -BackgroundColor "Black"
 		Write-Host "================================================================" -BackgroundColor "Black"
 		If ($ConvertOutputValue -eq $False) {
-			Write-Host ($ConvertOutput | Format-Table ID,SettingName,SettingValue -AutoSize | Out-String)
+			Write-Host ($Settings | Where-Object { ($_.ID) -eq 1 -or ($_.ID) -eq "" -or ($_.ID) -eq 11 | Format-Table ID,SettingName,SettingValue -AutoSize | Out-String)
 		}
 		ElseIf ($ConvertOutputValue -eq $True -and $OriginalQualityValue -eq $True) {
-			Write-Host ($Settings | Where-Object { ($_.ID) -eq 1 -or ($_.ID) -eq 2 -or ($_.ID) -eq "" -or ($_.ID) -eq 3 } | Format-Table ID,SettingName,SettingValue -AutoSize | Out-String)
+			Write-Host ($Settings | Where-Object { ($_.ID) -eq 1 -or ($_.ID) -eq 2 -or ($_.ID) -eq "" -or ($_.ID) -eq 3 -or ($_.ID) -eq 11 } | Format-Table ID,SettingName,SettingValue -AutoSize | Out-String)
 		}
 		ElseIf ($ConvertOutputValue -eq $True -and $OriginalQualityValue -eq $False) {
 			Write-Host ($Settings | Format-Table ID,SettingName,SettingValue -AutoSize | Out-String)
 		}
-		Write-Host "Please select a variable to edit:`n" -ForegroundColor "Yellow"
 		Write-Host "  0   - Return to main menu.`n" -ForegroundColor "Gray"
+		Write-Host "Please select a variable to edit:`n" -ForegroundColor "Yellow"
 		$MenuOption = Read-Host "Option"
 		
 		If ($MenuOption -eq 1) {
@@ -584,6 +602,17 @@ function SettingsMenu {
 			}
 			$MenuOption = 99
 		}
+		ElseIf ($MenuOption -eq 11) {
+			If (($UseArchive.SettingValue) -eq $False) {
+				$Script:UseArchiveValue = "--download-archive $ArchiveFile"
+				$UseArchive.SettingValue = $True
+			}
+			Else {
+				$Script:UseArchiveValue = ""
+				$UseArchive.SettingValue = $False
+			}
+			$MenuOption = 99
+		}
 		ElseIf ($MenuOption -eq 0) {
 			Return
 		}
@@ -621,6 +650,7 @@ Function EndMenu {
 				$Script:StopTimeValue = ""
 				$Script:StripAudioValue = ""
 				$Script:StripVideoValue = ""
+				$Script:UseArchiveValue = "--download-archive $ArchiveFile"
 				
 				$ConvertOutput.SettingValue = $ConvertOutputDefault
 				$OriginalQuality.SettingValue = $OriginalQualityDefault
@@ -632,6 +662,7 @@ Function EndMenu {
 				$StopTime.SettingValue = $StopTimeDefault
 				$StripAudio.SettingValue = $StripAudioDefault
 				$StripVideo.SettingValue = $StripVideoDefault
+				$UseArchive.SettingValue = $UseArchiveDefault
 				
 				Return
 			}
