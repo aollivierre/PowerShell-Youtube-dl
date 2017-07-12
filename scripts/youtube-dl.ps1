@@ -108,7 +108,7 @@ Else {
 }
 
 Function PauseScript {
-	If (PSBoundParameters.Count -eq 0) {
+	If ($PSBoundParameters.Count -eq 0) {
 		Write-Host "Press any key to continue ...`n" -ForegroundColor "Gray"
 		$Wait = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp")
 	}
