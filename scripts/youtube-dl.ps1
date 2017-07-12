@@ -263,7 +263,7 @@ Function MainMenu {
 					# Cancel
 				}
 				Else {
-					Write-Host "[ERROR]: Provided parameter is not a valid URL.`n" -ForegroundColor "Red" -BackgroundColor "Black"
+					Write-Host "`n[ERROR]: Provided parameter is not a valid URL.`n" -ForegroundColor "Red" -BackgroundColor "Black"
 					PauseScript
 				}
 			}
@@ -283,7 +283,7 @@ Function MainMenu {
 					# Cancel
 				}
 				Else {
-					Write-Host "[ERROR]: Provided parameter is not a valid URL.`n" -ForegroundColor "Red" -BackgroundColor "Black"
+					Write-Host "`n[ERROR]: Provided parameter is not a valid URL.`n" -ForegroundColor "Red" -BackgroundColor "Black"
 					PauseScript
 				}
 			}
