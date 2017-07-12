@@ -645,7 +645,7 @@ Function EndMenu {
 				$Script:OutputFileTypeValue = "--recode-video webm"
 				$Script:VideoBitRateValue = " -b:v 800k"
 				$Script:AudioBitRateValue = " -b:a 128k"
-				$Script:ResolutionValue = "640x360"
+				$Script:ResolutionValue = " -s 640x360"
 				$Script:StartTimeValue = ""
 				$Script:StopTimeValue = ""
 				$Script:StripAudioValue = ""
