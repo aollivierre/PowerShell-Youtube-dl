@@ -101,7 +101,7 @@ For advanced users, the youtube-dl.ps1 script, which is found in the folder `C:\
 
 # ADDITIONAL NOTES
 
-Please support the development of youtube-dl and ffmpeg. They are fantastic programs. Youtube-dl and ffmpeg can be found at the following links:
+Please support the development of youtube-dl and ffmpeg. The programs youtube-dl and ffmpeg can be found at the following links:
 
 https://youtube-dl.org/
 
