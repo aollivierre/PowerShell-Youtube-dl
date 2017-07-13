@@ -4,11 +4,11 @@ https://github.com/ForestFrog/PowerShell-Youtube-dl
 A PowerShell script used to operate the youtube-dl command line program.
 
 
-**Scripts written by ForestFrog**
+**Author: ForestFrog**
 
-**July 3rd, 2017**
+**July 12th, 2017**
 
-**v1.2.2**
+**v1.2.4**
 #
 
  - [INSTALLATION](#installation)
@@ -25,7 +25,7 @@ here: https://www.microsoft.com/en-us/download/details.aspx?id=50395
 
 **Download PowerShell-Youtube-dl script here:** https://github.com/ForestFrog/PowerShell-Youtube-dl/archive/master.zip
 
-Download the project .zip file, extract it to a folder, and run the `Youtube-dl_Installer.ps1` shortcut. The script will be installed to the folder `C:\Users\%USERNAME%\Youtube-dl`. A desktop shortcut and a Start Menu shortcut will be created. Run either of these to use the script. 
+Download the project .zip file, extract it to a folder, and run the `Youtube-dl_Installer` shortcut. The script will be installed to the folder `C:\Users\%USERNAME%\Youtube-dl`. A desktop shortcut and a Start Menu shortcut will be created. Run either of these to use the script. 
 
 To update the script, delete the following folders, download the new version and install it:
 
@@ -35,7 +35,7 @@ Make sure you don't delete any of the .txt files!
 
 #
 
-To uninstall these scripts and youtube-dl, delete the Youtube-dl folders located at `C:\Users\%USERNAME%\Youtube-dl` and `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Youtube-dl`, as well as the desktop shortcut.
+To uninstall this script and its files, run the `Youtube-dl_Uninstall` shortcut located in `C:\Users\%USERNAME%`. This will remove the script, the youtube-dl and ffmpeg programs, the start menu folder, and the desktop shortcut. This uninstaller will leave behind files that have a file extension of `.txt` or `.ini`. If you wish to uninstall all Youtube-dl files, including text files, run the script `C:\Users\%USERNAME%\Youtube-dl\scripts\Youtube-dl_Installer.ps1` with the `-Uninstall` and `-Everything` parameters via a PowerShell console.
 
 
 # USAGE
@@ -44,7 +44,7 @@ Run either the desktop shortcut or the Start Menu shortcut. Choose to download e
 
 Video files are downloaded to `C:\Users\%USERNAME%\Videos\Youtube-dl` and audio files are downloaded to `C:\Users\%USERNAME%\Music\Youtube-dl`. Playlists will be downloaded into their own subfolders.
 
-Upon being ran for the first time, the script will generate the `downloadarchive.txt`, `audioplaylist.txt`, and `videoplaylist.txt` files. The `downloadarchive.txt` file keeps a record of videos that have been downloaded from playlists. Any videos that the user downloads from a playlist will be added to this file and will be skipped if the playlist is downloaded again.
+Upon being ran for the first time, the script will generate the `downloadarchive.txt`, `audioplaylist.txt`, and `videoplaylist.txt` files. The `downloadarchive.txt` file keeps a record of videos that have been downloaded from playlists. Any videos that the user downloads from a playlist will be added to this file and will be skipped if the playlist is downloaded again, provided that the "UseArchive" variable is set to `True` in the settings menu.
 
 #
 
@@ -77,6 +77,13 @@ For advanced users, the youtube-dl.ps1 script, which is found in the folder `C:\
 
 # CHANGE LOG
 
+	1.2.4	July 12th, 2017
+		Added ability to choose whether to use the youtube-dl download archive when downloading playlists.
+
+	1.2.3	July 11th, 2017
+		Edited Youtube-dl_Installer.ps1 to uninstall the script using the -Uninstall parameter.
+		Added a shortcut for uninstalling the script and its files.
+
 	1.2.2	July 3rd, 2017
 		Cleaned up code.
 
@@ -94,7 +101,7 @@ For advanced users, the youtube-dl.ps1 script, which is found in the folder `C:\
 
 # ADDITIONAL NOTES
 
-Please support the development of youtube-dl and ffmpeg. They are fantastic programs. Youtube-dl and ffmpeg can be found at the following links:
+Please support the development of youtube-dl and ffmpeg. The programs youtube-dl and ffmpeg can be found at the following links:
 
 https://youtube-dl.org/
 
