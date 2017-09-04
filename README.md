@@ -22,6 +22,7 @@ A PowerShell script used to operate the youtube-dl command line program.
 
 These scripts require Windows PowerShell to function. PowerShell comes pre-installed with Windows 10 but otherwise can be downloaded
 here: https://www.microsoft.com/en-us/download/details.aspx?id=50395
+
 Make sure that your ExecutionPolicy is set to `RemoteSigned` or `Bypass`. To change your ExecutionPolicy, type `Set-ExecutionPolicy RemoteSigned`.
 
 **Download this script here:** https://github.com/ForestFrog/PowerShell-Youtube-dl/archive/master.zip
