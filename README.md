@@ -36,7 +36,7 @@ Make sure you don't delete any of the .txt files!
 
 #
 
-To uninstall this script and its files, run the `Youtube-dl_Uninstall` shortcut located in `C:\Users\%USERNAME%`. This will remove the script, the youtube-dl and ffmpeg programs, the start menu folder, and the desktop shortcut. This uninstaller will leave behind files that have a file extension of `.txt` or `.ini`. If you wish to uninstall all Youtube-dl files, including text files, run the script `C:\Users\%USERNAME%\Youtube-dl\scripts\Youtube-dl_Installer.ps1` with the `-Uninstall` and `-Everything` parameters via a PowerShell console.
+To uninstall this script and its files, run the `Youtube-dl_Uninstall` shortcut located in `C:\Users\%USERNAME%`. This will remove the script, the youtube-dl and ffmpeg programs, the start menu folder, and the desktop shortcut. This uninstaller will leave behind files that have a file extension of `.txt` or `.ini`. If you wish to uninstall all Youtube-dl files, including text files, copy the script `C:\Users\%USERNAME%\Youtube-dl\scripts\Youtube-dl_Installer.ps1` to the desktop and run it with the `-Uninstall` and `-Everything` parameters via a PowerShell console.
 
 
 # USAGE
