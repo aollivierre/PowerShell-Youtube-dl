@@ -164,12 +164,12 @@ If ($ParameterMode -eq $False) {
 	$ConvertOutput | Add-Member -MemberType NoteProperty -Name SettingName -Value "Convert output?"
 	$ConvertOutput | Add-Member -MemberType NoteProperty -Name SettingValue -Value $ConvertOutputDefault
 
-	$OriginalQualityDefault = $True
-	$OriginalQualityValue = $True
-	$OriginalQuality = New-Object Object
-	$OriginalQuality | Add-Member -MemberType NoteProperty -Name ID -Value 10
-	$OriginalQuality | Add-Member -MemberType NoteProperty -Name SettingName -Value "Keep original quality?"
-	$OriginalQuality | Add-Member -MemberType NoteProperty -Name SettingValue -Value $OriginalQualityDefault
+	$DefaultQualityDefault = $True
+	$DefaultQualityValue = $True
+	$DefaultQuality = New-Object Object
+	$DefaultQuality | Add-Member -MemberType NoteProperty -Name ID -Value 10
+	$DefaultQuality | Add-Member -MemberType NoteProperty -Name SettingName -Value "Use default quality?"
+	$DefaultQuality | Add-Member -MemberType NoteProperty -Name SettingValue -Value $DefaultQualityDefault
 
 	$OutputFileTypeDefault = "webm"
 	$OutputFileTypeValue = "--recode-video webm"
@@ -227,7 +227,7 @@ If ($ParameterMode -eq $False) {
 	$StripVideo | Add-Member -MemberType NoteProperty -Name SettingName -Value "Strip video?"
 	$StripVideo | Add-Member -MemberType NoteProperty -Name SettingValue -Value $StripVideoDefault
 	
-	$Settings = $BlankLine,$UseArchive,$ConvertOutput,$BlankLine,$OriginalQuality,$OutputFileType,$VideoBitRate,$AudioBitRate,$Resolution,$StartTime,$StopTime,$StripAudio,$StripVideo
+	$Settings = $BlankLine,$UseArchive,$ConvertOutput,$BlankLine,$DefaultQuality,$OutputFileType,$VideoBitRate,$AudioBitRate,$Resolution,$StartTime,$StopTime,$StripAudio,$StripVideo
 }
 
 
@@ -315,10 +315,10 @@ Function MainMenu {
 Function DownloadUrlVideo {
 	Param($url)
 	
-	If ($ConvertOutputValue -eq $True -and $OriginalQualityValue -eq $True) {
-		$Script:ffmpegConversion = $OutputFileTypeValue + " --prefer-ffmpeg"
+	If ($ConvertOutputValue -eq $True -and $DefaultQualityValue -eq $True) {
+		$Script:ffmpegConversion = $OutputFileTypeValue + " --postprocessor-args ""-b:v 800k -b:a 128k -s 640x360"" --prefer-ffmpeg"
 	}
-	ElseIf ($ConvertOutputValue -eq $True -and $OriginalQualityValue -eq $False) {
+	ElseIf ($ConvertOutputValue -eq $True -and $DefaultQualityValue -eq $False) {
 		$Script:ffmpegConversion = $OutputFileTypeValue + " --postprocessor-args """ + $VideoBitRateValue + $AudioBitRateValue `
 		+ $ResolutionValue + $StartTimeValue + $StopTimeValue + $StripAudioValue + $StripVideoValue + """" + " --prefer-ffmpeg"
 	}
@@ -381,10 +381,10 @@ Function DownloadPlaylists {
 		Return
 	}
 	Else {
-		If ($ConvertOutputValue -eq $True -and $OriginalQualityValue -eq $True) {
-			$Script:ffmpegConversion = $OutputFileTypeValue + " --prefer-ffmpeg"
+		If ($ConvertOutputValue -eq $True -and $DefaultQualityValue -eq $True) {
+			$Script:ffmpegConversion = $OutputFileTypeValue + " --postprocessor-args ""-b:v 800k -b:a 128k -s 640x360"" --prefer-ffmpeg"
 		}
-		ElseIf ($ConvertOutputValue -eq $True -and $OriginalQualityValue -eq $False) {
+		ElseIf ($ConvertOutputValue -eq $True -and $DefaultQualityValue -eq $False) {
 			$Script:ffmpegConversion = $OutputFileTypeValue + " --postprocessor-args """ + $VideoBitRateValue + $AudioBitRateValue `
 			+ $ResolutionValue + $StartTimeValue + $StopTimeValue + $StripAudioValue + $StripVideoValue + """" + " --prefer-ffmpeg"
 		}
@@ -443,10 +443,10 @@ function SettingsMenu {
 		If ($ConvertOutputValue -eq $False) {
 			Write-Host ($Settings | Where-Object { ($_.ID) -eq 1 -or ($_.ID) -eq "" -or ($_.ID) -eq 2 } | Format-Table ID,SettingName,SettingValue -AutoSize | Out-String)
 		}
-		ElseIf ($ConvertOutputValue -eq $True -and $OriginalQualityValue -eq $True) {
-			Write-Host ($Settings | Where-Object { ($_.ID) -eq 1 -or ($_.ID) -eq 2 -or ($_.ID) -eq "" -or ($_.ID) -eq 10 } | Format-Table ID,SettingName,SettingValue -AutoSize | Out-String)
+		ElseIf ($ConvertOutputValue -eq $True -and $DefaultQualityValue -eq $True) {
+			Write-Host ($Settings | Where-Object { ($_.ID) -eq 1 -or ($_.ID) -eq 2 -or ($_.ID) -eq "" -or ($_.ID) -eq 10 -or ($_.ID) -eq 11} | Format-Table ID,SettingName,SettingValue -AutoSize | Out-String)
 		}
-		ElseIf ($ConvertOutputValue -eq $True -and $OriginalQualityValue -eq $False) {
+		ElseIf ($ConvertOutputValue -eq $True -and $DefaultQualityValue -eq $False) {
 			Write-Host ($Settings | Format-Table ID,SettingName,SettingValue -AutoSize | Out-String)
 		}
 		Write-Host "  0   - Return to main menu.`n" -ForegroundColor "Gray"
@@ -476,13 +476,13 @@ function SettingsMenu {
 			$MenuOption = 99
 		}
 		ElseIf ($MenuOption -eq 10) {
-			If ($OriginalQualityValue -eq $False) {
-				$Script:OriginalQualityValue = $True
-				$OriginalQuality.SettingValue = $True
+			If ($DefaultQualityValue -eq $False) {
+				$Script:DefaultQualityValue = $True
+				$DefaultQuality.SettingValue = $True
 			}
 			Else {
-				$Script:OriginalQualityValue = $False
-				$OriginalQuality.SettingValue = $False
+				$Script:DefaultQualityValue = $False
+				$DefaultQuality.SettingValue = $False
 			}
 			$MenuOption = 99
 		}
@@ -638,7 +638,7 @@ Function EndMenu {
 				$Script:ffmpegConversion = ""
 				
 				$Script:ConvertOutputValue = $False
-				$Script:OriginalQualityValue = $True
+				$Script:DefaultQualityValue = $True
 				$Script:OutputFileTypeValue = "--recode-video webm"
 				$Script:VideoBitRateValue = " -b:v 800k"
 				$Script:AudioBitRateValue = " -b:a 128k"
@@ -650,7 +650,7 @@ Function EndMenu {
 				$Script:UseArchiveValue = "--download-archive $ArchiveFile"
 				
 				$ConvertOutput.SettingValue = $ConvertOutputDefault
-				$OriginalQuality.SettingValue = $OriginalQualityDefault
+				$DefaultQuality.SettingValue = $DefaultQualityDefault
 				$OutputFileType.SettingValue = $OutputFileTypeDefault
 				$VideoBitRate.SettingValue = $VideoBitRateDefault
 				$AudioBitRate.SettingValue = $AudioBitRateDefault
