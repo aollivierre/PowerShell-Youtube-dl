@@ -22,8 +22,9 @@ A PowerShell script used to operate the youtube-dl command line program.
 
 These scripts require Windows PowerShell to function. PowerShell comes pre-installed with Windows 10 but otherwise can be downloaded
 here: https://www.microsoft.com/en-us/download/details.aspx?id=50395
+Make sure that your ExecutionPolicy is set to `RemoteSigned` or `Bypass`. To change your ExecutionPolicy, type `Set-ExecutionPolicy RemoteSigned`.
 
-**Download PowerShell-Youtube-dl script here:** https://github.com/ForestFrog/PowerShell-Youtube-dl/archive/master.zip
+**Download this script here:** https://github.com/ForestFrog/PowerShell-Youtube-dl/archive/master.zip
 
 Download the project .zip file, extract it to a folder, and run the `Youtube-dl_Installer` shortcut. The script will be installed to the folder `C:\Users\%USERNAME%\Youtube-dl`. A desktop shortcut and a Start Menu shortcut will be created. Run either of these to use the script. 
 
