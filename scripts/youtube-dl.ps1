@@ -420,7 +420,7 @@ Function DownloadPlaylists {
 		Get-Content $AudioPlaylistFile | ForEach-Object {
 			Write-Host "`nDownloading playlist: $_" -ForegroundColor "Gray"
 			$VideoPath = $YoutubeMusicFolder + "\%(playlist)s\%(title)s.%(ext)s"
-			$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg --yes-playlist --download-archive $ArchiveFile ""$_"""
+			$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg --yes-playlist $UseArchiveValue ""$_"""
 			Write-Host "$YoutubedlCommand`n" -ForegroundColor "Gray"
 			Invoke-Expression $YoutubedlCommand
 		}
