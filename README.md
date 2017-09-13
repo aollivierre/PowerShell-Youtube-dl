@@ -1,10 +1,10 @@
 # PowerShell-Youtube-dl
-https://github.com/ForestFrog/PowerShell-Youtube-dl
+https://github.com/mpb10/PowerShell-Youtube-dl
 
 A PowerShell script used to operate the youtube-dl command line program.
 
 
-**Author: ForestFrog**
+**Author: Matt Bittner**
 
 **July 12th, 2017**
 
@@ -20,7 +20,7 @@ A PowerShell script used to operate the youtube-dl command line program.
 
 # INSTALLATION
 
-**Script download link:** https://github.com/ForestFrog/PowerShell-Youtube-dl/archive/master.zip
+**Script download link:** https://github.com/mpb10/PowerShell-Youtube-dl/archive/master.zip
 
 Note: These scripts require Windows PowerShell to function. PowerShell comes pre-installed with Windows 10 but otherwise can be downloaded here: https://www.microsoft.com/en-us/download/details.aspx?id=50395
 
