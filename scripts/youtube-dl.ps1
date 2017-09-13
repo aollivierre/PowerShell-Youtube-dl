@@ -6,7 +6,7 @@
 .GUID  
 
 .AUTHOR
-	ForestFrog
+	Matt Bittner
 
 .COMPANYNAME 
 
@@ -15,10 +15,10 @@
 .TAGS 
 
 .LICENSEURI
-	https://github.com/ForestFrog/PowerShell-Youtube-dl/blob/master/LICENSE
+	https://github.com/mpb10/PowerShell-Youtube-dl/blob/master/LICENSE
 
 .PROJECTURI
-	https://github.com/ForestFrog/PowerShell-Youtube-dl
+	https://github.com/mpb10/PowerShell-Youtube-dl
 
 .ICONURI 
 
@@ -72,7 +72,7 @@
 	Only downloads the audio of the specified video URL to the desktop.
 .NOTES 
 	Requires Windows 7 or higher 
-	Author: ForestFrog
+	Author: Matt Bittner
 	Updated: July 12th, 2017 
 
 .LINK 
