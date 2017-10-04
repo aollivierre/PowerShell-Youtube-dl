@@ -6,7 +6,7 @@
 .GUID  
 
 .AUTHOR
-	Matt Bittner
+	ForestFrog
 
 .COMPANYNAME 
 
@@ -15,10 +15,10 @@
 .TAGS 
 
 .LICENSEURI
-	https://github.com/mpb10/PowerShell-Youtube-dl/blob/master/LICENSE
+	https://github.com/ForestFrog/PowerShell-Youtube-dl/blob/master/LICENSE
 
 .PROJECTURI
-	https://github.com/mpb10/PowerShell-Youtube-dl
+	https://github.com/ForestFrog/PowerShell-Youtube-dl
 
 .ICONURI 
 
@@ -39,11 +39,18 @@
 	1.1.0	27-May-2017 - Implemented videoplaylist.txt and audioplaylist.txt downloading.
 #>
 
+
+# ======================================================================================================= #
+# ======================================================================================================= #
+
+
 <#
 .SYNOPSIS 
 	Download audio and video from the internet, mainly from youtube.com
+	
 .DESCRIPTION 
 	This script downloads audio and video from the internet using the programs youtube-dl and ffmpeg. This script can be ran as a command using parameters or it can be ran without parameters to use its GUI. Files are downloaded to the user's "Videos" and "Music" folders by default. See README.md for more information.
+	
 .PARAMETER Video 
 	Download the video of the provided URL. Output file formats will vary.
 .PARAMETER Audio 
@@ -70,15 +77,19 @@
 .EXAMPLE 
 	C:\Users\%USERNAME%\Youtube-dl\scripts\youtube-dl.ps1 -Audio -URL "https://www.youtube.com/watch?v=oHg5SJYRHA0" -OutputPath "C:\Users\%USERNAME%\Desktop"
 	Only downloads the audio of the specified video URL to the desktop.
+	
 .NOTES 
 	Requires Windows 7 or higher 
-	Author: Matt Bittner
+	Author: ForestFrog
 	Updated: July 12th, 2017 
 
 .LINK 
 	https://github.com/ForestFrog/PowerShell-Youtube-dl
 #>
 
+
+# ======================================================================================================= #
+# ======================================================================================================= #
 
 
 Param(
@@ -90,20 +101,11 @@ Param(
 )
 
 
+# ======================================================================================================= #
+# ======================================================================================================= #
 
-If ($PSBoundParameters.Count -gt 0) {
-	$ParameterMode = $True
-}
-Else {
-	$ParameterMode = $False
-	
-	$BackgroundColorBefore = $HOST.UI.RawUI.BackgroundColor
-	$ForegroundColorBefore = $HOST.UI.RawUI.ForegroundColor
 
-	$HOST.UI.RawUI.BackgroundColor = "Black"
-	$HOST.UI.RawUI.ForegroundColor = "White"
-}
-
+# Function for simulating the 'pause' command of the Windows command line.
 Function PauseScript {
 	If ($PSBoundParameters.Count -eq 0) {
 		Write-Host "`nPress any key to continue ...`n" -ForegroundColor "Gray"
@@ -111,6 +113,13 @@ Function PauseScript {
 	}
 }
 
+
+# ======================================================================================================= #
+# ======================================================================================================= #
+
+
+# Set variables for the locations of various folders and files.
+# Some folders and files are created if they are not found.
 $SettingsFolder = $ENV:USERPROFILE + "\Youtube-dl"
 
 $BinFolder = $SettingsFolder + "\bin"
@@ -142,96 +151,12 @@ If ((Test-Path "$YoutubeVideoFolder") -eq $False) {
 }
 
 
-If ($ParameterMode -eq $False) {
-	$ffmpegConversion = ""
-
-    $BlankLine = New-Object Object
-	$BlankLine | Add-Member -MemberType NoteProperty -Name ID -Value ""
-	$BlankLine | Add-Member -MemberType NoteProperty -Name SettingName -Value ""
-	$BlankLine | Add-Member -MemberType NoteProperty -Name SettingValue -Value ""
-
-    $UseArchiveDefault = $True
-	$UseArchiveValue = "--download-archive $ArchiveFile"
-	$UseArchive = New-Object Object
-	$UseArchive | Add-Member -MemberType NoteProperty -Name ID -Value 1
-	$UseArchive | Add-Member -MemberType NoteProperty -Name SettingName -Value "Use archive file?"
-	$UseArchive | Add-Member -MemberType NoteProperty -Name SettingValue -Value $UseArchiveDefault
-
-	$ConvertOutputDefault = $False
-	$ConvertOutputValue = $False
-	$ConvertOutput = New-Object Object
-	$ConvertOutput | Add-Member -MemberType NoteProperty -Name ID -Value 2
-	$ConvertOutput | Add-Member -MemberType NoteProperty -Name SettingName -Value "Convert output?"
-	$ConvertOutput | Add-Member -MemberType NoteProperty -Name SettingValue -Value $ConvertOutputDefault
-
-	$DefaultQualityDefault = $True
-	$DefaultQualityValue = $True
-	$DefaultQuality = New-Object Object
-	$DefaultQuality | Add-Member -MemberType NoteProperty -Name ID -Value 10
-	$DefaultQuality | Add-Member -MemberType NoteProperty -Name SettingName -Value "Use default quality?"
-	$DefaultQuality | Add-Member -MemberType NoteProperty -Name SettingValue -Value $DefaultQualityDefault
-
-	$OutputFileTypeDefault = "webm"
-	$OutputFileTypeValue = "--recode-video webm"
-	$OutputFileType = New-Object Object
-	$OutputFileType | Add-Member -MemberType NoteProperty -Name ID -Value 11
-	$OutputFileType | Add-Member -MemberType NoteProperty -Name SettingName -Value "Output file extension"
-	$OutputFileType | Add-Member -MemberType NoteProperty -Name SettingValue -Value $OutputFileTypeDefault
-
-	$VideoBitRateDefault = "800k"
-	$VideoBitRateValue = " -b:v 800k"
-	$VideoBitRate = New-Object Object
-	$VideoBitRate | Add-Member -MemberType NoteProperty -Name ID -Value 12
-	$VideoBitRate | Add-Member -MemberType NoteProperty -Name SettingName -Value "Video bitrate"
-	$VideoBitRate | Add-Member -MemberType NoteProperty -Name SettingValue -Value $VideoBitRateDefault #In kilobytes
-
-	$AudioBitRateDefault = "128k"
-	$AudioBitRateValue = " -b:a 128k"
-	$AudioBitRate = New-Object Object
-	$AudioBitRate | Add-Member -MemberType NoteProperty -Name ID -Value 13
-	$AudioBitRate | Add-Member -MemberType NoteProperty -Name SettingName -Value "Audio bitrate"
-	$AudioBitRate | Add-Member -MemberType NoteProperty -Name SettingValue -Value $AudioBitRateDefault #In kilobytes
-
-	$ResolutionDefault = "640x360"
-	$ResolutionValue = " -s 640x360"
-	$Resolution = New-Object Object
-	$Resolution | Add-Member -MemberType NoteProperty -Name ID -Value 14
-	$Resolution | Add-Member -MemberType NoteProperty -Name SettingName -Value "Resolution"
-	$Resolution | Add-Member -MemberType NoteProperty -Name SettingValue -Value $ResolutionDefault #360p = 480:360, 480p = 640:480, 720p = 1280:720, 1080p = 1920:1080
-
-	$StartTimeDefault = "00:00:00"
-	$StartTimeValue = ""
-	$StartTime = New-Object Object
-	$StartTime | Add-Member -MemberType NoteProperty -Name ID -Value 15
-	$StartTime | Add-Member -MemberType NoteProperty -Name SettingName -Value "Start time"
-	$StartTime | Add-Member -MemberType NoteProperty -Name SettingValue -Value $StartTimeDefault #format as 00:00:00
-
-	$StopTimeDefault = "No stop time"
-	$StopTimeValue = ""
-	$StopTime = New-Object Object
-	$StopTime | Add-Member -MemberType NoteProperty -Name ID -Value 16
-	$StopTime | Add-Member -MemberType NoteProperty -Name SettingName -Value "Stop time"
-	$StopTime | Add-Member -MemberType NoteProperty -Name SettingValue -Value $StopTimeDefault #In seconds
-
-	$StripAudioDefault = $False
-	$StripAudioValue = ""
-	$StripAudio = New-Object Object
-	$StripAudio | Add-Member -MemberType NoteProperty -Name ID -Value 17
-	$StripAudio | Add-Member -MemberType NoteProperty -Name SettingName -Value "Strip audio?"
-	$StripAudio | Add-Member -MemberType NoteProperty -Name SettingValue -Value $StripAudioDefault
-
-	$StripVideoDefault = $False
-	$StripVideoValue = ""
-	$StripVideo = New-Object Object
-	$StripVideo | Add-Member -MemberType NoteProperty -Name ID -Value 18
-	$StripVideo | Add-Member -MemberType NoteProperty -Name SettingName -Value "Strip video?"
-	$StripVideo | Add-Member -MemberType NoteProperty -Name SettingValue -Value $StripVideoDefault
-	
-	$Settings = $BlankLine,$UseArchive,$ConvertOutput,$BlankLine,$DefaultQuality,$OutputFileType,$VideoBitRate,$AudioBitRate,$Resolution,$StartTime,$StopTime,$StripAudio,$StripVideo
-}
+# ======================================================================================================= #
+# ======================================================================================================= #
 
 
-# In MainMenu, ask for audio or video, get url, then run either DownloadUrlAudio or DownloadUrlVideo.
+# Main menu of the GUI. Asks users if they want to download audio, video, playlists listed in
+# the text files, or open the settings menu.
 Function MainMenu {
 	$MenuOption = 99
 	While ($MenuOption -ne 1 -and $MenuOption -ne 2 -and $MenuOption -ne 3 -and $MenuOption -ne 4 -and $MenuOption -ne 0) {
@@ -255,16 +180,17 @@ Function MainMenu {
 				$url = Read-Host "URL"
 				If ($url -like "http*") {
 					DownloadUrlVideo $url
+					EndMenu
 				}
 				ElseIf ($url.Trim() -eq "") {
-					# Cancel
+					# Cancel if nothing is entered.
+					break
 				}
 				Else {
 					Write-Host "`n[ERROR]: Provided parameter is not a valid URL.`n" -ForegroundColor "Red" -BackgroundColor "Black"
 					PauseScript
 				}
 			}
-			EndMenu
 			$MenuOption = 99
 		}
 		ElseIf ($MenuOption -eq 2) {
@@ -275,16 +201,17 @@ Function MainMenu {
 				$url = Read-Host "URL"
 				If ($url -like "http*") {
 					DownloadUrlAudio $url
+					EndMenu
 				}
 				ElseIf ($url.Trim() -eq "") {
-					# Cancel
+					# Cancel if nothing is entered.
+					break
 				}
 				Else {
 					Write-Host "`n[ERROR]: Provided parameter is not a valid URL.`n" -ForegroundColor "Red" -BackgroundColor "Black"
 					PauseScript
 				}
 			}
-			EndMenu
 			$MenuOption = 99
 		}
 		ElseIf ($MenuOption -eq 3) {
@@ -310,11 +237,20 @@ Function MainMenu {
 }
 
 
+# ======================================================================================================= #
+# ======================================================================================================= #
 
+
+# Function used to download videos. It is passed a URL and applies any ffmpeg options that are set to
+# be applied to the youtube-dl command for conversion.
 # Call using: DownloadUrlVideo $url
 Function DownloadUrlVideo {
 	Param($url)
 	
+	
+	
+	# Checks if the '$ConvertOutputValue' is set to true. If it is, the ffmpeg video conversion settings will be
+	# applied to the youtube-dl command.
 	If ($ConvertOutputValue -eq $True -and $DefaultQualityValue -eq $True) {
 		$Script:ffmpegConversion = $OutputFileTypeValue + " --postprocessor-args ""-b:v 800k -b:a 128k -s 640x360"" --prefer-ffmpeg"
 	}
@@ -326,6 +262,10 @@ Function DownloadUrlVideo {
 		$Script:ffmpegConversion = ""
 	}
 	
+	
+	
+	# Checks if the URL provided is a playlist. If it is, it will download each video in that
+	# playlist, putting them into a folder. If the URL is not a playlist, the video is downloaded as normal.
 	If ($url -like "*youtube.com/playlist*") {
 		$VideoPath = $YoutubeVideoFolder + "\%(playlist)s\%(title)s.%(ext)s"
 		$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors $ffmpegConversion --yes-playlist $UseArchiveValue ""$url"""
@@ -341,17 +281,30 @@ Function DownloadUrlVideo {
 }
 
 
+# ======================================================================================================= #
+# ======================================================================================================= #
 
+
+# Function used to download audio from videos. It is passed a URL and the program ffmpeg is used to
+# strip the audio off of the video and convert it to an mp3 format.
 # Call using: DownloadUrlAudio $url
 Function DownloadUrlAudio {
 	Param($url)
 	
+	
+	
+	# If the user has set some video conversion settings, it will warn them that these settings will not
+	# be applied to the downloaded audio file.
 	If ($ConvertOutputValue -eq $True) {
 		Write-Host "`n[NOTE]: The output file is currently set to be converted." -ForegroundColor "Red" -BackgroundColor "Black"
 		Write-Host "        Only option ""1   - Download Video"" will convert output." -ForegroundColor "Red" -BackgroundColor "Black"
 		PauseScript
 	}
 	
+	
+	
+	# Checks if the URL provided is a playlist. If it is, it will download the audio of each video in that
+	# playlist, putting them into a folder. If the URL is not a playlist, the audio is downloaded as normal.
 	If ($url -like "*youtube.com/playlist*") {
 		$VideoPath = $YoutubeMusicFolder + "\%(playlist)s\%(title)s.%(ext)s"
 		$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg --yes-playlist $UseArchiveValue ""$url"""
@@ -367,18 +320,37 @@ Function DownloadUrlAudio {
 }
 
 
+# ======================================================================================================= #
+# ======================================================================================================= #
 
+
+# Function for downloading playlists that are listed in the videoplaylist.txt and audioplaylist.txt files.
+# The playlist URLs are to be listed one line at a time.
 Function DownloadPlaylists {
 	Write-Host "Downloading playlist URL's listed in:`n   $VideoPlaylistFile`n   $AudioPlaylistFile"
 	$VideoPlaylistFileLength = Get-ChildItem $VideoPlaylistFile | ForEach-Object {$_.Length}
 	$AudioPlaylistFileLength = Get-ChildItem $AudioPlaylistFile | ForEach-Object {$_.Length}
 	
+	
+	
+	# Check to see if both text files are empty. If they are, warn the user and return to the main menu.
 	If ($VideoPlaylistFileLength -eq 0 -and $AudioPlaylistFileLength -eq 0) {
 		Write-Host "`n[ERROR]: Both predefined playlist files are empty." -ForegroundColor "Red" -BackgroundColor "Black"
 		Write-Host "         Please put playlist URL's inside them, one on each line." -ForegroundColor "Red" -BackgroundColor "Black"
 		Write-Host "         Playlist files are located in: $SettingsFolder`n" -ForegroundColor "Red" -BackgroundColor "Black"
 		PauseScript
 		Return
+	}
+	
+	
+	
+	# If the videoplaylist.txt file is empty, warn the user but continue on to the audioplaylist.txt file.
+	# If it is not empty, set up the ffmpeg conversion settings if they are set and begin downloading.
+	If ($VideoPlaylistFileLength -eq 0) {
+		Write-Host "`n[NOTE]: Predefined video playlist file is empty." -ForegroundColor "Red" -BackgroundColor "Black"
+		Write-Host "        Please put playlist URL's inside it, one on each line." -ForegroundColor "Red" -BackgroundColor "Black"
+		Write-Host "        Playlist file is located at: $VideoPlaylistFile`n" -ForegroundColor "Red" -BackgroundColor "Black"
+		PauseScript
 	}
 	Else {
 		If ($ConvertOutputValue -eq $True -and $DefaultQualityValue -eq $True) {
@@ -391,15 +363,8 @@ Function DownloadPlaylists {
 		Else {
 			$Script:ffmpegConversion = ""
 		}
-	}
 	
-	If ($VideoPlaylistFileLength -eq 0) {
-		Write-Host "`n[NOTE]: Predefined video playlist file is empty." -ForegroundColor "Red" -BackgroundColor "Black"
-		Write-Host "        Please put playlist URL's inside it, one on each line." -ForegroundColor "Red" -BackgroundColor "Black"
-		Write-Host "        Playlist file is located at: $VideoPlaylistFile`n" -ForegroundColor "Red" -BackgroundColor "Black"
-		PauseScript
-	}
-	Else {
+		# Loop through the text file and run the download command on each URL.
 		Get-Content $VideoPlaylistFile | ForEach-Object {
 			Write-Host "`nDownloading playlist: $_" -ForegroundColor "Gray"
 			$VideoPath = $YoutubeVideoFolder + "\%(playlist)s\%(title)s.%(ext)s"
@@ -410,6 +375,10 @@ Function DownloadPlaylists {
 		Write-Host "`nFinished downloading predefined video playlists.`n" -ForegroundColor "Yellow"
 	}
 	
+	
+	
+	# If the audioplaylist.txt file is empty, warn the user.
+	# If it is not empty, begin downloading.
 	If ($AudioPlaylistFileLength -eq 0) {
 		Write-Host "`n[NOTE]: Predefined audio playlist file is empty." -ForegroundColor "Red" -BackgroundColor "Black"
 		Write-Host "        Please put playlist URL's inside it, one on each line." -ForegroundColor "Red" -BackgroundColor "Black"
@@ -417,10 +386,11 @@ Function DownloadPlaylists {
 		PauseScript
 	}
 	Else {
+		# Loop through the text file and run the download command on each URL.
 		Get-Content $AudioPlaylistFile | ForEach-Object {
 			Write-Host "`nDownloading playlist: $_" -ForegroundColor "Gray"
 			$VideoPath = $YoutubeMusicFolder + "\%(playlist)s\%(title)s.%(ext)s"
-			$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg --yes-playlist $UseArchiveValue ""$_"""
+			$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg --yes-playlist --download-archive $ArchiveFile ""$_"""
 			Write-Host "$YoutubedlCommand`n" -ForegroundColor "Gray"
 			Invoke-Expression $YoutubedlCommand
 		}
@@ -430,7 +400,11 @@ Function DownloadPlaylists {
 }
 
 
+# ======================================================================================================= #
+# ======================================================================================================= #
 
+
+# Function for the settings GUI menu. Allows the user to edit a variety of options (variables).
 function SettingsMenu {
 	$MenuOption = 99
 	While ($MenuOption -ne 1 -and $MenuOption -ne 2 -and $MenuOption -ne 10 -and $MenuOption -ne 11 -and $MenuOption -ne 12 -and `
@@ -440,6 +414,8 @@ function SettingsMenu {
 		Write-Host "================================================================" -BackgroundColor "Black"
 		Write-Host "                       Youtube-dl Settings                      " -ForegroundColor "Yellow" -BackgroundColor "Black"
 		Write-Host "================================================================" -BackgroundColor "Black"
+		
+		# Options for showing and hiding certain options based on the set values for other options.
 		If ($ConvertOutputValue -eq $False) {
 			Write-Host ($Settings | Where-Object { ($_.ID) -eq 1 -or ($_.ID) -eq "" -or ($_.ID) -eq 2 } | Format-Table ID,SettingName,SettingValue -AutoSize | Out-String)
 		}
@@ -449,6 +425,9 @@ function SettingsMenu {
 		ElseIf ($ConvertOutputValue -eq $True -and $DefaultQualityValue -eq $False) {
 			Write-Host ($Settings | Format-Table ID,SettingName,SettingValue -AutoSize | Out-String)
 		}
+		
+		
+		# The user selects which option to edit by entering that option's corresponding ID number.
 		Write-Host "  0   - Return to main menu.`n" -ForegroundColor "Gray"
 		Write-Host "Please select a variable to edit:`n" -ForegroundColor "Yellow"
 		$MenuOption = Read-Host "Option"
@@ -621,7 +600,13 @@ function SettingsMenu {
 }
 
 
-	
+# ======================================================================================================= #
+# ======================================================================================================= #
+
+
+# Function for displaying a message which says that the script is done. The user can choose to run the
+# script again or can exit. If the script is ran again, all of the settings and variables are set back
+# to their default values.
 Function EndMenu {
 	If ($ParameterMode -eq $False) {
 		$MenuOption = 99
@@ -678,15 +663,125 @@ Function EndMenu {
 }
 
 
+# ======================================================================================================= #
+# ======================================================================================================= #
 
 
-
-# Begin running the script
-
-
-If ($ParameterMode -eq $True) {
+# Determine whether to use the GUI or the command line.
+If ($PSBoundParameters.Count -gt 0) {
+	$ParameterMode = $True
 	
-	If ($FromFiles -eq $True -and $Video -eq $False -and $Audio -eq $False) {	# Download from predefined playlist files
+	# If parameters are provided, run the script in command line mode.
+	CommandLineMode
+}
+Else {
+	# If the script is provided no parameters, it will begin running in GUI mode and initialize the variables
+	# used to hold and visualize the options that are found in the settings menu. Then the main menu will be loaded.
+	$ParameterMode = $False
+	
+	$BackgroundColorBefore = $HOST.UI.RawUI.BackgroundColor
+	$ForegroundColorBefore = $HOST.UI.RawUI.ForegroundColor
+
+	$HOST.UI.RawUI.BackgroundColor = "Black"
+	$HOST.UI.RawUI.ForegroundColor = "White"
+	
+	$ffmpegConversion = ""
+
+    $BlankLine = New-Object Object
+	$BlankLine | Add-Member -MemberType NoteProperty -Name ID -Value ""
+	$BlankLine | Add-Member -MemberType NoteProperty -Name SettingName -Value ""
+	$BlankLine | Add-Member -MemberType NoteProperty -Name SettingValue -Value ""
+
+    $UseArchiveDefault = $True
+	$UseArchiveValue = "--download-archive $ArchiveFile"
+	$UseArchive = New-Object Object
+	$UseArchive | Add-Member -MemberType NoteProperty -Name ID -Value 1
+	$UseArchive | Add-Member -MemberType NoteProperty -Name SettingName -Value "Use archive file?"
+	$UseArchive | Add-Member -MemberType NoteProperty -Name SettingValue -Value $UseArchiveDefault
+
+	$ConvertOutputDefault = $False
+	$ConvertOutputValue = $False
+	$ConvertOutput = New-Object Object
+	$ConvertOutput | Add-Member -MemberType NoteProperty -Name ID -Value 2
+	$ConvertOutput | Add-Member -MemberType NoteProperty -Name SettingName -Value "Convert output?"
+	$ConvertOutput | Add-Member -MemberType NoteProperty -Name SettingValue -Value $ConvertOutputDefault
+
+	$DefaultQualityDefault = $True
+	$DefaultQualityValue = $True
+	$DefaultQuality = New-Object Object
+	$DefaultQuality | Add-Member -MemberType NoteProperty -Name ID -Value 10
+	$DefaultQuality | Add-Member -MemberType NoteProperty -Name SettingName -Value "Use default quality?"
+	$DefaultQuality | Add-Member -MemberType NoteProperty -Name SettingValue -Value $DefaultQualityDefault
+
+	$OutputFileTypeDefault = "webm"
+	$OutputFileTypeValue = "--recode-video webm"
+	$OutputFileType = New-Object Object
+	$OutputFileType | Add-Member -MemberType NoteProperty -Name ID -Value 11
+	$OutputFileType | Add-Member -MemberType NoteProperty -Name SettingName -Value "Output file extension"
+	$OutputFileType | Add-Member -MemberType NoteProperty -Name SettingValue -Value $OutputFileTypeDefault
+
+	$VideoBitRateDefault = "800k"
+	$VideoBitRateValue = " -b:v 800k"
+	$VideoBitRate = New-Object Object
+	$VideoBitRate | Add-Member -MemberType NoteProperty -Name ID -Value 12
+	$VideoBitRate | Add-Member -MemberType NoteProperty -Name SettingName -Value "Video bitrate"
+	$VideoBitRate | Add-Member -MemberType NoteProperty -Name SettingValue -Value $VideoBitRateDefault #In kilobytes
+
+	$AudioBitRateDefault = "128k"
+	$AudioBitRateValue = " -b:a 128k"
+	$AudioBitRate = New-Object Object
+	$AudioBitRate | Add-Member -MemberType NoteProperty -Name ID -Value 13
+	$AudioBitRate | Add-Member -MemberType NoteProperty -Name SettingName -Value "Audio bitrate"
+	$AudioBitRate | Add-Member -MemberType NoteProperty -Name SettingValue -Value $AudioBitRateDefault #In kilobytes
+
+	$ResolutionDefault = "640x360"
+	$ResolutionValue = " -s 640x360"
+	$Resolution = New-Object Object
+	$Resolution | Add-Member -MemberType NoteProperty -Name ID -Value 14
+	$Resolution | Add-Member -MemberType NoteProperty -Name SettingName -Value "Resolution"
+	$Resolution | Add-Member -MemberType NoteProperty -Name SettingValue -Value $ResolutionDefault #360p = 480:360, 480p = 640:480, 720p = 1280:720, 1080p = 1920:1080
+
+	$StartTimeDefault = "00:00:00"
+	$StartTimeValue = ""
+	$StartTime = New-Object Object
+	$StartTime | Add-Member -MemberType NoteProperty -Name ID -Value 15
+	$StartTime | Add-Member -MemberType NoteProperty -Name SettingName -Value "Start time"
+	$StartTime | Add-Member -MemberType NoteProperty -Name SettingValue -Value $StartTimeDefault #format as 00:00:00
+
+	$StopTimeDefault = "No stop time"
+	$StopTimeValue = ""
+	$StopTime = New-Object Object
+	$StopTime | Add-Member -MemberType NoteProperty -Name ID -Value 16
+	$StopTime | Add-Member -MemberType NoteProperty -Name SettingName -Value "Stop time"
+	$StopTime | Add-Member -MemberType NoteProperty -Name SettingValue -Value $StopTimeDefault #In seconds
+
+	$StripAudioDefault = $False
+	$StripAudioValue = ""
+	$StripAudio = New-Object Object
+	$StripAudio | Add-Member -MemberType NoteProperty -Name ID -Value 17
+	$StripAudio | Add-Member -MemberType NoteProperty -Name SettingName -Value "Strip audio?"
+	$StripAudio | Add-Member -MemberType NoteProperty -Name SettingValue -Value $StripAudioDefault
+
+	$StripVideoDefault = $False
+	$StripVideoValue = ""
+	$StripVideo = New-Object Object
+	$StripVideo | Add-Member -MemberType NoteProperty -Name ID -Value 18
+	$StripVideo | Add-Member -MemberType NoteProperty -Name SettingName -Value "Strip video?"
+	$StripVideo | Add-Member -MemberType NoteProperty -Name SettingValue -Value $StripVideoDefault
+	
+	$Settings = $BlankLine,$UseArchive,$ConvertOutput,$BlankLine,$DefaultQuality,$OutputFileType,$VideoBitRate,$AudioBitRate,$Resolution,$StartTime,$StopTime,$StripAudio,$StripVideo
+
+	MainMenu
+}
+
+
+# ======================================================================================================= #
+# ======================================================================================================= #
+
+
+# If parameters are provided, run the script in command line mode.
+Function CommandLineMode {
+	If ($FromFiles -eq $True -and $Video -eq $False -and $Audio -eq $False) {	# Download from predefined playlist files code block
 		
 		# Setting output path location
 		If ($OutputPath.Length -gt 0) {
@@ -736,9 +831,10 @@ If ($ParameterMode -eq $True) {
 	Exit
 }
 
-If ($ParameterMode -eq $False) {
-	MainMenu
-}
+
+# ======================================================================================================= #
+# ======================================================================================================= #
+
 
 Exit
 
