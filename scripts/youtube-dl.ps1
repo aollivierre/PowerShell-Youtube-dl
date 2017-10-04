@@ -667,6 +667,63 @@ Function EndMenu {
 # ======================================================================================================= #
 
 
+# If parameters are provided, run the script in command line mode.
+Function CommandLineMode {
+	If ($FromFiles -eq $True -and $Video -eq $False -and $Audio -eq $False) {	# Download from predefined playlist files code block
+		
+		# Setting output path location
+		If ($OutputPath.Length -gt 0) {
+			$YoutubeMusicFolder = $OutputPath
+			$YoutubeVideoFolder = $OutputPath
+			If ((Test-Path "$YoutubeVideoFolder") -eq $False) {
+				New-Item -Type directory -Path "$YoutubeVideoFolder"
+			}
+		}
+		DownloadPlaylists
+		
+		Write-Host "`nDownloads complete.`n" -ForegroundColor "Yellow"
+	}
+	ElseIf ($FromFiles -eq $True -and ($Video -eq $True -or $Audio -eq $True)) {
+		Write-Host "`n[ERROR]: Parameter -FromFiles can't be used with -Video or -Audio.`n" -ForegroundColor "Red" -BackgroundColor "Black"
+	}
+	ElseIf ($Video -eq $True -and $Audio -eq $False) {	# Download video code block
+		
+		# Setting output path location
+		If ($OutputPath.Length -gt 0) {
+			$YoutubeVideoFolder = $OutputPath
+			If ((Test-Path "$YoutubeVideoFolder") -eq $False) {
+				New-Item -Type directory -Path "$YoutubeVideoFolder"
+			}
+		}
+		DownloadUrlVideo $URL
+		
+		Write-Host "`nDownload complete.`nDownloaded to: $YoutubeVideoFolder`n" -ForegroundColor "Yellow"
+	}
+	ElseIf ($Audio -eq $True -and $Video -eq $False) {	# Download audio code block
+		
+		# Setting output path location
+		If ($OutputPath.Length -gt 0) {
+			$YoutubeMusicFolder = $OutputPath
+			If ((Test-Path "$YoutubeMusicFolder") -eq $False) {
+				New-Item -Type directory -Path "$YoutubeMusicFolder"
+			}
+		}
+		DownloadUrlAudio $URL
+		
+		Write-Host "`nDownload complete.`nDownloaded to: $YoutubeMusicFolder`n" -ForegroundColor "Yellow"
+	}
+	ElseIf ($Video -eq $True -and $Audio -eq $True) {
+		Write-Host "`n[ERROR]: Please select either -Video or -Audio. Not Both.`n" -ForegroundColor "Red" -BackgroundColor "Black"
+	}
+	
+	Exit
+}
+
+
+# ======================================================================================================= #
+# ======================================================================================================= #
+
+
 # Determine whether to use the GUI or the command line.
 If ($PSBoundParameters.Count -gt 0) {
 	$ParameterMode = $True
@@ -772,63 +829,6 @@ Else {
 	$Settings = $BlankLine,$UseArchive,$ConvertOutput,$BlankLine,$DefaultQuality,$OutputFileType,$VideoBitRate,$AudioBitRate,$Resolution,$StartTime,$StopTime,$StripAudio,$StripVideo
 
 	MainMenu
-}
-
-
-# ======================================================================================================= #
-# ======================================================================================================= #
-
-
-# If parameters are provided, run the script in command line mode.
-Function CommandLineMode {
-	If ($FromFiles -eq $True -and $Video -eq $False -and $Audio -eq $False) {	# Download from predefined playlist files code block
-		
-		# Setting output path location
-		If ($OutputPath.Length -gt 0) {
-			$YoutubeMusicFolder = $OutputPath
-			$YoutubeVideoFolder = $OutputPath
-			If ((Test-Path "$YoutubeVideoFolder") -eq $False) {
-				New-Item -Type directory -Path "$YoutubeVideoFolder"
-			}
-		}
-		DownloadPlaylists
-		
-		Write-Host "`nDownloads complete.`n" -ForegroundColor "Yellow"
-	}
-	ElseIf ($FromFiles -eq $True -and ($Video -eq $True -or $Audio -eq $True)) {
-		Write-Host "`n[ERROR]: Parameter -FromFiles can't be used with -Video or -Audio.`n" -ForegroundColor "Red" -BackgroundColor "Black"
-	}
-	ElseIf ($Video -eq $True -and $Audio -eq $False) {	# Download video code block
-		
-		# Setting output path location
-		If ($OutputPath.Length -gt 0) {
-			$YoutubeVideoFolder = $OutputPath
-			If ((Test-Path "$YoutubeVideoFolder") -eq $False) {
-				New-Item -Type directory -Path "$YoutubeVideoFolder"
-			}
-		}
-		DownloadUrlVideo $URL
-		
-		Write-Host "`nDownload complete.`nDownloaded to: $YoutubeVideoFolder`n" -ForegroundColor "Yellow"
-	}
-	ElseIf ($Audio -eq $True -and $Video -eq $False) {	# Download audio code block
-		
-		# Setting output path location
-		If ($OutputPath.Length -gt 0) {
-			$YoutubeMusicFolder = $OutputPath
-			If ((Test-Path "$YoutubeMusicFolder") -eq $False) {
-				New-Item -Type directory -Path "$YoutubeMusicFolder"
-			}
-		}
-		DownloadUrlAudio $URL
-		
-		Write-Host "`nDownload complete.`nDownloaded to: $YoutubeMusicFolder`n" -ForegroundColor "Yellow"
-	}
-	ElseIf ($Video -eq $True -and $Audio -eq $True) {
-		Write-Host "`n[ERROR]: Please select either -Video or -Audio. Not Both.`n" -ForegroundColor "Red" -BackgroundColor "Black"
-	}
-	
-	Exit
 }
 
 
