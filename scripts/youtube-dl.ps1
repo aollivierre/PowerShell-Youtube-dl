@@ -31,7 +31,7 @@
 	https://ffmpeg.org/
 
 .RELEASENOTES
-	1.2.5	15-Nov-2017 - Simplified some of the code.
+	1.2.5	15-Nov-2017 - Simplified some of the code. Updated the readme file.
 	1.2.4	12-Jul-2017 - Added ability to choose whether to use the youtube-dl download archive when downloading playlists.
 	1.2.3	11-Jul-2017 - Edited Youtube-dl_Installer.ps1 to uninstall the script using the -Uninstall parameter. Added a shortcut for uninstalling the script and its files.
 	1.2.2	03-Jul-2017 - Cleaned up code.
