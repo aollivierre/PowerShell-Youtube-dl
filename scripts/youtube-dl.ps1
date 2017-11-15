@@ -164,7 +164,7 @@ Function MainMenu {
 		$url = ""
 		Clear-Host
 		Write-Host "================================================================"
-		Write-Host "                Youtube-dl Download Script v1.2.4               " -ForegroundColor "Yellow"
+		Write-Host "                Youtube-dl Download Script v1.2.5               " -ForegroundColor "Yellow"
 		Write-Host "================================================================"
 		Write-Host "`nPlease select an option:`n" -ForegroundColor "Yellow"
 		Write-Host "  1   - Download video"
