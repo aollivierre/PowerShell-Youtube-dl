@@ -6,7 +6,7 @@
 .GUID  
 
 .AUTHOR
-	ForestFrog
+	mpb10
 
 .COMPANYNAME 
 
@@ -15,10 +15,10 @@
 .TAGS 
 
 .LICENSEURI
-	https://github.com/ForestFrog/PowerShell-Youtube-dl/blob/master/LICENSE
+	https://github.com/mpb10/PowerShell-Youtube-dl/blob/master/LICENSE
 
 .PROJECTURI
-	https://github.com/ForestFrog/PowerShell-Youtube-dl
+	https://github.com/mpb10/PowerShell-Youtube-dl
 
 .ICONURI 
 
@@ -81,11 +81,11 @@
 	
 .NOTES 
 	Requires Windows 7 or higher 
-	Author: ForestFrog
-	Updated: July 12th, 2017 
+	Author: mpb10
+	Updated: November 15th, 2017 
 
 .LINK 
-	https://github.com/ForestFrog/PowerShell-Youtube-dl
+	https://github.com/mpb10/PowerShell-Youtube-dl
 #>
 
 
