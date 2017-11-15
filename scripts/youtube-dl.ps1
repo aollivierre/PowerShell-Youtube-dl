@@ -256,7 +256,7 @@ Function DownloadUrlVideo {
 	
 	# Checks if the '$ConvertOutputValue' is set to true. If it is, the ffmpeg video conversion settings will be
 	# applied to the youtube-dl command.
-	If ($ConvertOutput -eq $True) {
+	If ($ConvertOutputValue -eq $True) {
 		If ($DefaultQualityValue -eq $True) {
 			$Script:ffmpegConversion = $OutputFileTypeValue + " --postprocessor-args ""-b:v 800k -b:a 128k -s 640x360"" --prefer-ffmpeg"
 		}
