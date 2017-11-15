@@ -276,13 +276,13 @@ Function DownloadUrlVideo {
 	If ($url -like "*youtube.com/playlist*") {
 		$VideoPath = $YoutubeVideoFolder + "\%(playlist)s\%(title)s.%(ext)s"
 		$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors $ffmpegConversion --yes-playlist $UseArchiveValue ""$url"""
-		Write-Verbose "`n$YoutubedlCommand`n" -ForegroundColor "Gray"
+		Write-Verbose "`n$YoutubedlCommand`n"
 		Invoke-Expression $YoutubedlCommand
 	}
 	Else {
 		$VideoPath = $YoutubeVideoFolder + "\%(title)s.%(ext)s"
 		$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors $ffmpegConversion --no-playlist ""$url"""
-		Write-Verbose "`n$YoutubedlCommand`n" -ForegroundColor "Gray"
+		Write-Verbose "`n$YoutubedlCommand`n"
 		Invoke-Expression $YoutubedlCommand
 	}
 }
@@ -315,13 +315,13 @@ Function DownloadUrlAudio {
 	If ($url -like "*youtube.com/playlist*") {
 		$VideoPath = $YoutubeMusicFolder + "\%(playlist)s\%(title)s.%(ext)s"
 		$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg --yes-playlist $UseArchiveValue ""$url"""
-		Write-Verbose "`n$YoutubedlCommand`n" -ForegroundColor "Gray"
+		Write-Verbose "`n$YoutubedlCommand`n"
 		Invoke-Expression $YoutubedlCommand
 	}
 	Else {
 		$VideoPath = $YoutubeMusicFolder + "\%(title)s.%(ext)s"
 		$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg --no-playlist ""$url"""
-		Write-Verbose "`n$YoutubedlCommand`n" -ForegroundColor "Gray"
+		Write-Verbose "`n$YoutubedlCommand`n"
 		Invoke-Expression $YoutubedlCommand
 	}
 }
