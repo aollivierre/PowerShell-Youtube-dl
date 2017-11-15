@@ -1,7 +1,7 @@
 <#PSScriptInfo 
 
 .VERSION
-	1.2.4 
+	1.2.5 
 
 .GUID  
 
@@ -31,6 +31,7 @@
 	https://ffmpeg.org/
 
 .RELEASENOTES
+	1.2.5	15-Nov-2017 - Simplified some of the code.
 	1.2.4	12-Jul-2017 - Added ability to choose whether to use the youtube-dl download archive when downloading playlists.
 	1.2.3	11-Jul-2017 - Edited Youtube-dl_Installer.ps1 to uninstall the script using the -Uninstall parameter. Added a shortcut for uninstalling the script and its files.
 	1.2.2	03-Jul-2017 - Cleaned up code.
@@ -378,12 +379,6 @@ Function DownloadPlaylists {
 		Write-Host "`nFinished downloading predefined video playlists.`n" -ForegroundColor "Yellow"
 		
 	}
-	Else {
-		Write-Host "`n[NOTE]: Predefined video playlist file is empty." -ForegroundColor "Red" -BackgroundColor "Black"
-		Write-Host "        Please put playlist URL's inside it, one on each line." -ForegroundColor "Red" -BackgroundColor "Black"
-		Write-Host "        Playlist file is located at: $VideoPlaylistFile`n" -ForegroundColor "Red" -BackgroundColor "Black"
-		PauseScript
-	}
 	
 	
 	
@@ -401,12 +396,6 @@ Function DownloadPlaylists {
 		}
 		Write-Host "`nFinished downloading predefined audio playlists.`n" -ForegroundColor "Yellow"
 		
-	}
-	Else {
-		Write-Host "`n[NOTE]: Predefined audio playlist file is empty." -ForegroundColor "Red" -BackgroundColor "Black"
-		Write-Host "        Please put playlist URL's inside it, one on each line." -ForegroundColor "Red" -BackgroundColor "Black"
-		Write-Host "        Playlist file is located at: $AudioPlaylistFile`n" -ForegroundColor "Red" -BackgroundColor "Black"
-		PauseScript
 	}
 }
 
