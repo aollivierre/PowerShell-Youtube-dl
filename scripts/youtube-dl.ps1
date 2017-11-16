@@ -1,7 +1,7 @@
 <#PSScriptInfo 
 
 .VERSION
-	1.2.5 
+	1.2.6 
 
 .GUID  
 
@@ -31,6 +31,7 @@
 	https://ffmpeg.org/
 
 .RELEASENOTES
+	1.2.6	16-Nov-2017 - Added option to download the entire playlist that a video resides in.
 	1.2.5	15-Nov-2017 - Simplified some of the code. Updated the readme file.
 	1.2.4	12-Jul-2017 - Added ability to choose whether to use the youtube-dl download archive when downloading playlists.
 	1.2.3	11-Jul-2017 - Edited Youtube-dl_Installer.ps1 to uninstall the script using the -Uninstall parameter. Added a shortcut for uninstalling the script and its files.
@@ -82,7 +83,7 @@
 .NOTES 
 	Requires Windows 7 or higher 
 	Author: mpb10
-	Updated: November 15th, 2017 
+	Updated: November 16th, 2017 
 
 .LINK 
 	https://github.com/mpb10/PowerShell-Youtube-dl
@@ -164,7 +165,7 @@ Function MainMenu {
 		$url = ""
 		Clear-Host
 		Write-Host "================================================================"
-		Write-Host "                Youtube-dl Download Script v1.2.5               " -ForegroundColor "Yellow"
+		Write-Host "                Youtube-dl Download Script v1.2.6               " -ForegroundColor "Yellow"
 		Write-Host "================================================================"
 		Write-Host "`nPlease select an option:`n" -ForegroundColor "Yellow"
 		Write-Host "  1   - Download video"
@@ -282,7 +283,7 @@ Function DownloadUrlVideo {
 	}
 	Else {
 		$VideoPath = $YoutubeVideoFolder + "\%(title)s.%(ext)s"
-		$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors $ffmpegConversion --no-playlist ""$url"""
+		$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors $ffmpegConversion $YesPlaylistValue ""$url"""
 		Write-Verbose "`n$YoutubedlCommand`n"
 		Invoke-Expression $YoutubedlCommand
 	}
@@ -321,7 +322,7 @@ Function DownloadUrlAudio {
 	}
 	Else {
 		$VideoPath = $YoutubeMusicFolder + "\%(title)s.%(ext)s"
-		$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg --no-playlist ""$url"""
+		$YoutubedlCommand = "youtube-dl -o ""$VideoPath"" --ignore-errors -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg $YesPlaylistValue ""$url"""
 		Write-Verbose "`n$YoutubedlCommand`n"
 		Invoke-Expression $YoutubedlCommand
 	}
@@ -417,10 +418,10 @@ function SettingsMenu {
 		
 		# Options for showing and hiding certain options based on the set values for other options.
 		If ($ConvertOutputValue -eq $False) {
-			Write-Host ($Settings | Where-Object { ($_.ID) -eq 1 -or ($_.ID) -eq "" -or ($_.ID) -eq 2 } | Format-Table ID,SettingName,SettingValue -AutoSize | Out-String)
+			Write-Host ($Settings | Where-Object { ($_.ID) -eq 1 -or ($_.ID) -eq 2 -or ($_.ID) -eq 3 -or ($_.ID) -eq ""} | Format-Table ID,SettingName,SettingValue -AutoSize | Out-String)
 		}
 		ElseIf ($ConvertOutputValue -eq $True -and $DefaultQualityValue -eq $True) {
-			Write-Host ($Settings | Where-Object { ($_.ID) -eq 1 -or ($_.ID) -eq 2 -or ($_.ID) -eq "" -or ($_.ID) -eq 10 -or ($_.ID) -eq 11} | Format-Table ID,SettingName,SettingValue -AutoSize | Out-String)
+			Write-Host ($Settings | Where-Object { ($_.ID) -eq 1 -or ($_.ID) -eq 2 -or ($_.ID) -eq 3 -or ($_.ID) -eq 10 -or ($_.ID) -eq 11 -or ($_.ID) -eq ""} | Format-Table ID,SettingName,SettingValue -AutoSize | Out-String)
 		}
 		ElseIf ($ConvertOutputValue -eq $True -and $DefaultQualityValue -eq $False) {
 			Write-Host ($Settings | Format-Table ID,SettingName,SettingValue -AutoSize | Out-String)
@@ -444,6 +445,17 @@ function SettingsMenu {
 			$MenuOption = 99
 		}
 		ElseIf ($MenuOption -eq 2) {
+			If ($YesPlaylistValue -eq "--no-playlist") {
+				$Script:YesPlaylistValue = "--yes-playlist"
+				$YesPlaylist.SettingValue = $True
+			}
+			Else {
+				$Script:YesPlaylistValue = "--no-playlist"
+				$YesPlaylist.SettingValue = $False
+			}
+			$MenuOption = 99
+		}
+		ElseIf ($MenuOption -eq 3) {
 			If ($ConvertOutputValue -eq $False) {
 				$Script:ConvertOutputValue = $True
 				$ConvertOutput.SettingValue = $True
@@ -627,6 +639,7 @@ Function EndMenu {
 				$Script:YoutubedlCommand = ""
 				$Script:ffmpegConversion = ""
 				
+				$Script:YesPlaylistValue = "--no-playlist"
 				$Script:ConvertOutputValue = $False
 				$Script:DefaultQualityValue = $True
 				$Script:OutputFileTypeValue = "--recode-video webm"
@@ -639,6 +652,7 @@ Function EndMenu {
 				$Script:StripVideoValue = ""
 				$Script:UseArchiveValue = "--download-archive $ArchiveFile"
 				
+				$YesPlaylist.SettingValue = $YesPlaylistDefault
 				$ConvertOutput.SettingValue = $ConvertOutputDefault
 				$DefaultQuality.SettingValue = $DefaultQualityDefault
 				$OutputFileType.SettingValue = $OutputFileTypeDefault
@@ -742,22 +756,29 @@ Else {
 	
 	$ffmpegConversion = ""
 
-    	$BlankLine = New-Object Object
+    $BlankLine = New-Object Object
 	$BlankLine | Add-Member -MemberType NoteProperty -Name ID -Value ""
 	$BlankLine | Add-Member -MemberType NoteProperty -Name SettingName -Value ""
 	$BlankLine | Add-Member -MemberType NoteProperty -Name SettingValue -Value ""
 
-    	$UseArchiveDefault = $True
+    $UseArchiveDefault = $True
 	$UseArchiveValue = "--download-archive $ArchiveFile"
 	$UseArchive = New-Object Object
 	$UseArchive | Add-Member -MemberType NoteProperty -Name ID -Value 1
 	$UseArchive | Add-Member -MemberType NoteProperty -Name SettingName -Value "Use archive file?"
 	$UseArchive | Add-Member -MemberType NoteProperty -Name SettingValue -Value $UseArchiveDefault
-
+	
+	$YesPlaylistDefault = $False
+	$YesPlaylistValue = "--no-playlist"
+	$YesPlaylist = New-Object Object
+	$YesPlaylist | Add-Member -MemberType NoteProperty -Name ID -Value 2
+	$YesPlaylist | Add-Member -MemberType NoteProperty -Name SettingName -Value "Download entire playlist?"
+	$YesPlaylist | Add-Member -MemberType NoteProperty -Name SettingValue -Value $YesPlaylistDefault
+	
 	$ConvertOutputDefault = $False
 	$ConvertOutputValue = $False
 	$ConvertOutput = New-Object Object
-	$ConvertOutput | Add-Member -MemberType NoteProperty -Name ID -Value 2
+	$ConvertOutput | Add-Member -MemberType NoteProperty -Name ID -Value 3
 	$ConvertOutput | Add-Member -MemberType NoteProperty -Name SettingName -Value "Convert output?"
 	$ConvertOutput | Add-Member -MemberType NoteProperty -Name SettingValue -Value $ConvertOutputDefault
 
@@ -824,7 +845,7 @@ Else {
 	$StripVideo | Add-Member -MemberType NoteProperty -Name SettingName -Value "Strip video?"
 	$StripVideo | Add-Member -MemberType NoteProperty -Name SettingValue -Value $StripVideoDefault
 	
-	$Settings = $BlankLine,$UseArchive,$ConvertOutput,$BlankLine,$DefaultQuality,$OutputFileType,$VideoBitRate,$AudioBitRate,$Resolution,$StartTime,$StopTime,$StripAudio,$StripVideo
+	$Settings = $BlankLine,$UseArchive,$YesPlaylist,$ConvertOutput,$BlankLine,$DefaultQuality,$OutputFileType,$VideoBitRate,$AudioBitRate,$Resolution,$StartTime,$StopTime,$StripAudio,$StripVideo
 
 	MainMenu
 }
