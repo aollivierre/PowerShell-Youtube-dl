@@ -6,9 +6,9 @@ A PowerShell script used to operate the youtube-dl command line program.
 
 **Author: mpb10**
 
-**November 15th, 2017**
+**November 16th, 2017**
 
-**v1.2.5**
+**v1.2.6**
 #
 
  - [INSTALLATION](#installation)
@@ -196,6 +196,9 @@ For advanced users, the youtube-dl.ps1 script, which is found in the folder `C:\
 
 
 # CHANGE LOG
+
+	1.2.6	November 16th, 2017
+		Added option to download the entire playlist that a video resides in.
 
 	1.2.5	November 15th, 2017
 		Simplified and cleaned up some code.
