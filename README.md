@@ -95,8 +95,17 @@ This option brings the user to the settings menu. The primary purpose of the set
 				false. This is useful when downloading from playlists that continually have videos 
 				added to them.
 
-	'Convert output?'
+	'Download entire playlist?'
 		ID:		2
+		Default:	False
+		Description:	This setting determines whether to download the entire playlist when the video or
+				audio being downloaded is part of a playlist. Setting this to true will download
+				the entire playlist if a single video of that playlist is downloaded. This is useful
+				for one-time downloading of playlists that you don't want to list in the playlist
+				text files.
+
+	'Convert output?'
+		ID:		3
 		Default:	False
 		Description:	This setting toggles whether the video will be converted when it is downloaded. Changing
 				this setting to 'True' will display additional ffmepg conversion settings.
