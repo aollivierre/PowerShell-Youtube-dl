@@ -83,7 +83,7 @@ The video conversion settings found in `4   - Settings` will only affect the vid
 
 `4   - Settings`	
 
-This option brings the user to the settings menu. The primary purpose of the settings menu is to allow the user to set ffmpeg conversion options. Below is a description of each setting:
+This option brings the user to the settings menu. The primary purpose of the settings menu is to allow the user to set ffmpeg conversion options. These ffmpeg options have no effect when running the script from the command line. Below is a description of each setting:
 
 	'Use archive file?'
 		ID:		1
