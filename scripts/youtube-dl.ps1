@@ -693,6 +693,10 @@ Function CommandLineMode {
 	# If user provided output path doesn't exist, create it.
 	If (($OutputPath.Length -gt 0) -and ((Test-Path "$OutputPath") -eq $False)) {
 		New-Item -Type directory -Path "$OutputPath"
+		
+		# Setting output path location
+		$YoutubeMusicFolder = $OutputPath
+		$YoutubeVideoFolder = $OutputPath
 	}
 	ElseIf ($OutputPath.Length -gt 0) {
 		# Setting output path location
