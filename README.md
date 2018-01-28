@@ -1,3 +1,9 @@
+# VERSION 2.0 IN PROGRESS
+
+Version 2.0 is in progress. Please do not attempt to use this branch as it's still under development.
+
+Thank you.
+
 # PowerShell-Youtube-dl
 https://github.com/mpb10/PowerShell-Youtube-dl
 
