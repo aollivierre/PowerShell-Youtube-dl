@@ -178,7 +178,7 @@ Function InstallScript {
 	
 	DownloadFile "http://github.com/mpb10/PowerShell-Youtube-dl/raw/master/README.md" "$RootFolder\README.md"
 	
-    Write-Host "`nInstallation complete. Please Restart the script.`n" -ForegroundColor "Yellow"
+    Write-Host "`nInstallation complete. Please restart the script.`n" -ForegroundColor "Yellow"
     PauseScript
 }
 
@@ -189,6 +189,7 @@ Function UpdateScript {
 	New-Item -Type Directory -Path "$BinFolder"
 	DownloadYoutube-dl
 	DownloadFfmpeg
+	Write-Host "`nUpdate complete. Please restart the script.`n" -ForegroundColor "Yellow"
 }
 
 
@@ -275,7 +276,7 @@ Function CommandLineMode {
 	ElseIf ($Update -eq $True) {
 		Write-Host "`nUpdating youtube-dl.exe and ffmpeg files ...`n"
 		UpdateScript
-		Write-Host "`nDone.`nExiting in 5 seconds ...`n" -ForegroundColor "Gray"
+		Write-Host "`nExiting in 5 seconds ...`n" -ForegroundColor "Gray"
 		Start-Sleep -s 5
 		Exit
 	}
