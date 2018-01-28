@@ -3,7 +3,7 @@
 	Download audio and video from the internet, mainly from youtube.com
 	
 .DESCRIPTION 
-	This script downloads audio and video from the internet using the programs youtube-dl and ffmpeg. This script can be ran as a command using parameters or it can be ran without parameters to use its GUI. Files are downloaded to the user's "Videos" and "Music" folders by default. See README.md for more information.
+	This script downloads audio and video from the internet using the programs youtube-dl and ffmpeg. This script can be ran as a command using parameters, or it can be ran without parameters to use its GUI. Files are downloaded to the user's "Videos" and "Music" folders by default. See README.md for more information.
 	
 .PARAMETER Video 
 	Download the video of the provided URL. Output file formats will vary.
@@ -11,10 +11,14 @@
 	Only download the audio of the provided URL. Output file format will be mp3.
 .PARAMETER FromFiles 
 	Download playlist URL's listed in videoplaylists.txt and audioplaylists.txt 
+.PARAMETER Convert
+	Convert the downloaded video to the default file format using the default settings.
 .PARAMETER URL 
 	The video URL to download from.
 .PARAMETER OutputPath 
 	The directory where to save the output file.
+.PARAMETER Install
+	Install the script to "C:\Users\%USERNAME%\Scripts\Youtube-dl" and create desktop and Start Menu shortcuts.
 
 .EXAMPLE 
 	C:\Users\%USERNAME%\Youtube-dl\scripts\youtube-dl.ps1
@@ -33,9 +37,10 @@
 	Only downloads the audio of the specified video URL to the desktop.
 	
 .NOTES 
-	Requires Windows 7 or higher 
+	Requires Windows 7 or higher and PowerShell 5.0 or greater.
 	Author: mpb10
-	Updated: November 16th, 2017 
+	Updated: January 27th, 2018
+	Version: 2.0.0
 
 .LINK 
 	https://github.com/mpb10/PowerShell-Youtube-dl
@@ -50,8 +55,9 @@ Param(
 	[Switch]$Video,
 	[Switch]$Audio,
 	[Switch]$FromFiles,
+	[Switch]$Convert,
 	[String]$URL,
-	[String]$OutputPath
+	[String]$OutputPath,
 	[Switch]$Install
 )
 
@@ -109,8 +115,12 @@ Else {
 # ======================================================================================================= #
 # ======================================================================================================= #
 	
-
-$RootFolder = $ENV:USERPROFILE + "\Scripts\Youtube-dl"
+If ($PSScriptRoot -eq "$ENV:USERPOFILE\Scripts\Youtube-dl\scripts") {
+	$RootFolder = $ENV:USERPROFILE + "\Scripts\Youtube-dl"
+}
+Else {
+	$RootFolder = $PSScriptRoot
+}
 
 $ArchiveFile = $RootFolder + "\downloadarchive.txt"
 If ((Test-Path "$ArchiveFile") -eq $False) {
@@ -162,7 +172,8 @@ Else {
 }
 
 
-
+Write-Host "`nTest.`n"
+PauseScript
 
 
 
@@ -242,20 +253,11 @@ Function InstallScript {
 	DownloadFfmpeg
 	
 	Copy-Item "$PSScriptRoot\youtube-dl.ps1" -Destination "$ScriptsFolder"
-	
-	$DownloadURL = "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/install/Youtube-dl.lnk"
-	$DownloadedFile = $RootFolder + "\Youtube-dl.lnk"
-	(New-Object System.Net.WebClient).DownloadFile($DownloadURL, $DownloadedFile)
-    Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$DesktopFolder"
-    Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$StartFolder"
-	
-	$DownloadURL = "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/LICENSE"
-	$DownloadedFile = $RootFolder + "\LICENSE"
-	(New-Object System.Net.WebClient).DownloadFile($DownloadURL, $DownloadedFile)
-	
-	$DownloadURL = "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/README.md"
-	$DownloadedFile = $RootFolder + "\README.md"
-	(New-Object System.Net.WebClient).DownloadFile($DownloadURL, $DownloadedFile)
+	Copy-Item "$PSScriptRoot\..\install\files\Youtube-dl.lnk" -Destination "$RootFolder"
+	Copy-Item "$PSScriptRoot\..\install\files\Youtube-dl.lnk" -Destination "$DesktopFolder"
+    Copy-Item "$PSScriptRoot\..\install\files\Youtube-dl.lnk" -Destination "$StartFolder"
+	Copy-Item "$PSScriptRoot\..\LICENSE" -Destination "$RootFolder"
+	Copy-Item "$PSScriptRoot\..\README.md" -Destination "$RootFolder"
 
     Write-Host "`nInstallation complete. Please Restart the script.`n" -ForegroundColor "Yellow"
     PauseScript
