@@ -21,6 +21,8 @@
 	Run the script in command line mode instead of using the GUI.
 .PARAMETER Install
 	Install the script to "C:\Users\%USERNAME%\Scripts\Youtube-dl" and create desktop and Start Menu shortcuts.
+.PARAMETER Update
+	Update youtube-dl.exe and the ffmpeg files to the most recent versions.
 
 .EXAMPLE 
 	C:\Users\%USERNAME%\Youtube-dl\scripts\youtube-dl.ps1
@@ -61,7 +63,8 @@ Param(
 	[String]$URL,
 	[String]$OutputPath,
 	[Switch]$NoGUI,
-	[Switch]$Install
+	[Switch]$Install,
+	[Switch]$Update
 )
 
 
@@ -182,7 +185,8 @@ Function InstallScript {
 
 
 Function UpdateScript {
-	Remove-Item -Path "$RootFolder\bin"
+	Remove-Item -Path "$RootFolder\bin" -Recurse
+	New-Item -Type Directory -Path "$BinFolder"
 	DownloadYoutube-dl
 	DownloadFfmpeg
 }
@@ -265,6 +269,13 @@ Function CommandLineMode {
 		Write-Host "`nInstalling Youtube-dl to: ""$ENV:USERPOFILE\Scripts\Youtube-dl""`n"
 		InstallScript
 		Write-Host "`nExiting in 5 seconds ...`n" -ForegroundColor "Gray"
+		Start-Sleep -s 5
+		Exit
+	}
+	ElseIf ($Update -eq $True) {
+		Write-Host "`nUpdating youtube-dl.exe and ffmpeg files ...`n"
+		UpdateScript
+		Write-Host "`nDone.`nExiting in 5 seconds ...`n" -ForegroundColor "Gray"
 		Start-Sleep -s 5
 		Exit
 	}
