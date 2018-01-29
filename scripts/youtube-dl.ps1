@@ -132,12 +132,7 @@ Function DownloadFfmpeg {
 		DownloadFile "http://ffmpeg.zeranoe.com/builds/win32/static/ffmpeg-3.4.1-win32-static.zip" "$RootFolder\ffmpeg_3.4.1.zip"
 	}
 
-	If ($PSVersionTable.PSVersion.Major -ge 5) {
-		Expand-Archive -Path "$RootFolder\ffmpeg_3.4.1.zip" -DestinationPath "$RootFolder"
-	}
-	Else {
-		[System.IO.Compression.ZipFile]::ExtractToDirectory("$RootFolder\ffmpeg_3.4.1.zip", "$RootFolder")
-	}
+	Expand-Archive -Path "$RootFolder\ffmpeg_3.4.1.zip" -DestinationPath "$RootFolder"
 
 	$ffmpegBinFolder = $RootFolder + "\ffmpeg-3.4.1-win64-static\bin\*"
 	$ffmpegExtractedFolder = $RootFolder + "\ffmpeg-3.4.1-win64-static"
@@ -161,8 +156,8 @@ Function InstallScript {
 	
 	$StartFolder = $ENV:APPDATA + "\Microsoft\Windows\Start Menu\Programs\Youtube-dl"
 	New-Item -Type Directory -Path "$StartFolder"
-
-    $DesktopFolder = $ENV:USERPROFILE + "\Desktop"
+	
+	$DesktopFolder = $ENV:USERPROFILE + "\Desktop"
 	
 	DownloadYoutube-dl
 	
@@ -178,18 +173,19 @@ Function InstallScript {
 	
 	DownloadFile "http://github.com/mpb10/PowerShell-Youtube-dl/raw/master/README.md" "$RootFolder\README.md"
 	
-    Write-Host "`nInstallation complete. Please restart the script.`n" -ForegroundColor "Yellow"
-    PauseScript
+	Write-Host "`nInstallation complete. Please restart the script.`n" -ForegroundColor "Yellow"
+	PauseScript
 }
 
 
 
 Function UpdateScript {
-	Remove-Item -Path "$RootFolder\bin" -Recurse
-	New-Item -Type Directory -Path "$BinFolder"
+	Remove-Item -Path "$RootFolder\bin" -Filter "*.exe" -Recurse 
+	### Might not need ### New-Item -Type Directory -Path "$BinFolder"
 	DownloadYoutube-dl
 	DownloadFfmpeg
 	Write-Host "`nUpdate complete. Please restart the script.`n" -ForegroundColor "Yellow"
+	PauseScript
 }
 
 
@@ -265,6 +261,24 @@ Function DownloadAudio {
 
 
 
+Function DownloadPlaylists {
+	Write-Host "`nDownloading playlist URLs listed in:`n   $VideoPlaylistFile`n   $AudioPlaylistFile"
+	
+	Get-Content $VideoPlaylistFile | ForEach-Object {
+		Write-Host "`nDownloading playlist: $_`n" -ForegroundColor "Gray"
+		DownloadVideo "$_"
+	}
+
+	Get-Content $AudioPlaylistFile | ForEach-Object {
+		Write-Host "`nDownloading playlist: $_`n" -ForegroundColor "Gray"
+		DownloadAudio "$_"
+	}
+
+	Write-Host "`nFinished downloading URLs from playlist files.`n" -ForegroundColor "Yellow"
+}
+
+
+
 Function CommandLineMode {
 	If ($Install -eq $True) {
 		Write-Host "`nInstalling Youtube-dl to: ""$ENV:USERPOFILE\Scripts\Youtube-dl""`n"
@@ -301,11 +315,11 @@ Function CommandLineMode {
 		Write-Host "`n[ERROR]: The parameter -FromFiles can't be used with -Video or -Audio.`n" -ForegroundColor "Red" -BackgroundColor "Black"
 	}
 	ElseIf ($Video -eq $True -and $Audio -eq $False) {
-		DownloadVideo $URL
+		DownloadVideo "$URL"
 		Write-Host "`nDownload complete.`nDownloaded to: ""$VideoSaveLocation""`n" -ForegroundColor "Yellow"
 	}
 	ElseIf ($Audio -eq $True -and $Video -eq $False) {
-		DownloadAudio $URL
+		DownloadAudio "$URL"
 		Write-Host "`nDownload complete.`nDownloaded to: ""$AudioSaveLocation`n""" -ForegroundColor "Yellow"
 	}
 	ElseIf ($Video -eq $True -and $Audio -eq $True) {
@@ -351,16 +365,15 @@ If ((Test-Path "$BinFolder") -eq $False) {
 }
 $ENV:Path += ";$BinFolder"
 
-$ConversionSettings = @("$UseArchiveFile", "$EntirePlaylist", "ConvertFile", "$FileExtension", "$VideoBitrate", "$AudioBitrate", "$Resolution", "$StartTime", "$StopTime", "$StripVideo", "$StripAudio")
-
 
 # ======================================================================================================= #
 # ======================================================================================================= #
 
 
 If ($PSVersionTable.PSVersion.Major -lt 5) {
-	Write-Host "[NOTE]: Your PowerShell installation is not the most recent version.`n        It's recommended that you have PowerShell version 5 to use this script.`n        You can download PowerShell version 5 at:`n            https://www.microsoft.com/en-us/download/details.aspx?id=50395" -ForegroundColor "Red" -BackgroundColor "Black"
+	Write-Host "[NOTE]: Your PowerShell installation is not version 5.0 or greater.`n        This script requires PowerShell version 5.0 or greater to run.`n        You can download PowerShell version 5.0 at:`n            https://www.microsoft.com/en-us/download/details.aspx?id=50395" -ForegroundColor "Red" -BackgroundColor "Black"
 	PauseScript
+	Exit
 }
 Else {
 	Write-Verbose "PowerShell is up to date."
@@ -392,6 +405,15 @@ Else {
 	#$HOST.UI.RawUI.BackgroundColor = "Black"
 	#$HOST.UI.RawUI.ForegroundColor = "White"
 	
+	MainMenu
+
+
+
+
+
+	#$HOST.UI.RawUI.BackgroundColor = "$BackgroundColorBefore"
+	#$HOST.UI.RawUI.ForegroundColor = "$ForegroundColorBefore"
+
 	Write-Host "End GUI mode."
 	PauseScript
 }
@@ -399,7 +421,18 @@ Else {
 
 
 
+# Probably won't need $ConversionSettings array.
+# Will get each ffmpeg option ready for the command when they are set by the user. NOT in the SettingsInitialization function.
+# Take strip audio/video variable if-statements out of SettingsInitialization function.
+# May need to look at script settings strip audio/video variables. They are only $True/$False variables right now.
 
+
+
+# Remove $SettingsConversion array.
+# Add DownloadPlaylists function.
+# Changes to the UpdateScript function.
+# Changes to the PowerShell version check. Script now REQUIRES PowerShell version 5.
+# Changes to the DownloadFfmpeg function. Removed non-PowerShell version 5 zip file extration if-statement.
 
 
 
