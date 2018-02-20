@@ -294,7 +294,7 @@ Function DownloadPlaylists {
 
 Function CommandLineMode {
 	If ($Install -eq $True) {
-		Write-Host "`nInstalling Youtube-dl to: ""$ENV:USERPOFILE\Scripts\Youtube-dl""`n"
+		Write-Host "`nInstalling Youtube-dl to: ""$ENV:USERPROFILE\Scripts\Youtube-dl""`n"
 		InstallScript
 		Write-Host "`nExiting in 5 seconds ...`n" -ForegroundColor "Gray"
 		Start-Sleep -s 5
@@ -443,7 +443,7 @@ Function SettingsMenu {
 		Write-Host "                         Settings Menu                          " -ForegroundColor "Yellow"
 		Write-Host "================================================================"
 		Write-Host "`nPlease select an option:`n" -ForegroundColor "Yellow"
-		Write-Host "  1   - Install script to: ""$ENV:USERPOFILE\Scripts\Youtube-dl"""
+		Write-Host "  1   - Install script to: ""$ENV:USERPROFILE\Scripts\Youtube-dl"""
 		Write-Host "  2   - Update youtube-dl.exe and ffmpeg.exe"
 		Write-Host "  3   - Update youtube-dl.ps1 script file."
 		Write-Host "`n  0   - Return to Main Menu`n" -ForegroundColor "Gray"
@@ -451,7 +451,7 @@ Function SettingsMenu {
 		
 		Switch ($MenuOption) {
 			1 {
-				Write-Host "`nInstalling Youtube-dl to: ""$ENV:USERPOFILE\Scripts\Youtube-dl"""
+				Write-Host "`nInstalling Youtube-dl to: ""$ENV:USERPROFILE\Scripts\Youtube-dl"""
 				InstallScript
 				Write-Host "`nExiting in 5 seconds ...`n" -ForegroundColor "Gray"
 				Start-Sleep -s 5
@@ -504,7 +504,7 @@ Else {
 	Write-Verbose "PowerShell is up to date."
 }
 
-If ($PSScriptRoot -eq "$ENV:USERPOFILE\Scripts\Youtube-dl\scripts") {
+If ($PSScriptRoot -eq "$ENV:USERPROFILE\Scripts\Youtube-dl\scripts") {
 	$RootFolder = $ENV:USERPROFILE + "\Scripts\Youtube-dl"
 }
 Else {
@@ -571,13 +571,11 @@ Else {
 
 
 
-# $ENV:USERPROFILE is empty for some reason. 
+# Have UpdateScript function check and display what the newest version is on GitHub using:
+# 	Get-Content on this file: https://github.com/mpb10/PowerShell-Youtube-dl/raw/version-2/install/files/version-file
+# Then prompt the user if they want to update.
 
-
-
-
-
-
+# Maybe prompt user with version numbers when doing UpdateExe function?
 
 
 
