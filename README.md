@@ -10,6 +10,8 @@ A PowerShell script used to operate the youtube-dl command line program.
 
 **v1.2.6**
 #
+**ATTENTION:** While the master branch is still fully functional, the code it uses is rather clunky and not very pretty. I have begun completely re-writing the script in the version-2 branch. The code in the version-2 branch is MUCH cleaner and faster. So far, downloading video, audio, and playlists should all be functioning, via both the command line and GUI. Converting video files with ffmpeg may still need a little bit of work. Other than that, version-2 progress is coming along nicely. Check it out if you're interested!
+#
 
  - [INSTALLATION](#installation)
  - [USAGE](#usage)
