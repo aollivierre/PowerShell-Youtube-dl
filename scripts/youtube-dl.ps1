@@ -41,7 +41,7 @@
 .NOTES 
 	Requires Windows 7 or higher and PowerShell 5.0 or greater.
 	Author: mpb10
-	Updated: February 20th, 2018
+	Updated: February 22th, 2018
 	Version: 2.0.0
 
 .LINK 
@@ -63,6 +63,16 @@ Param(
 	[Switch]$UpdateExe,
 	[Switch]$UpdateScript
 )
+
+
+
+If ($PSVersionTable.PSVersion.Major -lt 5) {
+	Write-Host "[ERROR]: Your PowerShell installation is not version 5.0 or greater.`n        This script requires PowerShell version 5.0 or greater to function.`n        You can download PowerShell version 5.0 at:`n            https://www.microsoft.com/en-us/download/details.aspx?id=50395" -ForegroundColor "Red" -BackgroundColor "Black"
+	PauseScript
+	Exit
+}
+
+[Version]$CurrentVersion = '2.0.0'
 
 
 # ======================================================================================================= #
@@ -110,7 +120,9 @@ Function DownloadFile {
 		[String]$URLToDownload,
 		[String]$SaveLocation
 	)
-	(New-Object System.Net.WebClient).DownloadFile($URLToDownload, $SaveLocation)
+	(New-Object System.Net.WebClient).DownloadFile("$URLToDownload", "$TempFolder\download.tmp")
+	Copy-Item -Path "$TempFolder\download.tmp" -Destination "$SaveLocation"
+	Remove-Item -Path "$TempFolder\download.tmp"
 }
 
 
@@ -123,19 +135,56 @@ Function DownloadYoutube-dl {
 
 Function DownloadFfmpeg {
 	If (([environment]::Is64BitOperatingSystem) -eq $True) {
-		DownloadFile "http://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-3.4.1-win64-static.zip" "$RootFolder\ffmpeg_3.4.1.zip"
+		DownloadFile "http://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-3.4.1-win64-static.zip" "$BinFolder\ffmpeg_3.4.1.zip"
 	}
 	Else {
-		DownloadFile "http://ffmpeg.zeranoe.com/builds/win32/static/ffmpeg-3.4.1-win32-static.zip" "$RootFolder\ffmpeg_3.4.1.zip"
+		DownloadFile "http://ffmpeg.zeranoe.com/builds/win32/static/ffmpeg-3.4.1-win32-static.zip" "$BinFolder\ffmpeg_3.4.1.zip"
 	}
 
-	Expand-Archive -Path "$RootFolder\ffmpeg_3.4.1.zip" -DestinationPath "$RootFolder"
+	Expand-Archive -Path "$BinFolder\ffmpeg_3.4.1.zip" -DestinationPath "$BinFolder"
+	
+	Copy-Item -Path "$BinFolder\ffmpeg-3.4.1-win64-static\bin\*" -Destination "$BinFolder" -Recurse -Filter "*.exe" -ErrorAction Silent
+	Remove-Item -Path "$BinFolder\ffmpeg-3.4.1-win64-static" -Recurse
+}
 
-	$ffmpegBinFolder = $RootFolder + "\ffmpeg-3.4.1-win64-static\bin\*"
-	$ffmpegExtractedFolder = $RootFolder + "\ffmpeg-3.4.1-win64-static"
-	Copy-Item -Path "$ffmpegBinFolder" -Destination "$BinFolder" -Recurse -Filter "*.exe" -ErrorAction Silent
-	Remove-Item -Path "$RootFolder\ffmpeg_3.4.1.zip"
-	Remove-Item -Path "$ffmpegExtractedFolder" -Recurse 
+
+
+Function ScriptInitialization {
+	$BinFolder = $RootFolder + "\bin"
+	If ((Test-Path "$BinFolder") -eq $False) {
+		New-Item -Type Directory -Path "$BinFolder"
+	}
+	$ENV:Path += ";$BinFolder"
+
+	$ScriptsFolder = $RootFolder + "\scripts"
+	If ((Test-Path "$ScriptsFolder") -eq $False) {
+		New-Item -Type Directory -Path "$ScriptsFolder"
+	}
+
+	$TempFolder = $RootFolder + "\temp"
+	If ((Test-Path "$TempFolder") -eq $False) {
+		New-Item -Type Directory -Path "$TempFolder"
+	}
+
+	$ConfigFolder = $RootFolder + "\config"
+	If ((Test-Path "$ConfigFolder") -eq $False) {
+		New-Item -Type Directory -Path "$ConfigFolder"
+	}
+
+	$ArchiveFile = $RootFolder + "\downloadarchive.txt"
+	If ((Test-Path "$ArchiveFile") -eq $False) {
+		New-Item -Type file -Path "$ArchiveFile"
+	}
+
+	$VideoPlaylistFile = $ConfigFolder + "\videoplaylists.txt"
+	If ((Test-Path "$VideoPlaylistFile") -eq $False) {
+		New-Item -Type file -Path "$VideoPlaylistFile"
+	}
+
+	$AudioPlaylistFile = $ConfigFolder + "\audioplaylists.txt"
+	If ((Test-Path "$AudioPlaylistFile") -eq $False) {
+		New-Item -Type file -Path "$AudioPlaylistFile"
+	}
 }
 
 
@@ -149,23 +198,11 @@ Function InstallScript {
 		Write-Host "`nInstalling to: ""$ENV:USERPROFILE\Scripts\Youtube-dl"""
 		
 		$Script:RootFolder = $ENV:USERPROFILE + "\Scripts\Youtube-dl"
-		$Script:BinFolder = $RootFolder + "\bin"
-		$ENV:Path += ";$BinFolder"
-		$ScriptsFolder = $RootFolder + "\scripts"
+		
+		ScriptInitialization
+		
 		$StartFolder = $ENV:APPDATA + "\Microsoft\Windows\Start Menu\Programs\Youtube-dl"
 		$DesktopFolder = $ENV:USERPROFILE + "\Desktop"
-		
-		If ((Test-Path "$RootFolder") -eq $True) {
-			Remove-Item -Path "$RootFolder\bin" -Filter "*.exe" -Recurse -ErrorAction Silent
-			Remove-Item -Path "$RootFolder\scripts" -Filter "*.ps1" -Recurse -ErrorAction Silent
-		}
-		Else {
-			New-Item -Type Directory -Path "$RootFolder"
-		}
-		
-		New-Item -Type Directory -Path "$BinFolder" -ErrorAction Silent
-		New-Item -Type Directory -Path "$ScriptsFolder" -ErrorAction Silent
-		New-Item -Type Directory -Path "$StartFolder" -ErrorAction Silent
 		
 		DownloadYoutube-dl
 		DownloadFfmpeg
@@ -176,7 +213,8 @@ Function InstallScript {
 		Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$DesktopFolder"
 		Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$StartFolder"
 		
-		DownloadFile "http://github.com/mpb10/PowerShell-Youtube-dl/raw/master/LICENSE" "$RootFolder\LICENSE"
+		DownloadFile "http://github.com/mpb10/PowerShell-Youtube-dl/raw/master/LICENSE" "$RootFolder\LICENSE.txt"
+		Rename-Item -Path "$RootFolder\LICENSE.txt" -NewName "LICENSE"
 		
 		DownloadFile "http://github.com/mpb10/PowerShell-Youtube-dl/raw/master/README.md" "$RootFolder\README.md"
 		
@@ -192,22 +230,18 @@ Function InstallScript {
 
 Function UpdateExe {
 	Write-Host "Updating youtube-dl.exe and ffmpeg.exe files ..."
-	Remove-Item -Path "$RootFolder\bin" -Filter "*.exe" -Recurse -ErrorAction Silent
 	DownloadYoutube-dl
 	DownloadFfmpeg
 	Write-Host "`nUpdate .exe files complete. Please restart the script." -ForegroundColor "Yellow"
 	PauseScript
-	$HOST.UI.RawUI.BackgroundColor = $BackgroundColorBefore
-	$HOST.UI.RawUI.ForegroundColor = $ForegroundColorBefore
-	Exit
 }
 
 
 
 Function UpdateScript {
-	DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/install/files/version-file" "$RootFolder\version-file"
-	[Version]$NewestVersion = Get-Content "$RootFolder\version-file" | Select -Index 0
-	Remove-Item -Path "$RootFolder\version-file" -ErrorAction Silent
+	DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/install/files/version-file" "$TempFolder\version-file.txt"
+	[Version]$NewestVersion = Get-Content "$TempFolder\version-file.txt" | Select -Index 0
+	Remove-Item -Path "$TempFolder\*" -Recurse -ErrorAction Silent
 	
 	If ($NewestVersion -gt $CurrentVersion) {
 		Write-Host "The newest version of PowerShell-Youtube-dl is $NewestVersion"
@@ -216,14 +250,9 @@ Function UpdateScript {
 			Return
 		}
 		Else {
-			DownloadFile "http://github.com/mpb10/PowerShell-Youtube-dl/raw/master/scripts/youtube-dl.ps1" "$RootFolder\youtube-dl.ps1"
-			Copy-Item "$RootFolder\youtube-dl.ps1" -Destination "$RootFolder\scripts"
-			Remove-Item "$RootFolder\youtube-dl.ps1"
+			DownloadFile "http://github.com/mpb10/PowerShell-Youtube-dl/raw/master/scripts/youtube-dl.ps1" "$ScriptsFolder\youtube-dl.ps1"
 			Write-Host "`nUpdate script file complete. Please restart the script." -ForegroundColor "Yellow"
 			PauseScript
-			$HOST.UI.RawUI.BackgroundColor = $BackgroundColorBefore
-			$HOST.UI.RawUI.ForegroundColor = $ForegroundColorBefore
-			Exit
 		}
 	}
 	ElseIf ($NewestVersion -eq $CurrentVersion) {
@@ -314,12 +343,12 @@ Function DownloadAudio {
 Function DownloadPlaylists {
 	Write-Host "`nDownloading playlist URLs listed in:`n   $VideoPlaylistFile`n   $AudioPlaylistFile"
 	
-	Get-Content $VideoPlaylistFile | ForEach-Object {
+	Get-Content "$VideoPlaylistFile" | ForEach-Object {
 		Write-Host "`nDownloading playlist: $_`n" -ForegroundColor "Gray"
 		DownloadVideo "$_"
 	}
 
-	Get-Content $AudioPlaylistFile | ForEach-Object {
+	Get-Content "$AudioPlaylistFile" | ForEach-Object {
 		Write-Host "`nDownloading playlist: $_`n" -ForegroundColor "Gray"
 		DownloadAudio "$_"
 	}
@@ -336,9 +365,7 @@ Function CommandLineMode {
 		Exit
 	}
 	ElseIf ($UpdateExe -eq $True -and $UpdateScript -eq $True) {
-		Write-Host "`nUpdating youtube-dl.exe and ffmpeg.exe files ..."
 		UpdateExe
-		Write-Host "`nUpdating youtube-dl.ps1 script file ..."
 		UpdateScript
 		Exit
 	}
@@ -365,23 +392,23 @@ Function CommandLineMode {
 	
 	SettingsInitialization
 	
-	If ($FromFiles -eq $True -and $Video -eq $False -and $Audio -eq $False) {
+	If ($FromFiles -eq $True -and ($Video -eq $True -or $Audio -eq $True)) {
+		Write-Host "`n[ERROR]: The parameter -FromFiles can't be used with -Video or -Audio.`n" -ForegroundColor "Red" -BackgroundColor "Black"
+	}
+	ElseIf ($FromFiles -eq $True) {
 		DownloadPlaylists
 		Write-Host "`nDownloads complete.`nDownloaded to: ""$VideoSaveLocation"" and ""$AudioSaveLocation""`n" -ForegroundColor "Yellow"
 	}
-	ElseIf ($FromFiles -eq $True -and ($Video -eq $True -or $Audio -eq $True)) {
-		Write-Host "`n[ERROR]: The parameter -FromFiles can't be used with -Video or -Audio.`n" -ForegroundColor "Red" -BackgroundColor "Black"
+	ElseIf ($Video -eq $True -and $Audio -eq $True) {
+		Write-Host "`n[ERROR]: Please select either -Video or -Audio. Not Both.`n" -ForegroundColor "Red" -BackgroundColor "Black"
 	}
-	ElseIf ($Video -eq $True -and $Audio -eq $False) {
+	ElseIf ($Video -eq $True) {
 		DownloadVideo "$URL"
 		Write-Host "`nDownload complete.`nDownloaded to: ""$VideoSaveLocation""`n" -ForegroundColor "Yellow"
 	}
-	ElseIf ($Audio -eq $True -and $Video -eq $False) {
+	ElseIf ($Audio -eq $True) {
 		DownloadAudio "$URL"
 		Write-Host "`nDownload complete.`nDownloaded to: ""$AudioSaveLocation`n""" -ForegroundColor "Yellow"
-	}
-	ElseIf ($Video -eq $True -and $Audio -eq $True) {
-		Write-Host "`n[ERROR]: Please select either -Video or -Audio. Not Both.`n" -ForegroundColor "Red" -BackgroundColor "Black"
 	}
 	Else {
 		Write-Host "`n[ERROR]: Invalid parameters provided." -ForegroundColor "Red" -BackgroundColor "Black"
@@ -483,10 +510,16 @@ Function SettingsMenu {
 		Switch ($MenuOption) {
 			1 {
 				UpdateExe
+				$HOST.UI.RawUI.BackgroundColor = $BackgroundColorBefore
+				$HOST.UI.RawUI.ForegroundColor = $ForegroundColorBefore
+				Exit
 				$MenuOption = 99
 			}
 			2 {
 				UpdateScript
+				$HOST.UI.RawUI.BackgroundColor = $BackgroundColorBefore
+				$HOST.UI.RawUI.ForegroundColor = $ForegroundColorBefore
+				Exit
 				$MenuOption = 99
 			}
 			3 {
@@ -505,17 +538,6 @@ Function SettingsMenu {
 }
 
 
-# ======================================================================================================= #
-# ======================================================================================================= #
-
-If ($PSVersionTable.PSVersion.Major -lt 5) {
-	Write-Host "[ERROR]: Your PowerShell installation is not version 5.0 or greater.`n        This script requires PowerShell version 5.0 or greater to function.`n        You can download PowerShell version 5.0 at:`n            https://www.microsoft.com/en-us/download/details.aspx?id=50395" -ForegroundColor "Red" -BackgroundColor "Black"
-	PauseScript
-	Exit
-}
-
-[Version]$CurrentVersion = '2.0.0'
-
 
 # ======================================================================================================= #
 # ======================================================================================================= #
@@ -527,33 +549,19 @@ Else {
 	$RootFolder = "$PSScriptRoot\.."
 }
 
-$ArchiveFile = $RootFolder + "\downloadarchive.txt"
-If ((Test-Path "$ArchiveFile") -eq $False) {
-	New-Item -Type file -Path "$ArchiveFile"
-}
-
-$VideoPlaylistFile = $RootFolder + "\videoplaylists.txt"
-If ((Test-Path "$VideoPlaylistFile") -eq $False) {
-	New-Item -Type file -Path "$VideoPlaylistFile"
-}
-
-$AudioPlaylistFile = $RootFolder + "\audioplaylists.txt"
-If ((Test-Path "$AudioPlaylistFile") -eq $False) {
-	New-Item -Type file -Path "$AudioPlaylistFile"
-}
-
-$BinFolder = $RootFolder + "\bin"
-If ((Test-Path "$BinFolder") -eq $False) {
-	New-Item -Type Directory -Path "$BinFolder"
-}
-$ENV:Path += ";$BinFolder"
-
 $NumOfParams = ($PSBoundParameters.Count)
 
-If ((Test-Path "$BinFolder\youtube-dl.exe") -eq $False -or (Test-Path "$BinFolder\ffmpeg.exe") -eq $False -or (Test-Path "$BinFolder\ffplay.exe") -eq $False -or (Test-Path "$BinFolder\ffprobe.exe") -eq $False) {
-	Write-Host "`n.exe files not found. Downloading and installing to: ""$BinFolder"" ...`n" -ForegroundColor "Yellow"
-	Remove-Item -Path "$RootFolder\bin" -Filter "*.exe" -Recurse -ErrorAction Silent
+ScriptInitialization
+
+Remove-Item -Path "$TempFolder\*" -Recurse -ErrorAction Silent
+
+If ((Test-Path "$BinFolder\youtube-dl.exe") -eq $False) {
+	Write-Host "`nyoutube-dl.exe not found. Downloading and installing to: ""$BinFolder"" ...`n" -ForegroundColor "Yellow"
 	DownloadYoutube-dl
+}
+
+If ((Test-Path "$BinFolder\ffmpeg.exe") -eq $False -or (Test-Path "$BinFolder\ffplay.exe") -eq $False -or (Test-Path "$BinFolder\ffprobe.exe") -eq $False) {
+	Write-Host "`nffmpeg files not found. Downloading and installing to: ""$BinFolder"" ...`n" -ForegroundColor "Yellow"
 	DownloadFfmpeg
 }
 
@@ -583,9 +591,9 @@ Else {
 
 
 
-
-
-# Move text files into config folder.
+# Test new config folder
+# Test new downloading function and temp folder.
+# Test updateexe, updatescript, installscript, downloadyoutube-dl, and downloadffmpeg functions.
 
 # Check that more of the function completion messages are in the correct places.
 
