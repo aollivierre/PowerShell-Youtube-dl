@@ -41,7 +41,7 @@
 .NOTES 
 	Requires Windows 7 or higher and PowerShell 5.0 or greater.
 	Author: mpb10
-	Updated: January 27th, 2018
+	Updated: February 20th, 2018
 	Version: 2.0.0
 
 .LINK 
@@ -51,7 +51,6 @@
 
 # ======================================================================================================= #
 # ======================================================================================================= #
-
 
 Param(
 	[Switch]$Video,
@@ -142,61 +141,99 @@ Function DownloadFfmpeg {
 
 
 Function InstallScript {
-	
-	$Script:RootFolder = $ENV:USERPROFILE + "\Scripts\Youtube-dl"
-	$Script:BinFolder = $RootFolder + "\bin"
-	$ENV:Path += ";$BinFolder"
-	$ScriptsFolder = $RootFolder + "\scripts"
-	$StartFolder = $ENV:APPDATA + "\Microsoft\Windows\Start Menu\Programs\Youtube-dl"
-	$DesktopFolder = $ENV:USERPROFILE + "\Desktop"
-	
-	If ((Test-Path "$RootFolder") -eq $True) {
-		Remove-Item -Path "$RootFolder\bin" -Filter "*.exe" -Recurse -ErrorAction Silent
-		Remove-Item -Path "$RootFolder\scripts" -Filter "*.ps1" -Recurse -ErrorAction Silent
+	$MenuOption = Read-Host "Install PowerShell-Youtube-dl to ""$ENV:USERPROFILE\Scripts\Youtube-dl""? [Y/n]"
+	If ($MenuOption -like "n" -or $MenuOption -like "no") {
+		Return
 	}
 	Else {
-		New-Item -Type Directory -Path "$RootFolder"
+		Write-Host "`nInstalling to: ""$ENV:USERPROFILE\Scripts\Youtube-dl"""
+		
+		$Script:RootFolder = $ENV:USERPROFILE + "\Scripts\Youtube-dl"
+		$Script:BinFolder = $RootFolder + "\bin"
+		$ENV:Path += ";$BinFolder"
+		$ScriptsFolder = $RootFolder + "\scripts"
+		$StartFolder = $ENV:APPDATA + "\Microsoft\Windows\Start Menu\Programs\Youtube-dl"
+		$DesktopFolder = $ENV:USERPROFILE + "\Desktop"
+		
+		If ((Test-Path "$RootFolder") -eq $True) {
+			Remove-Item -Path "$RootFolder\bin" -Filter "*.exe" -Recurse -ErrorAction Silent
+			Remove-Item -Path "$RootFolder\scripts" -Filter "*.ps1" -Recurse -ErrorAction Silent
+		}
+		Else {
+			New-Item -Type Directory -Path "$RootFolder"
+		}
+		
+		New-Item -Type Directory -Path "$BinFolder" -ErrorAction Silent
+		New-Item -Type Directory -Path "$ScriptsFolder" -ErrorAction Silent
+		New-Item -Type Directory -Path "$StartFolder" -ErrorAction Silent
+		
+		DownloadYoutube-dl
+		DownloadFfmpeg
+		
+		Copy-Item "$PSScriptRoot\youtube-dl.ps1" -Destination "$ScriptsFolder"
+		
+		DownloadFile "http://github.com/mpb10/PowerShell-Youtube-dl/raw/master/install/files/Youtube-dl.lnk" "$RootFolder\Youtube-dl.lnk"
+		Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$DesktopFolder"
+		Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$StartFolder"
+		
+		DownloadFile "http://github.com/mpb10/PowerShell-Youtube-dl/raw/master/LICENSE" "$RootFolder\LICENSE"
+		
+		DownloadFile "http://github.com/mpb10/PowerShell-Youtube-dl/raw/master/README.md" "$RootFolder\README.md"
+		
+		Write-Host "`nInstallation complete. Please restart the script.`n" -ForegroundColor "Yellow"
+		PauseScript
+		$HOST.UI.RawUI.BackgroundColor = $BackgroundColorBefore
+		$HOST.UI.RawUI.ForegroundColor = $ForegroundColorBefore
+		Exit
 	}
-	
-	New-Item -Type Directory -Path "$BinFolder" -ErrorAction Silent
-	New-Item -Type Directory -Path "$ScriptsFolder" -ErrorAction Silent
-	New-Item -Type Directory -Path "$StartFolder" -ErrorAction Silent
-	
-	DownloadYoutube-dl
-	DownloadFfmpeg
-	
-	Copy-Item "$PSScriptRoot\youtube-dl.ps1" -Destination "$ScriptsFolder"
-	
-	DownloadFile "http://github.com/mpb10/PowerShell-Youtube-dl/raw/master/install/files/Youtube-dl.lnk" "$RootFolder\Youtube-dl.lnk"
-	Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$DesktopFolder"
-	Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$StartFolder"
-	
-	DownloadFile "http://github.com/mpb10/PowerShell-Youtube-dl/raw/master/LICENSE" "$RootFolder\LICENSE"
-	
-	DownloadFile "http://github.com/mpb10/PowerShell-Youtube-dl/raw/master/README.md" "$RootFolder\README.md"
-	
-	Write-Host "`nInstallation complete. Please restart the script.`n" -ForegroundColor "Yellow"
-	PauseScript
 }
 
 
 
 Function UpdateExe {
+	Write-Host "Updating youtube-dl.exe and ffmpeg.exe files ..."
 	Remove-Item -Path "$RootFolder\bin" -Filter "*.exe" -Recurse -ErrorAction Silent
 	DownloadYoutube-dl
 	DownloadFfmpeg
 	Write-Host "`nUpdate .exe files complete. Please restart the script." -ForegroundColor "Yellow"
 	PauseScript
+	$HOST.UI.RawUI.BackgroundColor = $BackgroundColorBefore
+	$HOST.UI.RawUI.ForegroundColor = $ForegroundColorBefore
+	Exit
 }
 
 
 
 Function UpdateScript {
-	DownloadFile "http://github.com/mpb10/PowerShell-Youtube-dl/raw/master/scripts/youtube-dl.ps1" "$RootFolder\youtube-dl.ps1"
-	Copy-Item "$RootFolder\youtube-dl.ps1" -Destination "$RootFolder\scripts"
-	Remove-Item "$RootFolder\youtube-dl.ps1"
-	Write-Host "`nUpdate script file complete. Please restart the script." -ForegroundColor "Yellow"
-	PauseScript
+	DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/install/files/version-file" "$RootFolder\version-file"
+	[Version]$NewestVersion = Get-Content "$RootFolder\version-file" | Select -Index 0
+	Remove-Item -Path "$RootFolder\version-file" -ErrorAction Silent
+	
+	If ($NewestVersion -gt $CurrentVersion) {
+		Write-Host "The newest version of PowerShell-Youtube-dl is $NewestVersion"
+		$MenuOption = Read-Host "Update the script to this version? [Y/n]"
+		If ($MenuOption -like "n" -or $MenuOption -like "no") {
+			Return
+		}
+		Else {
+			DownloadFile "http://github.com/mpb10/PowerShell-Youtube-dl/raw/master/scripts/youtube-dl.ps1" "$RootFolder\youtube-dl.ps1"
+			Copy-Item "$RootFolder\youtube-dl.ps1" -Destination "$RootFolder\scripts"
+			Remove-Item "$RootFolder\youtube-dl.ps1"
+			Write-Host "`nUpdate script file complete. Please restart the script." -ForegroundColor "Yellow"
+			PauseScript
+			$HOST.UI.RawUI.BackgroundColor = $BackgroundColorBefore
+			$HOST.UI.RawUI.ForegroundColor = $ForegroundColorBefore
+			Exit
+		}
+	}
+	ElseIf ($NewestVersion -eq $CurrentVersion) {
+		Write-Host "The running version of PowerShell-Youtube-dl is up to date."
+		PauseScript
+	}
+	Else {
+		Write-Host "[ERROR] Version mismatch. Re-installing the script is recommended." -ForegroundColor "Red" -BackgroundColor "Black"
+		PauseScript
+	}
 }
 
 
@@ -296,8 +333,6 @@ Function CommandLineMode {
 	If ($Install -eq $True) {
 		Write-Host "`nInstalling Youtube-dl to: ""$ENV:USERPROFILE\Scripts\Youtube-dl""`n"
 		InstallScript
-		Write-Host "`nExiting in 5 seconds ...`n" -ForegroundColor "Gray"
-		Start-Sleep -s 5
 		Exit
 	}
 	ElseIf ($UpdateExe -eq $True -and $UpdateScript -eq $True) {
@@ -305,22 +340,16 @@ Function CommandLineMode {
 		UpdateExe
 		Write-Host "`nUpdating youtube-dl.ps1 script file ..."
 		UpdateScript
-		Write-Host "`nExiting in 5 seconds ...`n" -ForegroundColor "Gray"
-		Start-Sleep -s 5
 		Exit
 	}
 	ElseIf ($UpdateExe -eq $True) {
 		Write-Host "`nUpdating youtube-dl.exe and ffmpeg files ..."
 		UpdateExe
-		Write-Host "`nExiting in 5 seconds ...`n" -ForegroundColor "Gray"
-		Start-Sleep -s 5
 		Exit
 	}
 	ElseIf ($UpdateScript -eq $True) {
 		Write-Host "`nUpdating youtube-dl.ps1 script file ..."
 		UpdateScript
-		Write-Host "Exiting in 5 seconds ...`n" -ForegroundColor "Gray"
-		Start-Sleep -s 5
 		Exit
 	}
 	
@@ -369,7 +398,7 @@ Function MainMenu {
 		$URL = ""
 		Clear-Host
 		Write-Host "================================================================"
-		Write-Host "                Youtube-dl Download Script v2.0.0               " -ForegroundColor "Yellow"
+		Write-Host "                  PowerShell-Youtube-dl v2.0.0                  " -ForegroundColor "Yellow"
 		Write-Host "================================================================"
 		Write-Host "`nPlease select an option:`n" -ForegroundColor "Yellow"
 		Write-Host "  1   - Download Video"
@@ -437,48 +466,32 @@ Function MainMenu {
 
 Function SettingsMenu {
 	$MenuOption = 99
-	While ($MenuOption -ne 1 -and $MenuOption -ne 2 -and $MenuOption -ne 0) {
+	While ($MenuOption -ne 1 -and $MenuOption -ne 2 -and $MenuOption -ne 3 -and $MenuOption -ne 0) {
 		Clear-Host
 		Write-Host "================================================================"
 		Write-Host "                         Settings Menu                          " -ForegroundColor "Yellow"
 		Write-Host "================================================================"
 		Write-Host "`nPlease select an option:`n" -ForegroundColor "Yellow"
-		Write-Host "  1   - Install script to: ""$ENV:USERPROFILE\Scripts\Youtube-dl"""
-		Write-Host "  2   - Update youtube-dl.exe and ffmpeg.exe"
-		Write-Host "  3   - Update youtube-dl.ps1 script file."
+		Write-Host "  1   - Update youtube-dl.exe and ffmpeg.exe"
+		Write-Host "  2   - Update youtube-dl.ps1 script file"
+		If ($PSScriptRoot -ne "$ENV:USERPROFILE\Scripts\Youtube-dl\scripts") {
+			Write-Host "  3   - Install script to: ""$ENV:USERPROFILE\Scripts\Youtube-dl"""
+		}
 		Write-Host "`n  0   - Return to Main Menu`n" -ForegroundColor "Gray"
 		$MenuOption = Read-Host "Option"
 		
 		Switch ($MenuOption) {
 			1 {
-				Write-Host "`nInstalling Youtube-dl to: ""$ENV:USERPROFILE\Scripts\Youtube-dl"""
-				InstallScript
-				Write-Host "`nExiting in 5 seconds ...`n" -ForegroundColor "Gray"
-				Start-Sleep -s 5
-				$HOST.UI.RawUI.BackgroundColor = $BackgroundColorBefore
-				$HOST.UI.RawUI.ForegroundColor = $ForegroundColorBefore
-				Clear-Host
-				Exit
+				UpdateExe
+				$MenuOption = 99
 			}
 			2 {
-				Write-Host "`nUpdating youtube-dl.exe and ffmpeg.exe files ..."
-				UpdateExe
-				Write-Host "Exiting in 5 seconds ...`n" -ForegroundColor "Gray"
-				Start-Sleep -s 5
-				$HOST.UI.RawUI.BackgroundColor = $BackgroundColorBefore
-				$HOST.UI.RawUI.ForegroundColor = $ForegroundColorBefore
-				Clear-Host
-				Exit
+				UpdateScript
+				$MenuOption = 99
 			}
 			3 {
-				Write-Host "`nUpdating youtube-dl.ps1 script file ..."
-				UpdateScript
-				Write-Host "Exiting in 5 seconds ...`n" -ForegroundColor "Gray"
-				Start-Sleep -s 5
-				$HOST.UI.RawUI.BackgroundColor = $BackgroundColorBefore
-				$HOST.UI.RawUI.ForegroundColor = $ForegroundColorBefore
-				Clear-Host
-				Exit
+				InstallScript
+				$MenuOption = 99
 			}
 			0 {
 				Return
@@ -496,13 +509,16 @@ Function SettingsMenu {
 # ======================================================================================================= #
 
 If ($PSVersionTable.PSVersion.Major -lt 5) {
-	Write-Host "[NOTE]: Your PowerShell installation is not version 5.0 or greater.`n        This script requires PowerShell version 5.0 or greater to run.`n        You can download PowerShell version 5.0 at:`n            https://www.microsoft.com/en-us/download/details.aspx?id=50395" -ForegroundColor "Red" -BackgroundColor "Black"
+	Write-Host "[ERROR]: Your PowerShell installation is not version 5.0 or greater.`n        This script requires PowerShell version 5.0 or greater to function.`n        You can download PowerShell version 5.0 at:`n            https://www.microsoft.com/en-us/download/details.aspx?id=50395" -ForegroundColor "Red" -BackgroundColor "Black"
 	PauseScript
 	Exit
 }
-Else {
-	Write-Verbose "PowerShell is up to date."
-}
+
+[Version]$CurrentVersion = '2.0.0'
+
+
+# ======================================================================================================= #
+# ======================================================================================================= #
 
 If ($PSScriptRoot -eq "$ENV:USERPROFILE\Scripts\Youtube-dl\scripts") {
 	$RootFolder = $ENV:USERPROFILE + "\Scripts\Youtube-dl"
@@ -545,7 +561,6 @@ If ((Test-Path "$BinFolder\youtube-dl.exe") -eq $False -or (Test-Path "$BinFolde
 # ======================================================================================================= #
 # ======================================================================================================= #
 
-
 If ($NumOfParams -gt 0) {
 	CommandLineMode
 }
@@ -570,19 +585,9 @@ Else {
 
 
 
+# Move text files into config folder.
 
-# Have UpdateScript function check and display what the newest version is on GitHub using:
-# 	Get-Content on this file: https://github.com/mpb10/PowerShell-Youtube-dl/raw/version-2/install/files/version-file
-# Then prompt the user if they want to update.
-
-# Maybe prompt user with version numbers when doing UpdateExe function?
-
-
-
-
-
-
-
+# Check that more of the function completion messages are in the correct places.
 
 
 
