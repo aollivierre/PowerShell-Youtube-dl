@@ -30,7 +30,7 @@ Note: These scripts require Windows PowerShell to function. PowerShell comes pre
 
 **To Install:** 
 
-Download the project .zip file, extract it to a folder, and run the `Youtube-dl - Portable Version` shortcut. You can choose to either use the script in this location, or you can install the script to `C:\Users\%USERNAME%\Scripts\Youtube-dl` by choosing option 3 of the settings menu. A desktop shortcut and a Start Menu shortcut will be created. Run either of these to use the script.
+Download the project .zip file, extract it to a folder, and run the `Youtube-dl - Portable Version` shortcut. You can choose to either use the script in this location, or you can install the script to `C:\Users\%USERNAME%\Scripts\Youtube-dl` by choosing option 3 of the settings menu. A desktop shortcut and a Start Menu shortcut will then be created. Run either of those to use the script.
 
 #
 
@@ -77,35 +77,25 @@ The ffmpeg video conversion settings found in the settings variables of `\script
 
 `4   - Settings`	
 
-This option brings the user to the settings menu. The primary purpose of the settings menu is to allow the user to set ffmpeg conversion options. These ffmpeg options have no effect when running the script from the command line. Below is a description of each setting:
+This option brings the user to the settings menu. The primary purpose of the settings menu is to update and install the script and its files. Below is a description of each option:
 
-	'Use archive file?'
-		ID:		1
-		Default:	True
-		Description:	This setting toggles whether the archive file is used when downloading a video.
-				Video and audio downloaded from playlists will automatically record each individual 
-				video's URL in the 'downloadarchive.txt' file. The script will skip the downloading 
-				of any video listed in the 'downloadarchive.txt' file unless this option is set to 
-				false. This is useful when downloading from playlists that continually have videos 
-				added to them.
+	'1  - Update youtube-dl.exe and ffmpeg.exe'
+		Description:	This option will download the newest version youtube-dl.exe file to the bin folder.
+				It should be noted that this option will also re-download the ffmpeg files as well,
+				but the ffmpeg version is hardcoded. Newer versions of the script will download newer
+				ffmpeg versions.
 
-	'Download entire playlist?'
-		ID:		2
-		Default:	False
-		Description:	This setting determines whether to download the entire playlist when the video or
-				audio being downloaded is part of a playlist. Setting this to true will download
-				the entire playlist if a single video of that playlist is downloaded. This is useful
-				for one-time downloading of playlists that you don't want to list in the playlist
-				text files.
+	'2  - Update youtube-dl.ps1 script file'
+		Description:	This option updates the script file to the newest version by downloading it from
+				Github to the scripts folder.
 
-	'Convert output?'
-		ID:		3
-		Default:	False
-		Description:	This setting toggles whether the video will be converted when it is downloaded. Changing
-				this setting to 'True' will display additional ffmepg conversion settings.
-				NOTE: Settings 10 through 18 will have no effect on the downloaded video if this is
-				set to 'False'.
-				
+	'3  - Install script to: "C:\Users\%USERNAME%\Scripts\Youtube-dl"'
+		Description:	This option installs the script to the user's home folder and creates a desktop
+				shortcut and a start menu shortcut. The user must modify their config files again
+				which are found in the config folder.
+	
+#
+
 	'Use default quality?'
 		ID:		10
 		Default:	True
@@ -167,32 +157,43 @@ This option brings the user to the settings menu. The primary purpose of the set
 				set to 'True', the video will be discarded and only the audio will be kept. This is
 				basically using option '2' of the main menu, '2 - Download audio'.
 	
-
-
 #
 
-For advanced users, the youtube-dl.ps1 script, which is found in the folder `C:\Users\%USERNAME%\Youtube-dl\scripts`, can be passed parameters so that this script can be used in conjunction with other scripts or forms of automation. Make sure to add the `C:\Users\%USERNAME%\Youtube-dl\bin` folder to your PATH.
+For advanced users, the youtube-dl.ps1 script, which is found in the folder `C:\Users\%USERNAME%\Scripts\Youtube-dl\scripts`, can be ran via the command line and passed parameters so that this script can be used in conjunction with other scripts or forms of automation. Make sure to add the `C:\Users\%USERNAME%\Scripts\Youtube-dl\bin` folder to your PATH so that youtube-dl.exe and the ffmpeg files can be located.
 
 **youtube-dl.ps1's parameters are as followed:**
 
-	-Video
+	-Video -URL <URL>
 		Download a video.
     
-	-Audio
-		Download only the audio of a video.
+	-Audio -URL <URL>
+		Download the audio of a video and converts it to an MP3.
     
 	-FromFiles
-		Download playlist URL's listed in the "audioplaylist.txt" and "videoplaylist.txt" files located 
-		in "C:\Users\%USERNAME%\Youtube-dl". The -URL parameter will be ignored if -FromFiles is used.
-    
-	-URL <URL>
-		The URL of the video to be downloaded from.
+		Download playlist URL's listed in the "videoplaylist.txt" and "audioplaylist.txt" files located 
+		in "C:\Users\%USERNAME%\Scripts\Youtube-dl\config". The -URL parameter will be ignored if -FromFiles is used.
     
 	-OutputPath <path>
-		(Optional) The location to which the file will be downloaded to.
+		(Optional) Specify a custom download location.
+		
+	-Convert
+		Tells the script to use the ffmpeg options located within the youtube-dl.ps1 script file.
+		
+	-Install
+		Installs the script to "C:\Users\%USERNAME%\Scripts\Youtube-dl", creates a desktop shortcut, and a
+		start menu shortcut.
+		
+	-UpdateExe
+		Updates the youtube-dl.exe file to the newest version and re-downloads the ffmpeg files to the bin folder.
+		
+	-UpdateScript
+		Updates the youtube-dl.ps1 script file to the newest version by downloading it from Github.
 
 
 # CHANGE LOG
+
+	2.0.0	February 24th, 2018
+		Finished re-writing the script.
 
 	1.2.6	November 16th, 2017
 		Added option to download the entire playlist that a video resides in.
@@ -225,7 +226,7 @@ For advanced users, the youtube-dl.ps1 script, which is found in the folder `C:\
 
 # ADDITIONAL NOTES
 
-Please support the development of youtube-dl and ffmpeg. The programs youtube-dl and ffmpeg can be found at the following links:
+Please support the development of youtube-dl and ffmpeg. The programs youtube-dl and ffmpeg and their source code can be found at the following links:
 
 https://youtube-dl.org/
 
