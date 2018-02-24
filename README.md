@@ -1,7 +1,3 @@
-# VERSION 2.0 IN PROGRESS
-
-Version 2.0 is work-in-progress. Not all features are implemented yet and you will run into bugs if you attempt to use this branch.
-
 # PowerShell-Youtube-dl
 https://github.com/mpb10/PowerShell-Youtube-dl
 
@@ -10,11 +6,10 @@ A PowerShell script used to operate the youtube-dl command line program.
 
 **Author: mpb10**
 
-**November 16th, 2017**
+**February 24th, 2018**
 
-**v1.2.6**
-#
-ATTENTION: While the master branch is still fully functional, the code it uses is rather clunky and not very pretty. I have begun completely re-writing the script in the version-2 branch. The code in the version-2 branch is MUCH cleaner and faster. So far, downloading video, audio, and playlists should all be functioning, via both the command line and GUI. Converting video files with ffmpeg may still need a little bit of work. Other than that, version-2 progress is coming along nicely. Check it out if you're interested!
+**v2.0.0**
+
 #
 
  - [INSTALLATION](#installation)
@@ -31,32 +26,25 @@ ATTENTION: While the master branch is still fully functional, the code it uses i
 
 Note: These scripts require Windows PowerShell to function. PowerShell comes pre-installed with Windows 10 but otherwise can be downloaded here: https://www.microsoft.com/en-us/download/details.aspx?id=50395
 
-Make sure your ExecutionPolicy is properly set by opening a PowerShell window with administrator privileges and typing `Set-ExecutionPolicy RemoteSigned`.
-
 #
 
 **To Install:** 
 
-Download the project .zip file, extract it to a folder, and run the `Youtube-dl_Installer` shortcut. The script will be installed to the folder `C:\Users\%USERNAME%\Youtube-dl`. A desktop shortcut and a Start Menu shortcut will be created. Run either of these to use the script. 
-
-To update the script, delete the following folders, download the new version and install it:
-
-	C:\Users\%USERNAME%\Youtube-dl\bin
-	C:\Users\%USERNAME%\Youtube-dl\scripts
-Make sure you don't delete any of the .txt files!
+Download the project .zip file, extract it to a folder, and run the `Youtube-dl - Portable Version` shortcut. You can choose to either use the script in this location, or you can install the script to `C:\Users\%USERNAME%\Scripts\Youtube-dl` by choosing option 3 of the settings menu. A desktop shortcut and a Start Menu shortcut will be created. Run either of these to use the script.
 
 #
 
-To uninstall this script and its files, run the `Youtube-dl_Uninstall` shortcut located in `C:\Users\%USERNAME%`. This will remove the script, the youtube-dl and ffmpeg programs, the start menu folder, and the desktop shortcut. This uninstaller will leave behind files that have a file extension of `.txt` or `.ini`. If you wish to uninstall all Youtube-dl files, including text files, copy the script `C:\Users\%USERNAME%\Youtube-dl\scripts\Youtube-dl_Installer.ps1` to the desktop and run it with the `-Uninstall` and `-Everything` parameters via a PowerShell console.
-
+To uninstall this script and its files, delete the two folders `C:\Users\%USERNAME%\Scripts\Youtube-dl` and `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Youtube-dl`.
 
 # USAGE
 
 Run either the desktop shortcut or the Start Menu shortcut. Choose to download either video or audio, and then right click and paste the URL into the prompt. The URL you provide it can be either the URL of a video or the URL of a playlist.
 
-Video files are downloaded to `C:\Users\%USERNAME%\Videos\Youtube-dl` and audio files are downloaded to `C:\Users\%USERNAME%\Music\Youtube-dl`. Playlists will be downloaded into their own subfolders.
+Video files are downloaded to `C:\Users\%USERNAME%\Videos\Youtube-dl` and audio files are downloaded to `C:\Users\%USERNAME%\Music\Youtube-dl`. Playlists will be downloaded into their own subfolders within these two folders.
 
-Upon being ran for the first time, the script will generate the `downloadarchive.txt`, `audioplaylist.txt`, and `videoplaylist.txt` files. The `downloadarchive.txt` file keeps a record of videos that have been downloaded from playlists. Any videos that the user downloads from a playlist will be added to this file and will be skipped if the playlist is downloaded again, provided that the "UseArchive" variable is set to `True` in the settings menu.
+Upon being ran for the first time, the script will generate the `downloadarchive.txt`, `videoplaylist.txt`, and `audioplaylist.txt` files in the `\config` folder. To use option `3  - Download from playlist files` of the main menu, list URL's in the `videoplaylist.txt` and `audioplaylist.txt` files one line at a time.
+
+The `downloadarchive.txt` file keeps a record of videos that have been downloaded from playlists. The URL of any video that the user downloads from a playlist will be added to this file and will be skipped if the playlist is downloaded again. This can be toggled by editing the `UseArchiveFile` setting variable witin the script file (see the [Advanced Usage](#advanced-usage) section for details)
 
 
 # ADVANCED USAGE
@@ -65,25 +53,25 @@ Upon being ran for the first time, the script will generate the `downloadarchive
 
 `1   - Download video`	
 
-This option prompts the user for the URL of a video. This URL can be a single video or a playlist and doesn't necessarily have to be from Youtube.com since Youtube-dl supports a wide range of websites. If a playlist URL is provided, the entire playlist will be downloaded. The `1   - Download video` option can be run from the command line using the `-Video -URL (UserProvidedURL)` parameter options.
+This option prompts the user for the URL of a video. This URL can be a single video or a playlist and doesn't necessarily have to be from Youtube.com since Youtube-dl supports a wide range of websites. If a playlist URL is provided, the entire playlist will be downloaded by default. The `1   - Download video` option can be run from the command line using the `-Video -URL <UserProvidedURL>` parameter options.
 
-Additonally, the `1   - Download video` option can be used with the video conversion settings found in the `4   - Settings` option menu which will be covered later.
+Additonally, videos that are downloaded can be automatically converted using ffmpeg via the `$ConvertFile` variable located within the `\scripts\youtube-dl.ps1` script file.
 
 #
 
 `2   - Download audio`	
 
-This option prompts the user for the URL of a video who's audio will be extracted and converted to an MP3 file. This URL can be a single video or a playlist and doesn't necessarily have to be from Youtube.com since Youtube-dl supports a wide range of websites. If a playlist URL is provided, the entire playlist will be downloaded. The script will also attempt to insert the correct artist and title metadata into the MP3 file, provided that there is a hypen character `-` seperating the artist and song name. The `2   - Download audio` option can be run from the command line using the `-Audio -URL (UserProvidedURL)` parameter options. 
+This option prompts the user for the URL of a video who's audio will be extracted and converted to an MP3 file. This URL can be a single video or a playlist and doesn't necessarily have to be from Youtube.com since Youtube-dl supports a wide range of websites. If a playlist URL is provided, the entire playlist will be downloaded. The script will also attempt to insert the correct artist and title metadata into the MP3 file, provided that there is a hyphen character `-` seperating the artist and song name in the video title. The `2   - Download audio` option can be run from the command line using the `-Audio -URL <UserProvidedURL>` parameter options. 
 
-The video conversion settings found in `4   - Settings` will have no effect on audio downloaded using the `2   - Download audio` option.
+The ffmpeg video conversion settings found in the settings variables of `\scripts\youtube-dl.ps1` have no effect when downloading audio.
 
 #
 
 `3   - Download predefined playlists`	
 
-This option downloads the video and audio of URL's listed in the `audioplaylist.txt` and `videoplaylist.txt` files which are located in `C:\Users\%USERNAME%\Youtube-dl`. List any playlist URL's or individual video URL's one line at a time in these files. The script will skip the downloading of any video listed in the `downloadarchive.txt` file unless the `Use archive file?` option, found in `4   - Settings`, is set to false. Videos listed in the `videoplaylist.txt` file will download to the `C:\Users\%USERNAME%\Videos\Youtube-dl` folder and put each playlist in its own folder. The same goes for the `audioplaylist.txt` file which downloads to the `C:\Users\%USERNAME%\Music\Youtube-dl` folder.
+This option downloads the video and audio of URL's listed in the `videoplaylist.txt` and `audioplaylist.txt` files which are located in `C:\Users\%USERNAME%\Scripts\Youtube-dl\config`. List any playlist URL's or individual video URL's one line at a time in these files. The script will not re-download a video that has already been downloaded before, provided that the `$UseArchiveFile = $True`. Videos listed in the `videoplaylist.txt` file will download to the `C:\Users\%USERNAME%\Videos\Youtube-dl` folder and put each playlist in its own folder. The same goes for the `audioplaylist.txt` file which downloads to the `C:\Users\%USERNAME%\Music\Youtube-dl` folder.
 
-The video conversion settings found in `4   - Settings` will only affect the videos listed in the `videoplaylist.txt` file.
+The ffmpeg video conversion settings found in the settings variables of `\scripts\youtube-dl.ps1` will only affect the videos listed in the `videoplaylist.txt` file.
 
 #
 
@@ -180,12 +168,6 @@ This option brings the user to the settings menu. The primary purpose of the set
 				basically using option '2' of the main menu, '2 - Download audio'.
 	
 
-
-#
-
-**New in version 1.1.0**, users can list playlists in the `audioplaylist.txt` and `videoplaylist.txt` files located in `C:\Users\%USERNAME%\Youtube-dl`. List any playlist URL's one line at a time that you would like to download video from in the `videoplaylist.txt` file. The same goes for the `audioplaylist.txt` file. To download from these files, choose option `3` in the main menu or use the `-FromFiles` parameter switch if calling the script from the command line. When downloading from the `videoplaylist.txt` file, use the conversion options in the Settings menu to convert all of the videos to one single file type.
-
-**New in version 1.2.0**, users can convert downloaded videos to other formats using  ffmpeg options which can be modified in option `4` of the main menu, "Settings". Only videos being downloaded will be converted, not audio downloads. This feature has not yet been implemented into the parameters that can be passed to the script.
 
 #
 
