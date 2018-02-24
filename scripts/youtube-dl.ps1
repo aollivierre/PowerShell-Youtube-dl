@@ -121,8 +121,7 @@ Function DownloadFile {
 		[String]$SaveLocation
 	)
 	(New-Object System.Net.WebClient).DownloadFile("$URLToDownload", "$TempFolder\download.tmp")
-	Copy-Item -Path "$TempFolder\download.tmp" -Destination "$SaveLocation"
-	Remove-Item -Path "$TempFolder\download.tmp"
+	Move-Item -Path "$TempFolder\download.tmp" -Destination "$SaveLocation" -Force
 }
 
 
@@ -144,44 +143,48 @@ Function DownloadFfmpeg {
 	Expand-Archive -Path "$BinFolder\ffmpeg_3.4.1.zip" -DestinationPath "$BinFolder"
 	
 	Copy-Item -Path "$BinFolder\ffmpeg-3.4.1-win64-static\bin\*" -Destination "$BinFolder" -Recurse -Filter "*.exe" -ErrorAction Silent
+	Remove-Item -Path "$BinFolder\ffmpeg_3.4.1.zip"
 	Remove-Item -Path "$BinFolder\ffmpeg-3.4.1-win64-static" -Recurse
 }
 
 
 
 Function ScriptInitialization {
-	$BinFolder = $RootFolder + "\bin"
+	$Script:BinFolder = $RootFolder + "\bin"
 	If ((Test-Path "$BinFolder") -eq $False) {
 		New-Item -Type Directory -Path "$BinFolder"
 	}
 	$ENV:Path += ";$BinFolder"
 
-	$ScriptsFolder = $RootFolder + "\scripts"
+	$Script:ScriptsFolder = $RootFolder + "\scripts"
 	If ((Test-Path "$ScriptsFolder") -eq $False) {
 		New-Item -Type Directory -Path "$ScriptsFolder"
 	}
 
-	$TempFolder = $RootFolder + "\temp"
+	$Script:TempFolder = $RootFolder + "\temp"
 	If ((Test-Path "$TempFolder") -eq $False) {
 		New-Item -Type Directory -Path "$TempFolder"
 	}
+	Else {
+		Remove-Item -Path "$TempFolder\*" -Recurse -ErrorAction Silent
+	}
 
-	$ConfigFolder = $RootFolder + "\config"
+	$Script:ConfigFolder = $RootFolder + "\config"
 	If ((Test-Path "$ConfigFolder") -eq $False) {
 		New-Item -Type Directory -Path "$ConfigFolder"
 	}
 
-	$ArchiveFile = $RootFolder + "\downloadarchive.txt"
+	$Script:ArchiveFile = $ConfigFolder + "\downloadarchive.txt"
 	If ((Test-Path "$ArchiveFile") -eq $False) {
 		New-Item -Type file -Path "$ArchiveFile"
 	}
 
-	$VideoPlaylistFile = $ConfigFolder + "\videoplaylists.txt"
+	$Script:VideoPlaylistFile = $ConfigFolder + "\videoplaylists.txt"
 	If ((Test-Path "$VideoPlaylistFile") -eq $False) {
 		New-Item -Type file -Path "$VideoPlaylistFile"
 	}
 
-	$AudioPlaylistFile = $ConfigFolder + "\audioplaylists.txt"
+	$Script:AudioPlaylistFile = $ConfigFolder + "\audioplaylists.txt"
 	If ((Test-Path "$AudioPlaylistFile") -eq $False) {
 		New-Item -Type file -Path "$AudioPlaylistFile"
 	}
@@ -344,16 +347,14 @@ Function DownloadPlaylists {
 	Write-Host "`nDownloading playlist URLs listed in:`n   $VideoPlaylistFile`n   $AudioPlaylistFile"
 	
 	Get-Content "$VideoPlaylistFile" | ForEach-Object {
-		Write-Host "`nDownloading playlist: $_`n" -ForegroundColor "Gray"
+		Write-Verbose "`nDownloading playlist: $_`n"
 		DownloadVideo "$_"
 	}
-
+	
 	Get-Content "$AudioPlaylistFile" | ForEach-Object {
-		Write-Host "`nDownloading playlist: $_`n" -ForegroundColor "Gray"
+		Write-Verbose "`nDownloading playlist: $_`n"
 		DownloadAudio "$_"
 	}
-
-	
 }
 
 
@@ -397,7 +398,7 @@ Function CommandLineMode {
 	}
 	ElseIf ($FromFiles -eq $True) {
 		DownloadPlaylists
-		Write-Host "`nDownloads complete.`nDownloaded to: ""$VideoSaveLocation"" and ""$AudioSaveLocation""`n" -ForegroundColor "Yellow"
+		Write-Host "`nDownloads complete. Downloaded to:`n   $VideoSaveLocation`n   $AudioSaveLocation`n" -ForegroundColor "Yellow"
 	}
 	ElseIf ($Video -eq $True -and $Audio -eq $True) {
 		Write-Host "`n[ERROR]: Please select either -Video or -Audio. Not Both.`n" -ForegroundColor "Red" -BackgroundColor "Black"
@@ -553,8 +554,6 @@ $NumOfParams = ($PSBoundParameters.Count)
 
 ScriptInitialization
 
-Remove-Item -Path "$TempFolder\*" -Recurse -ErrorAction Silent
-
 If ((Test-Path "$BinFolder\youtube-dl.exe") -eq $False) {
 	Write-Host "`nyoutube-dl.exe not found. Downloading and installing to: ""$BinFolder"" ...`n" -ForegroundColor "Yellow"
 	DownloadYoutube-dl
@@ -583,8 +582,7 @@ Else {
 	
 	$HOST.UI.RawUI.BackgroundColor = $BackgroundColorBefore
 	$HOST.UI.RawUI.ForegroundColor = $ForegroundColorBefore
-
-	Write-Host "End GUI mode."
+	
 	PauseScript
 	Exit
 }
