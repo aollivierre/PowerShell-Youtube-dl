@@ -96,13 +96,9 @@ This option brings the user to the settings menu. The primary purpose of the set
 	
 #
 
-	'Use default quality?'
-		ID:		10
-		Default:	True
-		Description:	Setting this option to 'True' will have the video be converted using the default
-				ffmpeg quality settings. Generally, the user will want to set this to false and modify
-				the ffmpeg settings themselves. Setting this setting to 'False' will display additional
-				ffmpeg settings.
+	'$AudioSaveLocation = '
+		Default:	"$ENV:USERPROFILE\Music\Youtube-dl"
+		Description:	
 				
 	'Output file extension'
 		ID:		11
