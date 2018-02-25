@@ -96,62 +96,83 @@ This option brings the user to the settings menu. The primary purpose of the set
 	
 #
 
+`Script File Settings`
+
+In the youtube-dl.ps1 script file from lines 80 to 100, there are some settings variables that the user can modify and tweak. Their default values and descriptions are below:
+
+	'$VideoSaveLocation = '
+		Default:	"$ENV:USERPROFILE\Videos\Youtube-dl"
+		Description:	This setting changes the default download location for video file downloads.
+				This value can still be overridden by the -OutputPath parameter when running
+				the script via the command line.
+				
 	'$AudioSaveLocation = '
 		Default:	"$ENV:USERPROFILE\Music\Youtube-dl"
-		Description:	
+		Description:	This setting changes the default download location for audio file downloads.
+				This value can still be overridden by the -OutputPath parameter when running
+				the script via the command line.
 				
-	'Output file extension'
-		ID:		11
-		Default:	webm
-		Description:	This setting determines what file format the video will be converted to. Available
-				file formats are mp3, mp4, webm, mkv, and avi.
+	'$UseArchiveFile = '
+		Default:	$True
+		Description:	This setting will toggle whether or not to use the downloadarchive.txt file.
+				When set to true, downloading a video from a playlist will record that video's
+				URL in the downloadarchive.txt file. If the playlist is downloaded again, that
+				video will then be skipped. This is useful for downloading videos from a
+				playlist that continues to have new videos added to it.
 				
-	'Video bitrate'
-		ID:		12
-		Default:	800k
-		Description:	This setting determines the video bitrate quality. This number is entered as kilobytes.
-				The video bitrate of 800k is low-to-medium quality and is good for posting to forums
-				because of its smaller file size. Experiment with this setting to get a quality that
-				suits you and your needs.
+	'$EntirePlaylist = '
+		Default:	$False
+		Description:	This setting toggles whether to download the entire playlist when a single
+				video URL of a playlist is passed to the script. For example, when set to
+				true, passing the URL of video number 3 out of a playlist of 12 will cause
+				the entire playlist to be downloaded. When set to false, only video number
+				3 will be downloaded. (To download entire playlists while this is set to
+				false, simply pass the script the entire playlist URL. It usually looks
+				something like: https://www.youtube.com/playlist?list=...)
 				
-	'Audio bitrate'
-		ID:		13
-		Default:	128k
-		Description:	This setting determines the audio bitrate quality. This number is entered as kilobytes.
-				The audio bitrate quality of 128k is generally good enough for most videos. Users seeking
-				very high audio quality would want an audio bitrate of 256k or 320k.
+	'$ConvertFile = '
+		Default:	$False
+		Description:	This setting toggles whether or not to convert downloaded video files to
+				the specified file format and quality using ffmpeg. Only videos will be
+				converted and not audio.
 				
-	'Resolution'
-		ID:		14
-		Default:	640x360
-		Description:	This setting determines the resolution that the video will be converted to. The
-				resolution of 640x360 is good for posting to forums because of its smaller file size.
+	'$FileExtension = '
+		Default:	"webm"
+		Description:	This setting determines which ffmpeg file format the video should be
+				converted to.
+		
+	'$VideoBitrate = '
+		Default:	"-b:v 800k"
+		Description:	This setting determines the video bitrate at which the file will be
+				converted. Increasing this value will increase the quality and file size.
 				
-	'Start time'
-		ID:		15
-		Default:	00:00:00
-		Description:	This setting determines the start time of the video. Parts of the video before this
-				timestamp will be trimmed off and discarded.
+	'$AudioBitrate = '
+		Default:	"-b:a 128k"
+		Description:	This setting determines the audio bitrate of the file to be converted.
+				Values of 128k, 192k, and 320k are generally chosen.
 				
-	'Stop time'
-		ID:		16
-		Default:	No stop time
-		Description:	This setting determines the stop time of the video. Parts of the video after this
-				timestamp will be trimmed off and discarded.
+	'$Resolution = '
+		Default:	"-s 640x360"
+		Description:	This setting determines the resolution to which the file will be converted.
 				
-	'Strip audio?'
-		ID:		17
-		Default:	False
-		Description:	This setting determines whether or not to keep the audio. If this is set to 'True',
-				the audio will be stripped from the video and discarded. This is useful for posting
-				to forums that do not allow videos that have audio.
-				
-	'Strip video?'
-		ID:		18
-		Default:	False
-		Description:	This setting determines whether to strip the video from the file. If this setting is
-				set to 'True', the video will be discarded and only the audio will be kept. This is
-				basically using option '2' of the main menu, '2 - Download audio'.
+	'$StartTime = '
+		Default:	""
+		Description:	This setting determines the starting time to which the file will be trimmed.
+		
+	'$StopTime = '
+		Default:	""
+		Description:	This setting determines the end time to which the file will be trimmed.
+		
+	'$StripAudio = '
+		Default:	""
+		Description:	This setting determines whether or not to strip the audio from the file.
+				This is useful for creating videos for websites that do not support video
+				files containing audio.
+		
+	'$StripVideo = '
+		Default:	""
+		Description:	This setting determines whether or not to strip the video form a file.
+				The download audio functionality of the script makes this option obsolete.
 	
 #
 
