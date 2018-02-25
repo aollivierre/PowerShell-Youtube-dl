@@ -219,7 +219,7 @@ Function InstallScript {
 		Copy-Item "$PSScriptRoot\..\LICENSE" -Destination "$RootFolder"
 		Copy-Item "$PSScriptRoot\..\README.md" -Destination "$RootFolder"
 		
-		Write-Host "`nInstallation complete. Please restart the script.`n" -ForegroundColor "Yellow"
+		Write-Host "`nInstallation complete. Please restart the script." -ForegroundColor "Yellow"
 		PauseScript
 		Exit
 	}
