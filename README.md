@@ -13,7 +13,8 @@ A PowerShell script used to operate the youtube-dl command line program.
 #
 
 **Version 2.0.0 Notes:**
-The install location of this script has changed to `C:\Users\%USERNAME%\Scripts\Youtube-dl`, and any configuration files from previous versions of the script will need to be moved into the `\config` folder of the install location. It should also be noted that ffmpeg video conversion, while rather crude at this point, is still implemented into the script. The `youtube-dl.ps1` script file itself contains the ffmpeg conversion settings. These settings will be incorporated into the script via the command line and GUI in the future.
+
+This information is for anyone who has used a version of this script previous to v2.0.0. The install location of this script has changed to `C:\Users\%USERNAME%\Scripts\Youtube-dl`, and any configuration files from previous versions of the script will need to be moved into the `\config` folder of the install location. It should also be noted that ffmpeg video conversion, while rather crude at this point, is still implemented into the script. The `youtube-dl.ps1` script file itself contains the ffmpeg conversion settings. These settings will be incorporated into the script via the command line and GUI in the future.
 
 #
 
