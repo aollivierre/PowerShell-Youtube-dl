@@ -69,7 +69,7 @@ The ffmpeg video conversion settings found in the script file settings variables
 
 `3   - Download predefined playlists`	
 
-This option downloads the video and audio of URL's listed in the `videoplaylist.txt` and `audioplaylist.txt` files which are located in `C:\Users\%USERNAME%\Scripts\Youtube-dl\config`. List any playlist URL's or individual video URL's one line at a time in these files. The script will not re-download a video that has already been downloaded before, provided that the `$UseArchiveFile = $True`. Videos listed in the `videoplaylist.txt` file will download to the `C:\Users\%USERNAME%\Videos\Youtube-dl` folder and put each playlist in its own folder. The same goes for the `audioplaylist.txt` file which downloads to the `C:\Users\%USERNAME%\Music\Youtube-dl` folder.
+This option downloads the video and audio of URL's listed in the `videoplaylist.txt` and `audioplaylist.txt` files which are located in `C:\Users\%USERNAME%\Scripts\Youtube-dl\config`. List any playlist URL's or individual video URL's one line at a time in these files to download them as a batch job. The script will not re-download a video that has already been downloaded before, provided that the `$UseArchiveFile = ` script file setting is set to true. Videos listed in the `videoplaylist.txt` file will download to the `C:\Users\%USERNAME%\Videos\Youtube-dl` folder and put each playlist in its own folder. The same goes for the `audioplaylist.txt` file which downloads to the `C:\Users\%USERNAME%\Music\Youtube-dl` folder.
 
 The ffmpeg video conversion settings found in the settings variables of `\scripts\youtube-dl.ps1` will only affect the videos listed in the `videoplaylist.txt` file.
 
