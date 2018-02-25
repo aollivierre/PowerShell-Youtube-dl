@@ -223,8 +223,6 @@ Function InstallScript {
 		
 		Write-Host "`nInstallation complete. Please restart the script.`n" -ForegroundColor "Yellow"
 		PauseScript
-		$HOST.UI.RawUI.BackgroundColor = $BackgroundColorBefore
-		$HOST.UI.RawUI.ForegroundColor = $ForegroundColorBefore
 		Exit
 	}
 }
@@ -477,8 +475,6 @@ Function MainMenu {
 				$MenuOption = 99
 			}
 			0 {
-				$HOST.UI.RawUI.BackgroundColor = $BackgroundColorBefore
-				$HOST.UI.RawUI.ForegroundColor = $ForegroundColorBefore
 				Clear-Host
 				Exit
 			}
@@ -511,15 +507,11 @@ Function SettingsMenu {
 		Switch ($MenuOption) {
 			1 {
 				UpdateExe
-				$HOST.UI.RawUI.BackgroundColor = $BackgroundColorBefore
-				$HOST.UI.RawUI.ForegroundColor = $ForegroundColorBefore
 				Exit
 				$MenuOption = 99
 			}
 			2 {
 				UpdateScript
-				$HOST.UI.RawUI.BackgroundColor = $BackgroundColorBefore
-				$HOST.UI.RawUI.ForegroundColor = $ForegroundColorBefore
 				Exit
 				$MenuOption = 99
 			}
@@ -572,16 +564,8 @@ If ($NumOfParams -gt 0) {
 	CommandLineMode
 }
 Else {
-	$BackgroundColorBefore = $HOST.UI.RawUI.BackgroundColor
-	$ForegroundColorBefore = $HOST.UI.RawUI.ForegroundColor
-
-	$HOST.UI.RawUI.BackgroundColor = "Black"
-	$HOST.UI.RawUI.ForegroundColor = "White"
 
 	MainMenu
-	
-	$HOST.UI.RawUI.BackgroundColor = $BackgroundColorBefore
-	$HOST.UI.RawUI.ForegroundColor = $ForegroundColorBefore
 	
 	PauseScript
 	Exit
