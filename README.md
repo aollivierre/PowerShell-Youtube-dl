@@ -96,7 +96,7 @@ This option brings the user to the settings menu. The primary purpose of the set
 	
 #
 
-**SCRIPT FILE SETTINGS**
+**SCRIPT FILE SETTINGS:**
 
 In the youtube-dl.ps1 script file from lines 80 to 100, there are some settings variables that the user can modify and tweak. Their default values and descriptions are below:
 
