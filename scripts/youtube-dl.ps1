@@ -212,14 +212,12 @@ Function InstallScript {
 		
 		Copy-Item "$PSScriptRoot\youtube-dl.ps1" -Destination "$ScriptsFolder"
 		
-		DownloadFile "http://github.com/mpb10/PowerShell-Youtube-dl/raw/master/install/files/Youtube-dl.lnk" "$RootFolder\Youtube-dl.lnk"
+		Copy-Item "$PSScriptRoot\install\files\Youtube-dl.lnk" -Destination "$RootFolder"
 		Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$DesktopFolder"
 		Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$StartFolder"
 		
-		DownloadFile "http://github.com/mpb10/PowerShell-Youtube-dl/raw/master/LICENSE" "$RootFolder\LICENSE.txt"
-		Rename-Item -Path "$RootFolder\LICENSE.txt" -NewName "LICENSE"
-		
-		DownloadFile "http://github.com/mpb10/PowerShell-Youtube-dl/raw/master/README.md" "$RootFolder\README.md"
+		Copy-Item "$PSScriptRoot\LICENSE" -Destination "$RootFolder"
+		Copy-Item "$PSScriptRoot\README.md" -Destination "$RootFolder"
 		
 		Write-Host "`nInstallation complete. Please restart the script.`n" -ForegroundColor "Yellow"
 		PauseScript
