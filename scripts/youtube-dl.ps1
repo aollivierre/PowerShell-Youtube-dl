@@ -193,7 +193,7 @@ Function ScriptInitialization {
 
 
 Function InstallScript {
-	$MenuOption = Read-Host "Install PowerShell-Youtube-dl to ""$ENV:USERPROFILE\Scripts\Youtube-dl""? [Y/n]"
+	$MenuOption = Read-Host "`nInstall PowerShell-Youtube-dl to ""$ENV:USERPROFILE\Scripts\Youtube-dl""? [Y/n]"
 	If ($MenuOption -like "n" -or $MenuOption -like "no") {
 		Return
 	}
@@ -212,12 +212,12 @@ Function InstallScript {
 		
 		Copy-Item "$PSScriptRoot\youtube-dl.ps1" -Destination "$ScriptsFolder"
 		
-		Copy-Item "$PSScriptRoot\install\files\Youtube-dl.lnk" -Destination "$RootFolder"
+		Copy-Item "$PSScriptRoot\..\install\files\Youtube-dl.lnk" -Destination "$RootFolder"
 		Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$DesktopFolder"
 		Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$StartFolder"
 		
-		Copy-Item "$PSScriptRoot\LICENSE" -Destination "$RootFolder"
-		Copy-Item "$PSScriptRoot\README.md" -Destination "$RootFolder"
+		Copy-Item "$PSScriptRoot\..\LICENSE" -Destination "$RootFolder"
+		Copy-Item "$PSScriptRoot\..\README.md" -Destination "$RootFolder"
 		
 		Write-Host "`nInstallation complete. Please restart the script.`n" -ForegroundColor "Yellow"
 		PauseScript
