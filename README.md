@@ -32,7 +32,9 @@ This information is for anyone who has used a version of this script previous to
 
 **Script download link:** https://github.com/mpb10/PowerShell-Youtube-dl/archive/master.zip
 
-**Note:** These scripts require version 5.0 or greater of Windows PowerShell to function. Version 5.0 of PowerShell comes pre-installed with Windows 10 but otherwise can be downloaded here: https://www.microsoft.com/en-us/download/details.aspx?id=50395
+**NOTE:** The download function for youtube-dl.exe is not functioning correctly. The user will need to copy the youtube-dl.exe file manually into the `\bin` folder of the script install location. The file youtube-dl.exe can be downloaded here: http://yt-dl.org/downloads/latest/youtube-dl.exe
+
+**NOTE:** These scripts require version 5.0 or greater of Windows PowerShell to function. Version 5.0 of PowerShell comes pre-installed with Windows 10 but otherwise can be downloaded here: https://www.microsoft.com/en-us/download/details.aspx?id=50395
 
 #
 
