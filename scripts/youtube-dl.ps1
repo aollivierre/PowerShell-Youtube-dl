@@ -230,7 +230,7 @@ Function InstallScript {
 
 
 Function UpdateExe {
-	Write-Host "Updating youtube-dl.exe and ffmpeg.exe files ..."
+	Write-Host "`nUpdating youtube-dl.exe and ffmpeg.exe files ..."
 	DownloadYoutube-dl
 	DownloadFfmpeg
 	Write-Host "`nUpdate .exe files complete. Please restart the script." -ForegroundColor "Yellow"
@@ -245,7 +245,7 @@ Function UpdateScript {
 	Remove-Item -Path "$TempFolder\*" -Recurse -ErrorAction Silent
 	
 	If ($NewestVersion -gt $CurrentVersion) {
-		Write-Host "The newest version of PowerShell-Youtube-dl is $NewestVersion"
+		Write-Host "`nThe newest version of PowerShell-Youtube-dl is $NewestVersion"
 		$MenuOption = Read-Host "Update the script to this version? [Y/n]"
 		If ($MenuOption -like "n" -or $MenuOption -like "no") {
 			Return
@@ -257,7 +257,7 @@ Function UpdateScript {
 		}
 	}
 	ElseIf ($NewestVersion -eq $CurrentVersion) {
-		Write-Host "The running version of PowerShell-Youtube-dl is up to date."
+		Write-Host "`nThe running version of PowerShell-Youtube-dl is up to date."
 		PauseScript
 	}
 	Else {
