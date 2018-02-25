@@ -34,7 +34,7 @@ Download the project .zip file, extract it to a folder, and run the `Youtube-dl 
 
 #
 
-To uninstall this script and its files, delete the two folders `C:\Users\%USERNAME%\Scripts\Youtube-dl` and `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Youtube-dl`.
+To uninstall this script and its files, delete the two folders `C:\Users\%USERNAME%\Scripts\Youtube-dl` and `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Youtube-dl` as well as the desktop shortcut.
 
 # USAGE
 
