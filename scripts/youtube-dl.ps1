@@ -82,8 +82,8 @@ If ($PSVersionTable.PSVersion.Major -lt 5) {
 #
 # ======================================================================================================= #
 
-$AudioSaveLocation = "$ENV:USERPROFILE\Music\Youtube-dl"
 $VideoSaveLocation = "$ENV:USERPROFILE\Videos\Youtube-dl"
+$AudioSaveLocation = "$ENV:USERPROFILE\Music\Youtube-dl"
 $UseArchiveFile = $True
 $EntirePlaylist = $False
 
