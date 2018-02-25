@@ -17,8 +17,6 @@ A PowerShell script used to operate the youtube-dl command line program.
 This information is for anyone who has used a version of this script previous to v2.0.0. The install location of this script has changed to `C:\Users\%USERNAME%\Scripts\Youtube-dl`, and any configuration files from previous versions of the script will need to be manually moved into the `\config` folder of the install location. Also, the script can now be ran in the folder that it is extracted from, making the script much more portable and easier to try out before installing. It should also be noted that ffmpeg video conversion, while rather crude at this point, is still implemented into the script. The `youtube-dl.ps1` script file itself contains the ffmpeg conversion settings. These settings will be incorporated into the script via the command line and GUI in the future. Finally, the script now requires version 5.0 or greater of PowerShell to function.
 
 #
-**ATTENTION:** While the master branch is still fully functional, the code it uses is rather clunky and not very pretty. I have begun completely re-writing the script in the version-2 branch. The code in the version-2 branch is MUCH cleaner and faster. So far, downloading video, audio, and playlists should all be functioning, via both the command line and GUI. Converting video files with ffmpeg may still need a little bit of work. Other than that, version-2 progress is coming along nicely. Check it out if you're interested!
-#
 
  - [INSTALLATION](#installation)
  - [USAGE](#usage)
@@ -32,7 +30,7 @@ This information is for anyone who has used a version of this script previous to
 
 **Script download link:** https://github.com/mpb10/PowerShell-Youtube-dl/archive/master.zip
 
-**NOTE:** The download function for youtube-dl.exe is not functioning correctly. The user will need to copy the youtube-dl.exe file manually into the `\bin` folder of the script install location. The file youtube-dl.exe can be downloaded here: http://yt-dl.org/downloads/latest/youtube-dl.exe
+**NOTE:** The automatic downloading of the youtube-dl.exe file is not functioning correctly. The user will need to copy the youtube-dl.exe file manually into the `\bin` folder of the script install location. The file youtube-dl.exe can be downloaded here: http://yt-dl.org/downloads/latest/youtube-dl.exe
 
 **NOTE:** These scripts require version 5.0 or greater of Windows PowerShell to function. Version 5.0 of PowerShell comes pre-installed with Windows 10 but otherwise can be downloaded here: https://www.microsoft.com/en-us/download/details.aspx?id=50395
 
