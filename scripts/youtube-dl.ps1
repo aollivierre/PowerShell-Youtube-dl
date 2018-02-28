@@ -195,35 +195,42 @@ Function ScriptInitialization {
 
 
 Function InstallScript {
-	$MenuOption = Read-Host "`nInstall PowerShell-Youtube-dl to ""$ENV:USERPROFILE\Scripts\Youtube-dl""? [Y/n]"
-	If ($MenuOption -like "n" -or $MenuOption -like "no") {
+	If ($PSScriptRoot -eq "$ENV:USERPROFILE\Scripts\Youtube-dl\scripts") {
+		Write-Host "`nPowerShell-Youtube-dl files are already installed."
+		PauseScript
 		Return
 	}
 	Else {
-		Write-Host "`nInstalling to: ""$ENV:USERPROFILE\Scripts\Youtube-dl"""
-		
-		$Script:RootFolder = $ENV:USERPROFILE + "\Scripts\Youtube-dl"
-		
-		ScriptInitialization
-		
-		$StartFolder = $ENV:APPDATA + "\Microsoft\Windows\Start Menu\Programs\Youtube-dl"
-		$DesktopFolder = $ENV:USERPROFILE + "\Desktop"
-		
-		DownloadYoutube-dl
-		DownloadFfmpeg
-		
-		Copy-Item "$PSScriptRoot\youtube-dl.ps1" -Destination "$ScriptsFolder"
-		
-		Copy-Item "$PSScriptRoot\..\install\files\Youtube-dl.lnk" -Destination "$RootFolder"
-		Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$DesktopFolder"
-		Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$StartFolder"
-		
-		Copy-Item "$PSScriptRoot\..\LICENSE" -Destination "$RootFolder"
-		Copy-Item "$PSScriptRoot\..\README.md" -Destination "$RootFolder"
-		
-		Write-Host "`nInstallation complete. Please restart the script." -ForegroundColor "Yellow"
-		PauseScript
-		Exit
+		$MenuOption = Read-Host "`nInstall PowerShell-Youtube-dl to ""$ENV:USERPROFILE\Scripts\Youtube-dl""? [Y/n]"
+		If ($MenuOption -like "n" -or $MenuOption -like "no") {
+			Return
+		}
+		Else {
+			Write-Host "`nInstalling to: ""$ENV:USERPROFILE\Scripts\Youtube-dl"""
+
+			$Script:RootFolder = $ENV:USERPROFILE + "\Scripts\Youtube-dl"
+
+			ScriptInitialization
+
+			$StartFolder = $ENV:APPDATA + "\Microsoft\Windows\Start Menu\Programs\Youtube-dl"
+			$DesktopFolder = $ENV:USERPROFILE + "\Desktop"
+
+			DownloadYoutube-dl
+			DownloadFfmpeg
+
+			Copy-Item "$PSScriptRoot\youtube-dl.ps1" -Destination "$ScriptsFolder"
+
+			Copy-Item "$PSScriptRoot\..\install\files\Youtube-dl.lnk" -Destination "$RootFolder"
+			Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$DesktopFolder"
+			Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$StartFolder"
+
+			Copy-Item "$PSScriptRoot\..\LICENSE" -Destination "$RootFolder"
+			Copy-Item "$PSScriptRoot\..\README.md" -Destination "$RootFolder"
+
+			Write-Host "`nInstallation complete. Please restart the script." -ForegroundColor "Yellow"
+			PauseScript
+			Exit
+		}
 	}
 }
 
