@@ -582,14 +582,6 @@ Else {
 
 
 
-# Test new config folder
-# Test new downloading function and temp folder.
-# Test updateexe, updatescript, installscript, downloadyoutube-dl, and downloadffmpeg functions.
-
-# Check that more of the function completion messages are in the correct places.
-
-
-
 
 
 
