@@ -368,7 +368,7 @@ Function DownloadPlaylists {
 
 Function CommandLineMode {
 	If ($Install -eq $True) {
-		Write-Host "`nInstalling Youtube-dl to: ""$ENV:USERPROFILE\Scripts\Youtube-dl""`n"
+		Write-Host "`nInstalling Youtube-dl to: ""$ENV:USERPROFILE\Scripts\Youtube-dl"""
 		InstallScript
 		Exit
 	}
