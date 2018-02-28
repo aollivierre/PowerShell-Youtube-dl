@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS 
-	Download audio and video from the internet, mainly from youtube.com
+	Download video and audio from the internet, mainly from youtube.com
 	
 .DESCRIPTION 
 	This script downloads audio and video from the internet using the programs youtube-dl and ffmpeg. This script can be ran as a command using parameters, or it can be ran without parameters to use its GUI. Files are downloaded to the user's "Videos" and "Music" folders by default. See README.md for more information.
@@ -19,8 +19,10 @@
 	The directory where to save the output file.
 .PARAMETER Install
 	Install the script to "C:\Users\%USERNAME%\Scripts\Youtube-dl" and create desktop and Start Menu shortcuts.
-.PARAMETER Update
+.PARAMETER UpdateExe
 	Update youtube-dl.exe and the ffmpeg files to the most recent versions.
+.PARAMETER UpdateScript
+	Update the youtube-dl.ps1 script file to the most recent version.
 
 .EXAMPLE 
 	C:\Users\%USERNAME%\Youtube-dl\scripts\youtube-dl.ps1
@@ -41,7 +43,7 @@
 .NOTES 
 	Requires Windows 7 or higher and PowerShell 5.0 or greater.
 	Author: mpb10
-	Updated: February 22th, 2018
+	Updated: February 28th, 2018
 	Version: 2.0.0
 
 .LINK 
@@ -74,6 +76,8 @@ If ($PSVersionTable.PSVersion.Major -lt 5) {
 
 [Version]$CurrentVersion = '2.0.0'
 
+[Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls"
+
 
 # ======================================================================================================= #
 # ======================================================================================================= #
@@ -96,8 +100,6 @@ $StartTime = ""
 $StopTime = ""
 $StripAudio = ""
 $StripVideo = ""
-
-[Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls"
 
 
 # ======================================================================================================= #
