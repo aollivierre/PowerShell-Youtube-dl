@@ -138,17 +138,17 @@ Function DownloadYoutube-dl {
 
 Function DownloadFfmpeg {
 	If (([environment]::Is64BitOperatingSystem) -eq $True) {
-		DownloadFile "http://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-3.4.1-win64-static.zip" "$BinFolder\ffmpeg_3.4.1.zip"
+		DownloadFile "http://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-3.4.2-win64-static.zip" "$BinFolder\ffmpeg_3.4.2.zip"
 	}
 	Else {
-		DownloadFile "http://ffmpeg.zeranoe.com/builds/win32/static/ffmpeg-3.4.1-win32-static.zip" "$BinFolder\ffmpeg_3.4.1.zip"
+		DownloadFile "http://ffmpeg.zeranoe.com/builds/win32/static/ffmpeg-3.4.2-win32-static.zip" "$BinFolder\ffmpeg_3.4.2.zip"
 	}
 
-	Expand-Archive -Path "$BinFolder\ffmpeg_3.4.1.zip" -DestinationPath "$BinFolder"
+	Expand-Archive -Path "$BinFolder\ffmpeg_3.4.2.zip" -DestinationPath "$BinFolder"
 	
-	Copy-Item -Path "$BinFolder\ffmpeg-3.4.1-win64-static\bin\*" -Destination "$BinFolder" -Recurse -Filter "*.exe" -ErrorAction Silent
-	Remove-Item -Path "$BinFolder\ffmpeg_3.4.1.zip"
-	Remove-Item -Path "$BinFolder\ffmpeg-3.4.1-win64-static" -Recurse
+	Copy-Item -Path "$BinFolder\ffmpeg-3.4.2-win64-static\bin\*" -Destination "$BinFolder" -Recurse -Filter "*.exe" -ErrorAction Silent
+	Remove-Item -Path "$BinFolder\ffmpeg_3.4.2.zip"
+	Remove-Item -Path "$BinFolder\ffmpeg-3.4.2-win64-static" -Recurse
 }
 
 
