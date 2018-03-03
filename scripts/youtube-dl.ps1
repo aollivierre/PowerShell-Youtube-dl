@@ -25,19 +25,19 @@
 	Update the youtube-dl.ps1 script file to the most recent version.
 
 .EXAMPLE 
-	C:\Users\%USERNAME%\Youtube-dl\scripts\youtube-dl.ps1
+	C:\Users\%USERNAME%\Scripts\Youtube-dl\scripts\youtube-dl.ps1
 	Runs the script in GUI mode.
 .EXAMPLE 
-	C:\Users\%USERNAME%\Youtube-dl\scripts\youtube-dl.ps1 -Video -URL "https://www.youtube.com/watch?v=oHg5SJYRHA0"
+	C:\Users\%USERNAME%\Scripts\Youtube-dl\scripts\youtube-dl.ps1 -Video -URL "https://www.youtube.com/watch?v=oHg5SJYRHA0"
 	Downloads the video at the specified URL.
 .EXAMPLE 
-	C:\Users\%USERNAME%\Youtube-dl\scripts\youtube-dl.ps1 -Audio -URL "https://www.youtube.com/watch?v=oHg5SJYRHA0"
+	C:\Users\%USERNAME%\Scripts\Youtube-dl\scripts\youtube-dl.ps1 -Audio -URL "https://www.youtube.com/watch?v=oHg5SJYRHA0"
 	Downloads only the audio of the specified video URL.
 .EXAMPLE 
-	C:\Users\%USERNAME%\Youtube-dl\scripts\youtube-dl.ps1 -FromFiles
+	C:\Users\%USERNAME%\Scripts\Youtube-dl\scripts\youtube-dl.ps1 -FromFiles
 	Downloads video URL's listed in videoplaylists.txt and audioplaylists.txt files. These files are generated when the script is ran for the first time.
 .EXAMPLE 
-	C:\Users\%USERNAME%\Youtube-dl\scripts\youtube-dl.ps1 -Audio -URL "https://www.youtube.com/watch?v=oHg5SJYRHA0" -OutputPath "C:\Users\%USERNAME%\Desktop"
+	C:\Users\%USERNAME%\Scripts\Youtube-dl\scripts\youtube-dl.ps1 -Audio -URL "https://www.youtube.com/watch?v=oHg5SJYRHA0" -OutputPath "C:\Users\%USERNAME%\Desktop"
 	Downloads the audio of the specified video URL to the user provided location.
 	
 .NOTES 
