@@ -223,8 +223,8 @@ Function InstallScript {
 			Copy-Item "$PSScriptRoot\youtube-dl.ps1" -Destination "$ScriptsFolder"
 
 			Copy-Item "$PSScriptRoot\..\install\files\Youtube-dl.lnk" -Destination "$RootFolder"
-			Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$DesktopFolder"
-			Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$StartFolder"
+			Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$DesktopFolder\Youtube-dl.lnk"
+			Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$StartFolder\Youtube-dl.lnk"
 
 			Copy-Item "$PSScriptRoot\..\LICENSE" -Destination "$RootFolder"
 			Copy-Item "$PSScriptRoot\..\README.md" -Destination "$RootFolder"
