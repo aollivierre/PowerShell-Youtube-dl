@@ -6,7 +6,7 @@ A PowerShell script used to operate the youtube-dl command line program.
 
 **Author: mpb10**
 
-**February 28th, 2018**
+**March 6th, 2018**
 
 **v2.0.1**
 
