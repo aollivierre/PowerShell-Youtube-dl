@@ -255,7 +255,7 @@ Function UpdateScript {
 	
 	If ($NewestVersion -gt $CurrentVersion) {
 		Write-Host "`nThe newest version of PowerShell-Youtube-dl is $NewestVersion"
-		$MenuOption = Read-Host "Update the script to this version? [y]/n"
+		$MenuOption = Read-Host "`nUpdate the script to this version? [y]/n"
 		If ($MenuOption -like "n" -or $MenuOption -like "no") {
 			Return
 		}
