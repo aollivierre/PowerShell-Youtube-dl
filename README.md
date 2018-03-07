@@ -28,7 +28,7 @@ This information is for anyone who has used a version of this script previous to
 
 # INSTALLATION
 
-**Script download link:** https://github.com/mpb10/PowerShell-Youtube-dl/releases/download/v2.0.0/PowerShell-Youtube-dl-v2.0.0.zip
+**Script download link:** https://github.com/mpb10/PowerShell-Youtube-dl/releases/download/v2.0.1/PowerShell-Youtube-dl-v2.0.1.zip
 
 **NOTE:** These scripts require version 5.0 or greater of Windows PowerShell to function. Version 5.0 of PowerShell comes pre-installed with Windows 10 but otherwise can be downloaded here: https://www.microsoft.com/en-us/download/details.aspx?id=50395
 
