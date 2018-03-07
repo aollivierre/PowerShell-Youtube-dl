@@ -8,7 +8,7 @@ A PowerShell script used to operate the youtube-dl command line program.
 
 **February 28th, 2018**
 
-**v2.0.0**
+**v2.0.1**
 
 #
 
@@ -214,6 +214,9 @@ For advanced users, the youtube-dl.ps1 script, which is found in the folder `C:\
 
 
 # CHANGE LOG
+	
+	2.0.1	March 6th, 2018
+		Minor bug fixes.
 
 	2.0.0	February 28th, 2018
 		Finished re-writing the script.
