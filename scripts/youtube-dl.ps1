@@ -43,8 +43,8 @@
 .NOTES 
 	Requires Windows 7 or higher and PowerShell 5.0 or greater.
 	Author: mpb10
-	Updated: February 28th, 2018
-	Version: 2.0.0
+	Updated: March 6th, 2018
+	Version: 2.0.1
 
 .LINK 
 	https://github.com/mpb10/PowerShell-Youtube-dl
@@ -74,7 +74,7 @@ If ($PSVersionTable.PSVersion.Major -lt 5) {
 	Exit
 }
 
-[Version]$CurrentVersion = '2.0.0'
+[Version]$CurrentVersion = '2.0.1'
 
 [Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls"
 
@@ -433,7 +433,7 @@ Function MainMenu {
 		$URL = ""
 		Clear-Host
 		Write-Host "================================================================"
-		Write-Host "                  PowerShell-Youtube-dl v2.0.0                  " -ForegroundColor "Yellow"
+		Write-Host "                  PowerShell-Youtube-dl v2.0.1                  " -ForegroundColor "Yellow"
 		Write-Host "================================================================"
 		Write-Host "`nPlease select an option:`n" -ForegroundColor "Yellow"
 		Write-Host "  1   - Download video"
