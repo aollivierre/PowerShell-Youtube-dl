@@ -6,9 +6,9 @@ A PowerShell script used to operate the youtube-dl command line program.
 
 **Author: mpb10**
 
-**March 6th, 2018**
+**March 9th, 2018**
 
-**v2.0.1**
+**v2.0.2**
 
 #
 
@@ -136,6 +136,11 @@ In the youtube-dl.ps1 script file from lines 80 to 100, there are some settings 
 				false, simply pass the script the entire playlist URL. It usually looks
 				something like: https://www.youtube.com/playlist?list=...)
 				
+	'$VerboseDownloading = '
+		Default:	$False
+		Description:	This setting toggles whether to display extra information when downloading
+				video or audio. Setting this to $True can be used to debug issues.
+				
 	'$ConvertFile = '
 		Default:	$False
 		Description:	This setting toggles whether or not to convert downloaded video files to
@@ -214,6 +219,10 @@ For advanced users, the youtube-dl.ps1 script, which is found in the folder `C:\
 
 
 # CHANGE LOG
+
+	2.0.2	March 9th, 2018
+		Fixed some issues with the shortcuts.
+		Added $VerboseDownloading option to the script file settings.
 	
 	2.0.1	March 6th, 2018
 		Minor bug fixes.
