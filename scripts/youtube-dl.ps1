@@ -67,18 +67,6 @@ Param(
 )
 
 
-
-If ($PSVersionTable.PSVersion.Major -lt 5) {
-	Write-Host "[ERROR]: Your PowerShell installation is not version 5.0 or greater.`n        This script requires PowerShell version 5.0 or greater to function.`n        You can download PowerShell version 5.0 at:`n            https://www.microsoft.com/en-us/download/details.aspx?id=50395" -ForegroundColor "Red" -BackgroundColor "Black"
-	PauseScript
-	Exit
-}
-
-[Version]$CurrentVersion = '2.0.1'
-
-[Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls"
-
-
 # ======================================================================================================= #
 # ======================================================================================================= #
 #
@@ -90,6 +78,7 @@ $VideoSaveLocation = "$ENV:USERPROFILE\Videos\Youtube-dl"
 $AudioSaveLocation = "$ENV:USERPROFILE\Music\Youtube-dl"
 $UseArchiveFile = $True
 $EntirePlaylist = $False
+$VerboseDownloading = $True
 
 $ConvertFile = $False
 $FileExtension = "webm"
@@ -292,6 +281,13 @@ Function SettingsInitialization {
 		$Script:SetEntirePlaylist = "--no-playlist"
 	}
 	
+	If ($VerboseDownloading -eq $True) {
+		$Script:SetVerboseDownloading = ""
+	}
+	Else {
+		$Script:SetVerboseDownloading = "--quiet --no-warnings"
+	}
+	
 	If ($StripVideo -eq $True) {
 		$SetStripVideo = "-vn"
 	}
@@ -322,11 +318,11 @@ Function DownloadVideo {
 	)
 	Write-Host "`nDownloading video from: $URLToDownload`n"
 	If ($URLToDownload -like "*youtube.com/playlist*" -or $EntirePlaylist -eq $True) {
-		$YoutubedlCommand = "youtube-dl -o ""$VideoSaveLocation\%(playlist)s\%(title)s.%(ext)s"" --ignore-errors $FfmpegCommand --yes-playlist $SetUseArchiveFile ""$URLToDownload"""
+		$YoutubedlCommand = "youtube-dl -o ""$VideoSaveLocation\%(playlist)s\%(title)s.%(ext)s"" --ignore-errors --console-title --no-mtime $SetVerboseDownloading $FfmpegCommand --yes-playlist $SetUseArchiveFile ""$URLToDownload"""
 		Invoke-Expression "$YoutubedlCommand"
 	}
 	Else {
-		$YoutubedlCommand = "youtube-dl -o ""$VideoSaveLocation\%(title)s.%(ext)s"" --ignore-errors $FfmpegCommand $SetEntirePlaylist ""$URLToDownload"""
+		$YoutubedlCommand = "youtube-dl -o ""$VideoSaveLocation\%(title)s.%(ext)s"" --ignore-errors --console-title --no-mtime $SetVerboseDownloading $FfmpegCommand $SetEntirePlaylist ""$URLToDownload"""
 		Invoke-Expression "$YoutubedlCommand"
 	}
 }
@@ -339,11 +335,11 @@ Function DownloadAudio {
 	)
 	Write-Host "`nDownloading audio from: $URLToDownload`n"
 	If ($URLToDownload -like "*youtube.com/playlist*" -or $EntirePlaylist -eq $True) {
-		$YoutubedlCommand = "youtube-dl -o ""$AudioSaveLocation\%(playlist)s\%(title)s.%(ext)s"" --ignore-errors -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg --yes-playlist $SetUseArchiveFile ""$URLToDownload"""
+		$YoutubedlCommand = "youtube-dl -o ""$AudioSaveLocation\%(playlist)s\%(title)s.%(ext)s"" --ignore-errors --console-title --no-mtime $SetVerboseDownloading -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg --yes-playlist $SetUseArchiveFile ""$URLToDownload"""
 		Invoke-Expression "$YoutubedlCommand"
 	}
 	Else {
-		$YoutubedlCommand = "youtube-dl -o ""$AudioSaveLocation\%(title)s.%(ext)s"" --ignore-errors -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg $SetEntirePlaylist ""$URLToDownload"""
+		$YoutubedlCommand = "youtube-dl -o ""$AudioSaveLocation\%(title)s.%(ext)s"" --ignore-errors --console-title --no-mtime $SetVerboseDownloading -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg $SetEntirePlaylist ""$URLToDownload"""
 		Invoke-Expression "$YoutubedlCommand"
 	}
 }
@@ -544,14 +540,25 @@ Function SettingsMenu {
 # ======================================================================================================= #
 # ======================================================================================================= #
 
+
+If ($PSVersionTable.PSVersion.Major -lt 5) {
+	Write-Host "[ERROR]: Your PowerShell installation is not version 5.0 or greater.`n        This script requires PowerShell version 5.0 or greater to function.`n        You can download PowerShell version 5.0 at:`n            https://www.microsoft.com/en-us/download/details.aspx?id=50395" -ForegroundColor "Red" -BackgroundColor "Black"
+	PauseScript
+	Exit
+}
+
+[Version]$CurrentVersion = '2.0.1'
+
+[Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls"
+
+$NumOfParams = ($PSBoundParameters.Count)
+
 If ($PSScriptRoot -eq "$ENV:USERPROFILE\Scripts\Youtube-dl\scripts") {
 	$RootFolder = $ENV:USERPROFILE + "\Scripts\Youtube-dl"
 }
 Else {
 	$RootFolder = "$PSScriptRoot\.."
 }
-
-$NumOfParams = ($PSBoundParameters.Count)
 
 ScriptInitialization
 
