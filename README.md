@@ -31,13 +31,14 @@ This information is for anyone who has used a version of this script previous to
 **Script download link:** https://github.com/mpb10/PowerShell-Youtube-dl/releases/download/v2.0.1/PowerShell-Youtube-dl-v2.0.1.zip
 
 **Requires:**
-	PowerShell 5.0 or greater. *
+
+	PowerShell 5.0 or greater *
 	Python 2.6, 2.7, or 3.2+ *
 	
 
-*Version 5.0 of PowerShell comes pre-installed with Windows 10 but otherwise can be downloaded here: https://www.microsoft.com/en-us/download/details.aspx?id=50395
+	*Version 5.0 of PowerShell comes pre-installed with Windows 10 but otherwise can be downloaded here: https://www.microsoft.com/en-us/download/details.aspx?id=50395
 
-*Python 2.6, 2.7, or 3.2+ can be downloaded here: https://www.python.org/downloads/windows/
+	*Python 2.6, 2.7, or 3.2+ can be downloaded here: https://www.python.org/downloads/windows/
 
 #
 
