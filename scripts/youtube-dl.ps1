@@ -78,7 +78,7 @@ $VideoSaveLocation = "$ENV:USERPROFILE\Videos\Youtube-dl"
 $AudioSaveLocation = "$ENV:USERPROFILE\Music\Youtube-dl"
 $UseArchiveFile = $True
 $EntirePlaylist = $False
-$VerboseDownloading = $True
+$VerboseDownloading = $False
 
 $ConvertFile = $False
 $FileExtension = "webm"
