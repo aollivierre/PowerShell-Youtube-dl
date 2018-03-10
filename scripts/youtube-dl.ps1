@@ -41,10 +41,10 @@
 	Downloads the audio of the specified video URL to the user provided location.
 	
 .NOTES 
-	Requires Windows 7 or higher and PowerShell 5.0 or greater.
+	Requires Windows 7 or higher, PowerShell 5.0 or greater, and Python 2.6, 2.7, or 3.2+
 	Author: mpb10
-	Updated: March 6th, 2018
-	Version: 2.0.1
+	Updated: March 9th, 2018
+	Version: 2.0.2
 
 .LINK 
 	https://github.com/mpb10/PowerShell-Youtube-dl
@@ -429,7 +429,7 @@ Function MainMenu {
 		$URL = ""
 		Clear-Host
 		Write-Host "================================================================"
-		Write-Host "                  PowerShell-Youtube-dl v2.0.1                  " -ForegroundColor "Yellow"
+		Write-Host "                  PowerShell-Youtube-dl v2.0.2                  " -ForegroundColor "Yellow"
 		Write-Host "================================================================"
 		Write-Host "`nPlease select an option:`n" -ForegroundColor "Yellow"
 		Write-Host "  1   - Download video"
@@ -547,7 +547,7 @@ If ($PSVersionTable.PSVersion.Major -lt 5) {
 	Exit
 }
 
-[Version]$CurrentVersion = '2.0.1'
+[Version]$CurrentVersion = '2.0.2'
 
 [Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls"
 
