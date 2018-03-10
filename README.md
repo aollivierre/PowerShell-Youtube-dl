@@ -33,7 +33,6 @@ This information is for anyone who has used a version of this script previous to
 **Requires:** PowerShell 5.0 or greater* and Python 2.6, 2.7, or 3.2+**
 
 	*Version 5.0 of PowerShell comes pre-installed with Windows 10 but otherwise can be downloaded here: https://www.microsoft.com/en-us/download/details.aspx?id=50395
-
 	**Python 2.6, 2.7, or 3.2+ can be downloaded here: https://www.python.org/downloads/windows/
 
 #
