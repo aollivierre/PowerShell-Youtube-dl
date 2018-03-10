@@ -204,10 +204,7 @@ Function InstallScript {
 	}
 	Else {
 		$MenuOption = Read-Host "`nInstall PowerShell-Youtube-dl to ""$ENV:USERPROFILE\Scripts\Youtube-dl""? [y]/n"
-		If ($MenuOption -like "n" -or $MenuOption -like "no") {
-			Return
-		}
-		Else {
+		If ($MenuOption -like "y" -or $MenuOption -like "yes" -or $NumOfParams -gt 0) {
 			Write-Host "`nInstalling to: ""$ENV:USERPROFILE\Scripts\Youtube-dl"""
 
 			$Script:RootFolder = $ENV:USERPROFILE + "\Scripts\Youtube-dl"
@@ -233,6 +230,9 @@ Function InstallScript {
 			PauseScript
 			Exit
 		}
+		Else {
+			Return
+		}
 	}
 }
 
@@ -256,13 +256,13 @@ Function UpdateScript {
 	If ($NewestVersion -gt $CurrentVersion) {
 		Write-Host "`nThe newest version of PowerShell-Youtube-dl is $NewestVersion"
 		$MenuOption = Read-Host "`nUpdate the script to this version? [y]/n"
-		If ($MenuOption -like "n" -or $MenuOption -like "no") {
-			Return
-		}
-		Else {
+		If ($MenuOption -like "y" -or $MenuOption -like "yes" -or $NumOfParams -gt 0) {
 			DownloadFile "http://github.com/mpb10/PowerShell-Youtube-dl/raw/master/scripts/youtube-dl.ps1" "$ScriptsFolder\youtube-dl.ps1"
 			Write-Host "`nUpdate script file complete. Please restart the script." -ForegroundColor "Yellow"
 			PauseScript
+		}
+		Else {
+			Return
 		}
 	}
 	ElseIf ($NewestVersion -eq $CurrentVersion) {
