@@ -199,7 +199,7 @@ For advanced users, the youtube-dl.ps1 script, which is found in the folder `C:\
     
 	-FromFiles
 		Download playlist URL's listed in the "videoplaylist.txt" and "audioplaylist.txt" files located 
-		in "C:\Users\%USERNAME%\Scripts\Youtube-dl\config". The -URL parameter will be ignored if -FromFiles is used.
+		in "C:\Users\%USERNAME%\Scripts\Youtube-dl\config". The -URL parameter is ignored if -FromFiles is used.
     
 	-OutputPath <path>
 		(Optional) Specify a custom download location.
