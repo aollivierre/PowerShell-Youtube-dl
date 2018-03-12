@@ -192,8 +192,8 @@ Function InstallScript {
 		Return
 	}
 	Else {
-		$MenuOption = Read-Host "`nInstall PowerShell-Youtube-dl to ""$ENV:USERPROFILE\Scripts\Youtube-dl""? [y]/n"
-		If ($MenuOption -like "y" -or $MenuOption -like "yes" -or $NumOfParams -gt 0) {
+		$MenuOption = Read-Host "`nInstall PowerShell-Youtube-dl to ""$ENV:USERPROFILE\Scripts\Youtube-dl""? [y/n]"
+		If ($MenuOption -like "y" -or $MenuOption -like "yes") {
 			Write-Host "`nInstalling to: ""$ENV:USERPROFILE\Scripts\Youtube-dl"""
 
 			$Script:RootFolder = $ENV:USERPROFILE + "\Scripts\Youtube-dl"
@@ -207,13 +207,14 @@ Function InstallScript {
 			DownloadFfmpeg
 
 			Copy-Item "$PSScriptRoot\youtube-dl.ps1" -Destination "$ScriptsFolder"
-
-			Copy-Item "$PSScriptRoot\..\install\files\Youtube-dl.lnk" -Destination "$RootFolder"
+			
+			DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/install/files/Youtube-dl.lnk" "$RootFolder\Youtube-dl.lnk"
+			
 			Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$DesktopFolder\Youtube-dl.lnk"
 			Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$StartFolder\Youtube-dl.lnk"
-
-			Copy-Item "$PSScriptRoot\..\LICENSE" -Destination "$RootFolder"
-			Copy-Item "$PSScriptRoot\..\README.md" -Destination "$RootFolder"
+			
+			DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/LICENSE" "$RootFolder\LICENSE.txt"
+			DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/README.md" "$RootFolder\README.md"
 
 			Write-Host "`nInstallation complete. Please restart the script." -ForegroundColor "Yellow"
 			PauseScript
@@ -231,7 +232,7 @@ Function UpdateExe {
 	Write-Host "`nUpdating youtube-dl.exe and ffmpeg.exe files ..."
 	DownloadYoutube-dl
 	DownloadFfmpeg
-	Write-Host "`nUpdate .exe files complete. Please restart the script." -ForegroundColor "Yellow"
+	Write-Host "`nUpdate .exe files complete." -ForegroundColor "Yellow"
 	PauseScript
 }
 
@@ -244,11 +245,12 @@ Function UpdateScript {
 	
 	If ($NewestVersion -gt $CurrentVersion) {
 		Write-Host "`nThe newest version of PowerShell-Youtube-dl is $NewestVersion"
-		$MenuOption = Read-Host "`nUpdate the script to this version? [y]/n"
-		If ($MenuOption -like "y" -or $MenuOption -like "yes" -or $NumOfParams -gt 0) {
+		$MenuOption = Read-Host "`nUpdate the script to this version? [y/n]"
+		If ($MenuOption -like "y" -or $MenuOption -like "yes") {
 			DownloadFile "http://github.com/mpb10/PowerShell-Youtube-dl/raw/master/scripts/youtube-dl.ps1" "$ScriptsFolder\youtube-dl.ps1"
 			Write-Host "`nUpdate script file complete. Please restart the script." -ForegroundColor "Yellow"
 			PauseScript
+			Exit
 		}
 		Else {
 			Return
@@ -374,12 +376,10 @@ Function CommandLineMode {
 		Exit
 	}
 	ElseIf ($UpdateExe -eq $True) {
-		Write-Host "`nUpdating youtube-dl.exe and ffmpeg files ..."
 		UpdateExe
 		Exit
 	}
 	ElseIf ($UpdateScript -eq $True) {
-		Write-Host "`nUpdating youtube-dl.ps1 script file ..."
 		UpdateScript
 		Exit
 	}
