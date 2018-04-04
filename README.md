@@ -37,7 +37,7 @@ A PowerShell script used to operate the youtube-dl command line program.
 2. Download the release .zip file and extract it to a folder.
 3. Run the 'Installer' shortcut located in the `\install` folder (or run the the script with the 'Youtube-dl - Portable Version' shortcut, navigate to the settings menu, and choose the "Install script to:" option).
 
-A desktop shortcut and a Start Menu shortcut will then be created. Run either of those to use the script.
+A desktop shortcut and a Start Menu shortcut will then be created. Run either of those to use the script. The install location is `C:\Users\%USERNAME%\Scripts\Youtube-dl`.
 
 #
 
