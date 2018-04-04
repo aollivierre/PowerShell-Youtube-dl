@@ -22,7 +22,7 @@ A PowerShell script used to operate the youtube-dl command line program.
 
 # INSTALLATION
 
-**Script download link:** https://github.com/mpb10/PowerShell-Youtube-dl/releases/download/v2.0.1/PowerShell-Youtube-dl-v2.0.1.zip
+**Script download link:** https://github.com/mpb10/PowerShell-Youtube-dl/releases/download/v2.0.2/PowerShell-Youtube-dl-v2.0.2.zip
 
 **Requires:** PowerShell 5.0 or greater* and Python 2.6, 2.7, or 3.2+**
 
