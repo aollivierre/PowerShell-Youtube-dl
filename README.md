@@ -33,11 +33,15 @@ A PowerShell script used to operate the youtube-dl command line program.
 
 **To Install:** 
 
-Download the project .zip file, extract it to a folder, and run the `Youtube-dl - Portable Version` shortcut. You can choose to either use the script in this location, or you can install the script to `C:\Users\%USERNAME%\Scripts\Youtube-dl` by choosing option 3 of the settings menu. A desktop shortcut and a Start Menu shortcut will then be created. Run either of those to use the script.
+1. Ensure that you have PowerShell Version 5.0 or greater installed and Python 2.6, 2.7, or 3.2+ installed.
+2. Download the release .zip file and extract it to a folder.
+3. Run the 'Installer' shortcut located in the `\install` folder (or run the the script with the 'Youtube-dl - Portable Version' shortcut, navigate to the settings menu, and choose the "Install script to:" option).
+
+A desktop shortcut and a Start Menu shortcut will then be created. Run either of those to use the script.
 
 #
 
-To uninstall this script and its files, delete the two folders `C:\Users\%USERNAME%\Scripts\Youtube-dl` and `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Youtube-dl`, as well as the desktop shortcut.
+To uninstall this script and its files, delete the two folders `C:\Users\%USERNAME%\Scripts\Youtube-dl` and `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Youtube-dl` and the desktop shortcut.
 
 # USAGE
 
