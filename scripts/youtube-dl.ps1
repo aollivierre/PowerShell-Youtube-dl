@@ -9,7 +9,7 @@
 	Download the video of the provided URL. Output file formats will vary.
 .PARAMETER Audio 
 	Download only the audio of the provided URL. Output file format will be mp3.
-.PARAMETER FromFiles 
+.PARAMETER Playlists 
 	Download playlist URL's listed in videoplaylists.txt and audioplaylists.txt 
 .PARAMETER Convert
 	Convert the downloaded video to the default file format using the default settings.
@@ -34,17 +34,17 @@
 	C:\Users\%USERNAME%\Scripts\Youtube-dl\scripts\youtube-dl.ps1 -Audio -URL "https://www.youtube.com/watch?v=oHg5SJYRHA0"
 	Downloads only the audio of the specified video URL.
 .EXAMPLE 
-	C:\Users\%USERNAME%\Scripts\Youtube-dl\scripts\youtube-dl.ps1 -FromFiles
+	C:\Users\%USERNAME%\Scripts\Youtube-dl\scripts\youtube-dl.ps1 -Playlists
 	Downloads video URL's listed in videoplaylists.txt and audioplaylists.txt files. These files are generated when the script is ran for the first time.
 .EXAMPLE 
 	C:\Users\%USERNAME%\Scripts\Youtube-dl\scripts\youtube-dl.ps1 -Audio -URL "https://www.youtube.com/watch?v=oHg5SJYRHA0" -OutputPath "C:\Users\%USERNAME%\Desktop"
 	Downloads the audio of the specified video URL to the user provided location.
 	
 .NOTES 
-	Requires Windows 7 or higher and PowerShell 5.0 or greater.
+	Requires Windows 7 or higher, PowerShell 5.0 or greater, and Python 2.6, 2.7, or 3.2+
 	Author: mpb10
-	Updated: March 6th, 2018
-	Version: 2.0.1
+	Updated: April 3rd, 2018
+	Version: 2.0.2
 
 .LINK 
 	https://github.com/mpb10/PowerShell-Youtube-dl
@@ -57,7 +57,7 @@
 Param(
 	[Switch]$Video,
 	[Switch]$Audio,
-	[Switch]$FromFiles,
+	[Switch]$Playlists,
 	[Switch]$Convert,
 	[String]$URL,
 	[String]$OutputPath,
@@ -65,18 +65,6 @@ Param(
 	[Switch]$UpdateExe,
 	[Switch]$UpdateScript
 )
-
-
-
-If ($PSVersionTable.PSVersion.Major -lt 5) {
-	Write-Host "[ERROR]: Your PowerShell installation is not version 5.0 or greater.`n        This script requires PowerShell version 5.0 or greater to function.`n        You can download PowerShell version 5.0 at:`n            https://www.microsoft.com/en-us/download/details.aspx?id=50395" -ForegroundColor "Red" -BackgroundColor "Black"
-	PauseScript
-	Exit
-}
-
-[Version]$CurrentVersion = '2.0.1'
-
-[Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls"
 
 
 # ======================================================================================================= #
@@ -90,6 +78,7 @@ $VideoSaveLocation = "$ENV:USERPROFILE\Videos\Youtube-dl"
 $AudioSaveLocation = "$ENV:USERPROFILE\Music\Youtube-dl"
 $UseArchiveFile = $True
 $EntirePlaylist = $False
+$VerboseDownloading = $False
 
 $ConvertFile = $False
 $FileExtension = "webm"
@@ -178,19 +167,14 @@ Function ScriptInitialization {
 		New-Item -Type Directory -Path "$ConfigFolder"
 	}
 
-	$Script:ArchiveFile = $ConfigFolder + "\downloadarchive.txt"
+	$Script:ArchiveFile = $ConfigFolder + "\DownloadArchive.txt"
 	If ((Test-Path "$ArchiveFile") -eq $False) {
 		New-Item -Type file -Path "$ArchiveFile"
 	}
 
-	$Script:VideoPlaylistFile = $ConfigFolder + "\videoplaylists.txt"
-	If ((Test-Path "$VideoPlaylistFile") -eq $False) {
-		New-Item -Type file -Path "$VideoPlaylistFile"
-	}
-
-	$Script:AudioPlaylistFile = $ConfigFolder + "\audioplaylists.txt"
-	If ((Test-Path "$AudioPlaylistFile") -eq $False) {
-		New-Item -Type file -Path "$AudioPlaylistFile"
+	$Script:PlaylistFile = $ConfigFolder + "\PlaylistFile.txt"
+	If ((Test-Path "$PlaylistFile") -eq $False) {
+		DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/install/files/PlaylistFile.txt" "$PlaylistFile"
 	}
 }
 
@@ -203,8 +187,8 @@ Function InstallScript {
 		Return
 	}
 	Else {
-		$MenuOption = Read-Host "`nInstall PowerShell-Youtube-dl to ""$ENV:USERPROFILE\Scripts\Youtube-dl""? [y]/n"
-		If ($MenuOption -like "y" -or $MenuOption -like "yes" -or $NumOfParams -gt 0) {
+		$MenuOption = Read-Host "`nInstall PowerShell-Youtube-dl to ""$ENV:USERPROFILE\Scripts\Youtube-dl""? [y/n]"
+		If ($MenuOption -like "y" -or $MenuOption -like "yes") {
 			Write-Host "`nInstalling to: ""$ENV:USERPROFILE\Scripts\Youtube-dl"""
 
 			$Script:RootFolder = $ENV:USERPROFILE + "\Scripts\Youtube-dl"
@@ -218,13 +202,14 @@ Function InstallScript {
 			DownloadFfmpeg
 
 			Copy-Item "$PSScriptRoot\youtube-dl.ps1" -Destination "$ScriptsFolder"
-
-			Copy-Item "$PSScriptRoot\..\install\files\Youtube-dl.lnk" -Destination "$RootFolder"
+			
+			DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/install/files/Youtube-dl.lnk" "$RootFolder\Youtube-dl.lnk"
 			Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$DesktopFolder\Youtube-dl.lnk"
 			Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$StartFolder\Youtube-dl.lnk"
-
-			Copy-Item "$PSScriptRoot\..\LICENSE" -Destination "$RootFolder"
-			Copy-Item "$PSScriptRoot\..\README.md" -Destination "$RootFolder"
+			
+			DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/install/files/PlaylistFile.txt" "$ConfigFolder\PlaylistFile.txt"
+			DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/LICENSE" "$RootFolder\LICENSE.txt"
+			DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/README.md" "$RootFolder\README.md"
 
 			Write-Host "`nInstallation complete. Please restart the script." -ForegroundColor "Yellow"
 			PauseScript
@@ -242,7 +227,7 @@ Function UpdateExe {
 	Write-Host "`nUpdating youtube-dl.exe and ffmpeg.exe files ..."
 	DownloadYoutube-dl
 	DownloadFfmpeg
-	Write-Host "`nUpdate .exe files complete. Please restart the script." -ForegroundColor "Yellow"
+	Write-Host "`nUpdate .exe files complete." -ForegroundColor "Yellow"
 	PauseScript
 }
 
@@ -255,11 +240,12 @@ Function UpdateScript {
 	
 	If ($NewestVersion -gt $CurrentVersion) {
 		Write-Host "`nThe newest version of PowerShell-Youtube-dl is $NewestVersion"
-		$MenuOption = Read-Host "`nUpdate the script to this version? [y]/n"
-		If ($MenuOption -like "y" -or $MenuOption -like "yes" -or $NumOfParams -gt 0) {
+		$MenuOption = Read-Host "`nUpdate the script to this version? [y/n]"
+		If ($MenuOption -like "y" -or $MenuOption -like "yes") {
 			DownloadFile "http://github.com/mpb10/PowerShell-Youtube-dl/raw/master/scripts/youtube-dl.ps1" "$ScriptsFolder\youtube-dl.ps1"
 			Write-Host "`nUpdate script file complete. Please restart the script." -ForegroundColor "Yellow"
 			PauseScript
+			Exit
 		}
 		Else {
 			Return
@@ -292,6 +278,13 @@ Function SettingsInitialization {
 		$Script:SetEntirePlaylist = "--no-playlist"
 	}
 	
+	If ($VerboseDownloading -eq $True) {
+		$Script:SetVerboseDownloading = ""
+	}
+	Else {
+		$Script:SetVerboseDownloading = "--quiet --no-warnings"
+	}
+	
 	If ($StripVideo -eq $True) {
 		$SetStripVideo = "-vn"
 	}
@@ -320,13 +313,14 @@ Function DownloadVideo {
 	Param(
 		[String]$URLToDownload
 	)
+	$URLToDownload = $URLToDownload.Trim()
 	Write-Host "`nDownloading video from: $URLToDownload`n"
 	If ($URLToDownload -like "*youtube.com/playlist*" -or $EntirePlaylist -eq $True) {
-		$YoutubedlCommand = "youtube-dl -o ""$VideoSaveLocation\%(playlist)s\%(title)s.%(ext)s"" --ignore-errors $FfmpegCommand --yes-playlist $SetUseArchiveFile ""$URLToDownload"""
+		$YoutubedlCommand = "youtube-dl -o ""$VideoSaveLocation\%(playlist)s\%(title)s.%(ext)s"" --ignore-errors --console-title --no-mtime $SetVerboseDownloading $FfmpegCommand --yes-playlist $SetUseArchiveFile ""$URLToDownload"""
 		Invoke-Expression "$YoutubedlCommand"
 	}
 	Else {
-		$YoutubedlCommand = "youtube-dl -o ""$VideoSaveLocation\%(title)s.%(ext)s"" --ignore-errors $FfmpegCommand $SetEntirePlaylist ""$URLToDownload"""
+		$YoutubedlCommand = "youtube-dl -o ""$VideoSaveLocation\%(title)s.%(ext)s"" --ignore-errors --console-title --no-mtime $SetVerboseDownloading $FfmpegCommand $SetEntirePlaylist ""$URLToDownload"""
 		Invoke-Expression "$YoutubedlCommand"
 	}
 }
@@ -337,13 +331,14 @@ Function DownloadAudio {
 	Param(
 		[String]$URLToDownload
 	)
+	$URLToDownload = $URLToDownload.Trim()
 	Write-Host "`nDownloading audio from: $URLToDownload`n"
 	If ($URLToDownload -like "*youtube.com/playlist*" -or $EntirePlaylist -eq $True) {
-		$YoutubedlCommand = "youtube-dl -o ""$AudioSaveLocation\%(playlist)s\%(title)s.%(ext)s"" --ignore-errors -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg --yes-playlist $SetUseArchiveFile ""$URLToDownload"""
+		$YoutubedlCommand = "youtube-dl -o ""$AudioSaveLocation\%(playlist)s\%(title)s.%(ext)s"" --ignore-errors --console-title --no-mtime $SetVerboseDownloading -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg --yes-playlist $SetUseArchiveFile ""$URLToDownload"""
 		Invoke-Expression "$YoutubedlCommand"
 	}
 	Else {
-		$YoutubedlCommand = "youtube-dl -o ""$AudioSaveLocation\%(title)s.%(ext)s"" --ignore-errors -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg $SetEntirePlaylist ""$URLToDownload"""
+		$YoutubedlCommand = "youtube-dl -o ""$AudioSaveLocation\%(title)s.%(ext)s"" --ignore-errors --console-title --no-mtime $SetVerboseDownloading -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg $SetEntirePlaylist ""$URLToDownload"""
 		Invoke-Expression "$YoutubedlCommand"
 	}
 }
@@ -351,16 +346,31 @@ Function DownloadAudio {
 
 
 Function DownloadPlaylists {
-	Write-Host "`nDownloading playlist URLs listed in:`n   $VideoPlaylistFile`n   $AudioPlaylistFile"
+	Write-Host "`nDownloading playlist URLs listed in: ""$PlaylistFile"""
 	
-	Get-Content "$VideoPlaylistFile" | ForEach-Object {
-		Write-Verbose "`nDownloading playlist: $_`n"
-		DownloadVideo "$_"
+	$PlaylistArray = Get-Content "$PlaylistFile" | Where-Object {$_.Trim() -ne "" -and $_.Trim() -notlike "#*"}
+	
+	$VideoPlaylistArray = $PlaylistArray | Select-Object -Index (($PlaylistArray.IndexOf("[Video Playlists]".Trim()))..($PlaylistArray.IndexOf("[Audio Playlists]".Trim())-1))
+	$AudioPlaylistArray = $PlaylistArray | Select-Object -Index (($PlaylistArray.IndexOf("[Audio Playlists]".Trim()))..($PlaylistArray.Count - 1))
+	
+	If ($VideoPlaylistArray.Count -gt 1) {
+		$VideoPlaylistArray | Where-Object {$_ -ne $VideoPlaylistArray[0]} | ForEach-Object {
+			Write-Verbose "`nDownloading playlist: $_`n"
+			DownloadVideo "$_"
+		}
 	}
-	
-	Get-Content "$AudioPlaylistFile" | ForEach-Object {
-		Write-Verbose "`nDownloading playlist: $_`n"
-		DownloadAudio "$_"
+	Else {
+		Write-Verbose "The [Video Playlists] section is empty."
+	}
+		
+	If ($AudioPlaylistArray.Count -gt 1) {
+		$AudioPlaylistArray | Where-Object {$_ -ne $AudioPlaylistArray[0]} | ForEach-Object {
+			Write-Verbose "`nDownloading playlist: $_`n"
+			DownloadAudio "$_"
+		}
+	}
+	Else {
+		Write-Verbose "The [Video Playlists] section is empty."
 	}
 }
 
@@ -378,12 +388,10 @@ Function CommandLineMode {
 		Exit
 	}
 	ElseIf ($UpdateExe -eq $True) {
-		Write-Host "`nUpdating youtube-dl.exe and ffmpeg files ..."
 		UpdateExe
 		Exit
 	}
 	ElseIf ($UpdateScript -eq $True) {
-		Write-Host "`nUpdating youtube-dl.ps1 script file ..."
 		UpdateScript
 		Exit
 	}
@@ -400,10 +408,10 @@ Function CommandLineMode {
 	
 	SettingsInitialization
 	
-	If ($FromFiles -eq $True -and ($Video -eq $True -or $Audio -eq $True)) {
-		Write-Host "`n[ERROR]: The parameter -FromFiles can't be used with -Video or -Audio.`n" -ForegroundColor "Red" -BackgroundColor "Black"
+	If ($Playlists -eq $True -and ($Video -eq $True -or $Audio -eq $True)) {
+		Write-Host "`n[ERROR]: The parameter -Playlists can't be used with -Video or -Audio.`n" -ForegroundColor "Red" -BackgroundColor "Black"
 	}
-	ElseIf ($FromFiles -eq $True) {
+	ElseIf ($Playlists -eq $True) {
 		DownloadPlaylists
 		Write-Host "`nDownloads complete. Downloaded to:`n   $VideoSaveLocation`n   $AudioSaveLocation`n" -ForegroundColor "Yellow"
 	}
@@ -433,12 +441,12 @@ Function MainMenu {
 		$URL = ""
 		Clear-Host
 		Write-Host "================================================================"
-		Write-Host "                  PowerShell-Youtube-dl v2.0.1                  " -ForegroundColor "Yellow"
+		Write-Host "                  PowerShell-Youtube-dl v2.0.2                  " -ForegroundColor "Yellow"
 		Write-Host "================================================================"
 		Write-Host "`nPlease select an option:`n" -ForegroundColor "Yellow"
 		Write-Host "  1   - Download video"
 		Write-Host "  2   - Download audio"
-		Write-Host "  3   - Download from playlist files"
+		Write-Host "  3   - Download from playlist file"
 		Write-Host "  4   - Settings"
 		Write-Host "`n  0   - Exit`n" -ForegroundColor "Gray"
 		$MenuOption = Read-Host "Option"
@@ -544,14 +552,25 @@ Function SettingsMenu {
 # ======================================================================================================= #
 # ======================================================================================================= #
 
+
+If ($PSVersionTable.PSVersion.Major -lt 5) {
+	Write-Host "[ERROR]: Your PowerShell installation is not version 5.0 or greater.`n        This script requires PowerShell version 5.0 or greater to function.`n        You can download PowerShell version 5.0 at:`n            https://www.microsoft.com/en-us/download/details.aspx?id=50395" -ForegroundColor "Red" -BackgroundColor "Black"
+	PauseScript
+	Exit
+}
+
+[Version]$CurrentVersion = '2.0.2'
+
+[Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls"
+
+$NumOfParams = ($PSBoundParameters.Count)
+
 If ($PSScriptRoot -eq "$ENV:USERPROFILE\Scripts\Youtube-dl\scripts") {
 	$RootFolder = $ENV:USERPROFILE + "\Scripts\Youtube-dl"
 }
 Else {
 	$RootFolder = "$PSScriptRoot\.."
 }
-
-$NumOfParams = ($PSBoundParameters.Count)
 
 ScriptInitialization
 
