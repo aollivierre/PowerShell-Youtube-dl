@@ -317,12 +317,11 @@ Function DownloadVideo {
 	Write-Host "`nDownloading video from: $URLToDownload`n"
 	If ($URLToDownload -like "*youtube.com/playlist*" -or $EntirePlaylist -eq $True) {
 		$YoutubedlCommand = "youtube-dl -o ""$VideoSaveLocation\%(playlist)s\%(title)s.%(ext)s"" --ignore-errors --console-title --no-mtime $SetVerboseDownloading $FfmpegCommand --yes-playlist $SetUseArchiveFile ""$URLToDownload"""
-		Invoke-Expression "$YoutubedlCommand"
 	}
 	Else {
 		$YoutubedlCommand = "youtube-dl -o ""$VideoSaveLocation\%(title)s.%(ext)s"" --ignore-errors --console-title --no-mtime $SetVerboseDownloading $FfmpegCommand $SetEntirePlaylist ""$URLToDownload"""
-		Invoke-Expression "$YoutubedlCommand"
 	}
+	Invoke-Expression "$YoutubedlCommand"
 }
 
 
@@ -335,12 +334,11 @@ Function DownloadAudio {
 	Write-Host "`nDownloading audio from: $URLToDownload`n"
 	If ($URLToDownload -like "*youtube.com/playlist*" -or $EntirePlaylist -eq $True) {
 		$YoutubedlCommand = "youtube-dl -o ""$AudioSaveLocation\%(playlist)s\%(title)s.%(ext)s"" --ignore-errors --console-title --no-mtime $SetVerboseDownloading -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg --yes-playlist $SetUseArchiveFile ""$URLToDownload"""
-		Invoke-Expression "$YoutubedlCommand"
 	}
 	Else {
 		$YoutubedlCommand = "youtube-dl -o ""$AudioSaveLocation\%(title)s.%(ext)s"" --ignore-errors --console-title --no-mtime $SetVerboseDownloading -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg $SetEntirePlaylist ""$URLToDownload"""
-		Invoke-Expression "$YoutubedlCommand"
 	}
+	Invoke-Expression "$YoutubedlCommand"
 }
 
 
