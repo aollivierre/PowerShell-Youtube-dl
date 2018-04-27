@@ -370,7 +370,7 @@ Function DownloadPlaylists {
 		}
 	}
 	Else {
-		Write-Verbose "The [Video Playlists] section is empty."
+		Write-Verbose "The [Audio Playlists] section is empty."
 	}
 }
 
