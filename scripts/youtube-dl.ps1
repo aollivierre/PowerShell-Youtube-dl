@@ -43,8 +43,8 @@
 .NOTES 
 	Requires Windows 7 or higher, PowerShell 5.0 or greater, and Python 2.6, 2.7, or 3.2+
 	Author: mpb10
-	Updated: April 3rd, 2018
-	Version: 2.0.2
+	Updated: April 27th, 2018
+	Version: 2.0.3
 
 .LINK 
 	https://github.com/mpb10/PowerShell-Youtube-dl
@@ -238,7 +238,7 @@ Function UpdateScript {
 	[Version]$NewestVersion = Get-Content "$TempFolder\version-file.txt" | Select -Index 0
 	Remove-Item -Path "$TempFolder\*" -Recurse -ErrorAction Silent
 	
-	If ($NewestVersion -gt $CurrentVersion) {
+	If ($NewestVersion -gt $RunningVersion) {
 		Write-Host "`nThe newest version of PowerShell-Youtube-dl is $NewestVersion"
 		$MenuOption = Read-Host "`nUpdate the script to this version? [y/n]"
 		If ($MenuOption -like "y" -or $MenuOption -like "yes") {
@@ -251,12 +251,12 @@ Function UpdateScript {
 			Return
 		}
 	}
-	ElseIf ($NewestVersion -eq $CurrentVersion) {
+	ElseIf ($NewestVersion -eq $RunningVersion) {
 		Write-Host "`nThe running version of PowerShell-Youtube-dl is up to date."
 		PauseScript
 	}
 	Else {
-		Write-Host "[ERROR] Version mismatch. Re-installing the script is recommended." -ForegroundColor "Red" -BackgroundColor "Black"
+		Write-Host "[ERROR] Script version mismatch. Re-installing the script is recommended." -ForegroundColor "Red" -BackgroundColor "Black"
 		PauseScript
 	}
 }
@@ -441,7 +441,7 @@ Function MainMenu {
 		$URL = ""
 		Clear-Host
 		Write-Host "================================================================"
-		Write-Host "                  PowerShell-Youtube-dl v2.0.2                  " -ForegroundColor "Yellow"
+		Write-Host "                  PowerShell-Youtube-dl v2.0.3                  " -ForegroundColor "Yellow"
 		Write-Host "================================================================"
 		Write-Host "`nPlease select an option:`n" -ForegroundColor "Yellow"
 		Write-Host "  1   - Download video"
@@ -559,7 +559,7 @@ If ($PSVersionTable.PSVersion.Major -lt 5) {
 	Exit
 }
 
-[Version]$CurrentVersion = '2.0.2'
+[Version]$RunningVersion = '2.0.3'
 
 [Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls"
 
