@@ -225,10 +225,16 @@ Function InstallScript {
 
 Function UpdateExe {
 	Write-Host "`nUpdating youtube-dl.exe and ffmpeg.exe files ..."
+	
 	DownloadYoutube-dl
 	DownloadFfmpeg
+	
 	Write-Host "`nUpdate .exe files complete." -ForegroundColor "Yellow"
 	PauseScript
+	
+	If ($UpdateScript -neq $True) {
+		exit
+	}
 }
 
 
@@ -236,14 +242,16 @@ Function UpdateExe {
 Function UpdateScript {
 	DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/install/files/version-file" "$TempFolder\version-file.txt"
 	[Version]$NewestVersion = Get-Content "$TempFolder\version-file.txt" | Select -Index 0
-	Remove-Item -Path "$TempFolder\*" -Recurse -ErrorAction Silent
+	Remove-Item -Path "$TempFolder\version-file.txt"
 	
 	If ($NewestVersion -gt $RunningVersion) {
 		Write-Host "`nThe newest version of PowerShell-Youtube-dl is $NewestVersion"
 		$MenuOption = Read-Host "`nUpdate the script to this version? [y/n]"
+		
 		If ($MenuOption -like "y" -or $MenuOption -like "yes") {
 			DownloadFile "http://github.com/mpb10/PowerShell-Youtube-dl/raw/master/scripts/youtube-dl.ps1" "$ScriptsFolder\youtube-dl.ps1"
 			Write-Host "`nUpdate script file complete. Please restart the script." -ForegroundColor "Yellow"
+			
 			PauseScript
 			Exit
 		}
@@ -376,7 +384,6 @@ Function DownloadPlaylists {
 
 Function CommandLineMode {
 	If ($Install -eq $True) {
-		Write-Host "`nInstalling Youtube-dl to: ""$ENV:USERPROFILE\Scripts\Youtube-dl"""
 		InstallScript
 		Exit
 	}
