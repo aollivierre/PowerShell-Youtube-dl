@@ -185,7 +185,7 @@ Function ScriptInitialization {
 
 	$Script:PlaylistFile = $ConfigFolder + "\PlaylistFile.txt"
 	If ((Test-Path "$PlaylistFile") -eq $False) {
-		DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/install/files/PlaylistFile.txt" "$PlaylistFile"
+		DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/version-2.0.3/install/files/PlaylistFile.txt" "$PlaylistFile"
 	}
 }
 
@@ -217,12 +217,12 @@ Function InstallScript {
 
 			Copy-Item "$PSScriptRoot\youtube-dl.ps1" -Destination "$RootFolder"
 			
-			DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/install/files/Youtube-dl.lnk" "$RootFolder\Youtube-dl.lnk"
+			DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/version-2.0.3/install/files/Youtube-dl.lnk" "$RootFolder\Youtube-dl.lnk"
 			Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$DesktopFolder\Youtube-dl.lnk"
 			Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$StartFolder\Youtube-dl.lnk"
 			
-			DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/LICENSE" "$RootFolder\LICENSE.txt"
-			DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/README.md" "$RootFolder\README.md"
+			DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/version-2.0.3/LICENSE" "$RootFolder\LICENSE.txt"
+			DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/version-2.0.3/README.md" "$RootFolder\README.md"
 
 			Write-Host "`nInstallation complete. Please restart the script." -ForegroundColor "Yellow"
 			PauseScript
@@ -253,7 +253,7 @@ Function UpdateExe {
 
 
 Function UpdateScript {
-	DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/install/files/version-file" "$TempFolder\version-file.txt"
+	DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/version-2.0.3/install/files/version-file" "$TempFolder\version-file.txt"
 	[Version]$NewestVersion = Get-Content "$TempFolder\version-file.txt" | Select -Index 0
 	Remove-Item -Path "$TempFolder\version-file.txt"
 	
@@ -262,24 +262,23 @@ Function UpdateScript {
 		$MenuOption = Read-Host "`nUpdate to this version? [y/n]"
 		
 		If ($MenuOption -like "y" -or $MenuOption -like "yes") {
-			DownloadFile "http://github.com/mpb10/PowerShell-Youtube-dl/raw/master/scripts/youtube-dl.ps1" "$RootFolder\youtube-dl.ps1"
+			DownloadFile "http://github.com/mpb10/PowerShell-Youtube-dl/raw/version-2.0.3/youtube-dl.ps1" "$RootFolder\youtube-dl.ps1"
 			
 			If ($PSScriptRoot -eq "$InstallLocation") {
 				$StartFolder = $ENV:APPDATA + "\Microsoft\Windows\Start Menu\Programs\Youtube-dl"
 				If ((Test-Path "$StartFolder") -eq $False) {
 					New-Item -Type Directory -Path "$StartFolder"
 				}
-				DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/install/files/Youtube-dl.lnk" "$RootFolder\Youtube-dl.lnk"
+				DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/version-2.0.3/install/files/Youtube-dl.lnk" "$RootFolder\Youtube-dl.lnk"
 				Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$DesktopFolder\Youtube-dl.lnk"
 				Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$StartFolder\Youtube-dl.lnk"
-				DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/LICENSE" "$RootFolder\LICENSE.txt"
-				DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/README.md" "$RootFolder\README.md"
+				DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/version-2.0.3/LICENSE" "$RootFolder\LICENSE.txt"
+				DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/version-2.0.3/README.md" "$RootFolder\README.md"
 			}
 			
-			DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/install/files/UpdateNotes.txt" "$TempFolder\UpdateNotes.txt"
+			DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/version-2.0.3/install/files/UpdateNotes.txt" "$TempFolder\UpdateNotes.txt"
 			Get-Content "$TempFolder\UpdateNotes.txt"
 			Remove-Item "$TempFolder\UpdateNotes.txt"
-			PauseScript
 			
 			Write-Host "Update complete. Please restart the script." -ForegroundColor "Yellow"
 			
