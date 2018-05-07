@@ -17,4 +17,3 @@
  4.  Any cache data downloaded from Youtube-dl will be stored in the new '\cache' folder.
 
 ===================================================================================================
-
