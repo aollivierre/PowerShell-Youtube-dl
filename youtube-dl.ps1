@@ -626,7 +626,7 @@ If ($Install -eq $False) {
 	ScriptInitialization
 }
 
-If ($CheckForUpdates -eq $True) {
+If ($CheckForUpdates -eq $True -and $Install -eq $False) {
 	UpdateScript
 }
 
