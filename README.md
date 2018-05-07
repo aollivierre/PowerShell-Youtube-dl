@@ -243,12 +243,15 @@ For advanced users, the youtube-dl.ps1 script, which is found in the folder `C:\
 # CHANGE LOG
 
 	2.0.3	May 7th, 2018
+		!!! FULL REINSTALL IS REQUIRED FOR THIS VERSION. !!! Just updating the script file won't cut it.
 		\scripts folder has been removed and youtube-dl.ps1 file moved to root folder.
 		DownloadArchive.txt split up into two separate files. One for video and one for audio.
 		Changes and fixes to updating and installing.
 		Any cache data that is downloaded is now downloaded to the new \cache folder.
 		Script automatically checks for updates on startup by default. Can be toggled in script file settings.
 		Video and audio are now downloaded to the same folder as the script when running in portable mode.
+		Added update notes feature when updating the script file.
+		Newest stable version of ffmpeg is now automatically chosen when downloaded.
 
 	2.0.2	April 3rd, 2018
 		Fixed some issues with the shortcuts.
