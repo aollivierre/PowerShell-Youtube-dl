@@ -48,7 +48,7 @@
 .NOTES 
 	Requires Windows 7 or higher, PowerShell 5.0 or greater, and Python 2.6, 2.7, or 3.2+
 	Author: mpb10
-	Updated: May 2nd, 2018
+	Updated: May 7th, 2018
 	Version: 2.0.3
 
 .LINK 
