@@ -243,7 +243,7 @@ For advanced users, the youtube-dl.ps1 script, which is found in the folder `C:\
 # CHANGE LOG
 
 	2.0.3	May 7th, 2018
-		!!! FULL REINSTALL IS REQUIRED FOR THIS VERSION. !!! Just updating the script file won't cut it.
+		!!! FULL RE-INSTALL IS REQUIRED FOR THIS VERSION !!! Just updating the script file won't cut it.
 		\scripts folder has been removed and youtube-dl.ps1 file moved to root folder.
 		DownloadArchive.txt split up into two separate files. One for video and one for audio.
 		Changes and fixes to updating and installing.
