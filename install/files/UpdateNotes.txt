@@ -4,13 +4,13 @@
 ===================================================================================================
 
  1.  The '\scripts' folder has been removed, and the 'youtube-dl.ps1' file now sits in the
-    root folder. BECAUSE OF THIS, IT'S RECOMMENDED THAT YOU DO A FULL REINSTALL OF THE SCRIPT.
-    Doing a full reinstall will ensure that the shortcuts' paths are updated.
+     root folder. BECAUSE OF THIS, IT'S RECOMMENDED THAT YOU DO A FULL REINSTALL OF THE SCRIPT.
+     Doing a full reinstall will ensure that the shortcuts' paths are updated.
 
  2.  There are now two download archive files. The file 'DownloadVideoArchive.txt' stores
-    the URL ID's of links that were downloaded using option '1  - Download video'. The file
-    'DownloadAudioArchive.txt' stores the URL ID's of links that were downloaded using 
-    option '2  - Download audio'.
+     the URL ID's of links that were downloaded using option '1  - Download video'. The file
+     'DownloadAudioArchive.txt' stores the URL ID's of links that were downloaded using 
+     option '2  - Download audio'.
 	
  3.  Refactored some code involving installing and updating the script.
 
