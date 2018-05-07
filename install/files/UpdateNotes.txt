@@ -12,8 +12,13 @@
      'DownloadAudioArchive.txt' stores the URL ID's of links that were downloaded using 
      option '2  - Download audio'.
 	
- 3.  Refactored some code involving installing and updating the script.
+ 3.  Refactored some code involving installing and updating the script. If the script file is
+     updated while the script is installed, the desktop and start menu shortcuts will be
+     updated too. This should help updating in the future if file paths change again.
 
  4.  Any cache data downloaded from Youtube-dl will be stored in the new '\cache' folder.
+
+ 5.  The script now automatically checks for updates on startup. This can be toggled using
+     the '$CheckForUpdates = ' script file setting.
 
 ===================================================================================================
