@@ -265,6 +265,9 @@ Function UpdateScript {
 			DownloadFile "http://github.com/mpb10/PowerShell-Youtube-dl/raw/version-2.0.3/youtube-dl.ps1" "$RootFolder\youtube-dl.ps1"
 			
 			If ($PSScriptRoot -eq "$InstallLocation") {
+				Write-Host "Root folder: $RootFolder" -ForegroundColor "Red"
+				PauseScript
+				$DesktopFolder = $ENV:USERPROFILE + "\Desktop"
 				$StartFolder = $ENV:APPDATA + "\Microsoft\Windows\Start Menu\Programs\Youtube-dl"
 				If ((Test-Path "$StartFolder") -eq $False) {
 					New-Item -Type Directory -Path "$StartFolder"
@@ -280,7 +283,7 @@ Function UpdateScript {
 			Get-Content "$TempFolder\UpdateNotes.txt"
 			Remove-Item "$TempFolder\UpdateNotes.txt"
 			
-			Write-Host "Update complete. Please restart the script." -ForegroundColor "Yellow"
+			Write-Host "`nUpdate complete. Please restart the script." -ForegroundColor "Yellow"
 			
 			PauseScript
 			Exit
