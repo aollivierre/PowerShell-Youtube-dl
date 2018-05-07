@@ -21,4 +21,9 @@
  5.  The script now automatically checks for updates on startup. This can be toggled using
      the '$CheckForUpdates = ' script file setting.
 
+ 6.  When running the script in portable mode (not running the script in the folder
+     C:\Users\%USERNAME%\Scripts\Youtube-dl), video and audio will be downloaded to the same
+     folder as the script. This location can be modified via the '$PortableSaveLocation = '
+     script file setting.
+
 ===================================================================================================
