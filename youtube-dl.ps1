@@ -295,7 +295,7 @@ Function UpdateScript {
 		}
 	}
 	ElseIf ($NewestVersion -eq $RunningVersion) {
-		Write-Host "`nThe running version of PowerShell-Youtube-dl is up to date." -ForegroundColor "Yellow"
+		Write-Host "`nThe running version of PowerShell-Youtube-dl is up-to-date." -ForegroundColor "Yellow"
 	}
 	Else {
 		Write-Host "`n[ERROR] Script version mismatch. Re-installing the script is recommended." -ForegroundColor "Red" -BackgroundColor "Black"
