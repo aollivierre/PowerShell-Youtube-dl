@@ -85,6 +85,7 @@ $AudioSaveLocation = "$ENV:USERPROFILE\Music\Youtube-dl"
 $UseArchiveFile = $True
 $EntirePlaylist = $False
 $VerboseDownloading = $False
+$CheckForUpdates = $True
 
 $ConvertFile = $False
 $FileExtension = "webm"
@@ -185,7 +186,7 @@ Function ScriptInitialization {
 
 	$Script:PlaylistFile = $ConfigFolder + "\PlaylistFile.txt"
 	If ((Test-Path "$PlaylistFile") -eq $False) {
-		DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/version-2.0.3/install/files/PlaylistFile.txt" "$PlaylistFile"
+		DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/install/files/PlaylistFile.txt" "$PlaylistFile"
 	}
 }
 
@@ -201,7 +202,7 @@ Function InstallScript {
 		$MenuOption = Read-Host "`nInstall PowerShell-Youtube-dl to ""$InstallLocation""? [y/n]"
 		
 		If ($MenuOption -like "y" -or $MenuOption -like "yes") {
-			Write-Host "`nInstalling to: ""$InstallLocation"""
+			Write-Host "`nInstalling to ""$InstallLocation"" ..."
 
 			$Script:RootFolder = $ENV:USERPROFILE + "\Scripts\Youtube-dl"
 			ScriptInitialization
@@ -217,12 +218,12 @@ Function InstallScript {
 
 			Copy-Item "$PSScriptRoot\youtube-dl.ps1" -Destination "$RootFolder"
 			
-			DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/version-2.0.3/install/files/Youtube-dl.lnk" "$RootFolder\Youtube-dl.lnk"
+			DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/install/files/Youtube-dl.lnk" "$RootFolder\Youtube-dl.lnk"
 			Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$DesktopFolder\Youtube-dl.lnk"
 			Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$StartFolder\Youtube-dl.lnk"
 			
-			DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/version-2.0.3/LICENSE" "$RootFolder\LICENSE.txt"
-			DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/version-2.0.3/README.md" "$RootFolder\README.md"
+			DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/LICENSE" "$RootFolder\LICENSE.txt"
+			DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/README.md" "$RootFolder\README.md"
 
 			Write-Host "`nInstallation complete. Please restart the script." -ForegroundColor "Yellow"
 			PauseScript
@@ -253,16 +254,16 @@ Function UpdateExe {
 
 
 Function UpdateScript {
-	DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/version-2.0.3/install/files/version-file" "$TempFolder\version-file.txt"
+	DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/install/files/version-file" "$TempFolder\version-file.txt"
 	[Version]$NewestVersion = Get-Content "$TempFolder\version-file.txt" | Select -Index 0
 	Remove-Item -Path "$TempFolder\version-file.txt"
 	
 	If ($NewestVersion -gt $RunningVersion) {
-		Write-Host "`nThe newest version is $NewestVersion"
+		Write-Host "`nA new version of PowerShell-Youtube-dl is available: v$NewestVersion" -ForegroundColor "Yellow"
 		$MenuOption = Read-Host "`nUpdate to this version? [y/n]"
 		
 		If ($MenuOption -like "y" -or $MenuOption -like "yes") {
-			DownloadFile "http://github.com/mpb10/PowerShell-Youtube-dl/raw/version-2.0.3/youtube-dl.ps1" "$RootFolder\youtube-dl.ps1"
+			DownloadFile "http://github.com/mpb10/PowerShell-Youtube-dl/raw/master/youtube-dl.ps1" "$RootFolder\youtube-dl.ps1"
 			
 			If ($PSScriptRoot -eq "$InstallLocation") {
 				Write-Host "Root folder: $RootFolder" -ForegroundColor "Red"
@@ -272,14 +273,14 @@ Function UpdateScript {
 				If ((Test-Path "$StartFolder") -eq $False) {
 					New-Item -Type Directory -Path "$StartFolder" | Out-Null
 				}
-				DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/version-2.0.3/install/files/Youtube-dl.lnk" "$RootFolder\Youtube-dl.lnk"
+				DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/install/files/Youtube-dl.lnk" "$RootFolder\Youtube-dl.lnk"
 				Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$DesktopFolder\Youtube-dl.lnk"
 				Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$StartFolder\Youtube-dl.lnk"
-				DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/version-2.0.3/LICENSE" "$RootFolder\LICENSE.txt"
-				DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/version-2.0.3/README.md" "$RootFolder\README.md"
+				DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/LICENSE" "$RootFolder\LICENSE.txt"
+				DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/README.md" "$RootFolder\README.md"
 			}
 			
-			DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/version-2.0.3/install/files/UpdateNotes.txt" "$TempFolder\UpdateNotes.txt"
+			DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/install/files/UpdateNotes.txt" "$TempFolder\UpdateNotes.txt"
 			Get-Content "$TempFolder\UpdateNotes.txt"
 			Remove-Item "$TempFolder\UpdateNotes.txt"
 			
@@ -293,8 +294,7 @@ Function UpdateScript {
 		}
 	}
 	ElseIf ($NewestVersion -eq $RunningVersion) {
-		Write-Host "`nThe running version of PowerShell-Youtube-dl is up to date."
-		PauseScript
+		Write-Host "`nThe running version of PowerShell-Youtube-dl is up to date." -ForegroundColor "Yellow"
 	}
 	Else {
 		Write-Host "`n[ERROR] Script version mismatch. Re-installing the script is recommended." -ForegroundColor "Red" -BackgroundColor "Black"
@@ -479,9 +479,9 @@ Function MainMenu {
 	While ($MenuOption -ne 1 -and $MenuOption -ne 2 -and $MenuOption -ne 3 -and $MenuOption -ne 4 -and $MenuOption -ne 0) {
 		$URL = ""
 		Clear-Host
-		Write-Host "================================================================"
-		Write-Host "                  PowerShell-Youtube-dl v2.0.3                  " -ForegroundColor "Yellow"
-		Write-Host "================================================================"
+		Write-Host "==================================================================================================="
+		Write-Host "                                    PowerShell-Youtube-dl v$RunningVersion                                   " -ForegroundColor "Yellow"
+		Write-Host "==================================================================================================="
 		Write-Host "`nPlease select an option:`n" -ForegroundColor "Yellow"
 		Write-Host "  1   - Download video"
 		Write-Host "  2   - Download audio"
@@ -489,6 +489,8 @@ Function MainMenu {
 		Write-Host "  4   - Settings"
 		Write-Host "`n  0   - Exit`n" -ForegroundColor "Gray"
 		$MenuOption = Read-Host "Option"
+		
+		Write-Host "`n==================================================================================================="
 		
 		Switch ($MenuOption) {
 			1 {
@@ -548,9 +550,9 @@ Function SettingsMenu {
 	$MenuOption = 99
 	While ($MenuOption -ne 1 -and $MenuOption -ne 2 -and $MenuOption -ne 3 -and $MenuOption -ne 0) {
 		Clear-Host
-		Write-Host "================================================================"
-		Write-Host "                         Settings Menu                          " -ForegroundColor "Yellow"
-		Write-Host "================================================================"
+		Write-Host "==================================================================================================="
+		Write-Host "                                           Settings Menu                                           " -ForegroundColor "Yellow"
+		Write-Host "==================================================================================================="
 		Write-Host "`nPlease select an option:`n" -ForegroundColor "Yellow"
 		Write-Host "  1   - Update youtube-dl.exe and ffmpeg.exe"
 		Write-Host "  2   - Update youtube-dl.ps1 script file"
@@ -560,6 +562,8 @@ Function SettingsMenu {
 		Write-Host "`n  0   - Return to Main Menu`n" -ForegroundColor "Gray"
 		$MenuOption = Read-Host "Option"
 		
+		Write-Host "`n==================================================================================================="
+		
 		Switch ($MenuOption) {
 			1 {
 				UpdateExe
@@ -567,6 +571,7 @@ Function SettingsMenu {
 			}
 			2 {
 				UpdateScript
+				PauseScript
 				$MenuOption = 99
 			}
 			3 {
@@ -613,6 +618,10 @@ Else {
 
 If ($Install -eq $False) {
 	ScriptInitialization
+}
+
+If ($CheckForUpdates -eq $True) {
+	UpdateScript
 }
 
 If ((Test-Path "$BinFolder\youtube-dl.exe") -eq $False -and $Install -eq $False) {
