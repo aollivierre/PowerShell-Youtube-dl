@@ -151,13 +151,13 @@ Function DownloadFfmpeg {
 Function ScriptInitialization {
 	$Script:BinFolder = $RootFolder + "\bin"
 	If ((Test-Path "$BinFolder") -eq $False) {
-		New-Item -Type Directory -Path "$BinFolder"
+		New-Item -Type Directory -Path "$BinFolder" | Out-Null
 	}
 	$ENV:Path += ";$BinFolder"
 
 	$Script:TempFolder = $RootFolder + "\temp"
 	If ((Test-Path "$TempFolder") -eq $False) {
-		New-Item -Type Directory -Path "$TempFolder"
+		New-Item -Type Directory -Path "$TempFolder" | Out-Null
 	}
 	Else {
 		Remove-Item -Path "$TempFolder\download.tmp" -ErrorAction Silent
@@ -165,22 +165,22 @@ Function ScriptInitialization {
 	
 	$Script:CacheFolder = $RootFolder + "\cache"
 	If ((Test-Path "$CacheFolder") -eq $False) {
-		New-Item -Type Directory -Path "$CacheFolder"
+		New-Item -Type Directory -Path "$CacheFolder" | Out-Null
 	}
 
 	$Script:ConfigFolder = $RootFolder + "\config"
 	If ((Test-Path "$ConfigFolder") -eq $False) {
-		New-Item -Type Directory -Path "$ConfigFolder"
+		New-Item -Type Directory -Path "$ConfigFolder" | Out-Null
 	}
 
 	$Script:VideoArchiveFile = $ConfigFolder + "\DownloadVideoArchive.txt"
 	If ((Test-Path "$VideoArchiveFile") -eq $False) {
-		New-Item -Type file -Path "$VideoArchiveFile"
+		New-Item -Type file -Path "$VideoArchiveFile" | Out-Null
 	}
 	
 	$Script:AudioArchiveFile = $ConfigFolder + "\DownloadAudioArchive.txt"
 	If ((Test-Path "$AudioArchiveFile") -eq $False) {
-		New-Item -Type file -Path "$AudioArchiveFile"
+		New-Item -Type file -Path "$AudioArchiveFile" | Out-Null
 	}
 
 	$Script:PlaylistFile = $ConfigFolder + "\PlaylistFile.txt"
@@ -209,7 +209,7 @@ Function InstallScript {
 			$DesktopFolder = $ENV:USERPROFILE + "\Desktop"
 			$StartFolder = $ENV:APPDATA + "\Microsoft\Windows\Start Menu\Programs\Youtube-dl"
 			If ((Test-Path "$StartFolder") -eq $False) {
-				New-Item -Type Directory -Path "$StartFolder"
+				New-Item -Type Directory -Path "$StartFolder" | Out-Null
 			}
 
 			DownloadYoutube-dl
@@ -270,7 +270,7 @@ Function UpdateScript {
 				$DesktopFolder = $ENV:USERPROFILE + "\Desktop"
 				$StartFolder = $ENV:APPDATA + "\Microsoft\Windows\Start Menu\Programs\Youtube-dl"
 				If ((Test-Path "$StartFolder") -eq $False) {
-					New-Item -Type Directory -Path "$StartFolder"
+					New-Item -Type Directory -Path "$StartFolder" | Out-Null
 				}
 				DownloadFile "https://github.com/mpb10/PowerShell-Youtube-dl/raw/version-2.0.3/install/files/Youtube-dl.lnk" "$RootFolder\Youtube-dl.lnk"
 				Copy-Item "$RootFolder\Youtube-dl.lnk" -Destination "$DesktopFolder\Youtube-dl.lnk"
@@ -436,7 +436,7 @@ Function CommandLineMode {
 	}
 	
 	If (($OutputPath.Length -gt 0) -and ((Test-Path "$OutputPath") -eq $False)) {
-		New-Item -Type directory -Path "$OutputPath"
+		New-Item -Type directory -Path "$OutputPath" | Out-Null
 		$Script:VideoSaveLocation = $OutputPath
 		$Script:AudioSaveLocation = $OutputPath
 	}
@@ -611,7 +611,9 @@ Else {
 	$RootFolder = "$PSScriptRoot"
 }
 
-ScriptInitialization
+If ($Install -eq $False) {
+	ScriptInitialization
+}
 
 If ((Test-Path "$BinFolder\youtube-dl.exe") -eq $False -and $Install -eq $False) {
 	Write-Host "`nyoutube-dl.exe not found. Downloading and installing to: ""$BinFolder"" ...`n" -ForegroundColor "Yellow"
