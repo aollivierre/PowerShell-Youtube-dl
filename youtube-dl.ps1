@@ -82,6 +82,7 @@ Param(
 
 $VideoSaveLocation = "$ENV:USERPROFILE\Videos\Youtube-dl"
 $AudioSaveLocation = "$ENV:USERPROFILE\Music\Youtube-dl"
+$PortableSaveLocation = "$PSScriptRoot"
 $UseArchiveFile = $True
 $EntirePlaylist = $False
 $VerboseDownloading = $False
@@ -593,7 +594,10 @@ Function SettingsMenu {
 
 # ======================================================================================================= #
 # ======================================================================================================= #
-
+#
+# MAIN
+#
+# ======================================================================================================= #
 
 If ($PSVersionTable.PSVersion.Major -lt 5) {
 	Write-Host "[ERROR]: Your PowerShell installation is not version 5.0 or greater.`n        This script requires PowerShell version 5.0 or greater to function.`n        You can download PowerShell version 5.0 at:`n            https://www.microsoft.com/en-us/download/details.aspx?id=50395" -ForegroundColor "Red" -BackgroundColor "Black"
@@ -614,6 +618,8 @@ If ($PSScriptRoot -eq "$InstallLocation") {
 }
 Else {
 	$RootFolder = "$PSScriptRoot"
+	$VideoSaveLocation = $PortableSaveLocation
+	$AudioSaveLocation = $PortableSaveLocation
 }
 
 If ($Install -eq $False) {
@@ -633,10 +639,6 @@ If (((Test-Path "$BinFolder\ffmpeg.exe") -eq $False -or (Test-Path "$BinFolder\f
 	Write-Host "ffmpeg files not found. Downloading and installing to: ""$BinFolder"" ...`n" -ForegroundColor "Yellow"
 	DownloadFfmpeg
 }
-
-
-# ======================================================================================================= #
-# ======================================================================================================= #
 
 If ($NumOfParams -gt 0) {
 	CommandLineMode
