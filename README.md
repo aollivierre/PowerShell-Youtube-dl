@@ -6,9 +6,9 @@ A PowerShell script used to operate the youtube-dl command line program.
 
 **Author: mpb10**
 
-**April 3rd, 2018**
+**May 7th, 2018**
 
-**v2.0.2**
+**v2.0.3**
 
 #
 
@@ -22,7 +22,7 @@ A PowerShell script used to operate the youtube-dl command line program.
 
 # INSTALLATION
 
-**Script download link:** https://github.com/mpb10/PowerShell-Youtube-dl/releases/download/v2.0.2/PowerShell-Youtube-dl-v2.0.2.zip
+**Script download link:** https://github.com/mpb10/PowerShell-Youtube-dl/releases/download/v2.0.3/PowerShell-Youtube-dl-v2.0.3.zip
 
 **Requires:** PowerShell 5.0 or greater* and Python 2.6, 2.7, or 3.2+**
 
@@ -35,7 +35,7 @@ A PowerShell script used to operate the youtube-dl command line program.
 
 1. Ensure that you have PowerShell Version 5.0 or greater installed and Python 2.6, 2.7, or 3.2+ installed.
 2. Download the release .zip file and extract it to a folder.
-3. Run the 'Installer' shortcut located in the `\install` folder (or run the the script with the 'Youtube-dl - Portable Version' shortcut, navigate to the settings menu, and choose the "Install script to:" option).
+3. Run the 'Installer' shortcut located in the `\install` folder (or run the the script with the 'Youtube-dl - Portable Version' shortcut, navigate to the settings menu, and choose the `3 -  Install script to:` option).
 
 A desktop shortcut and a Start Menu shortcut will then be created. Run either of those to use the script. The install location is `C:\Users\%USERNAME%\Scripts\Youtube-dl`.
 
@@ -47,11 +47,11 @@ To uninstall this script and its files, delete the two folders `C:\Users\%USERNA
 
 Run either the desktop shortcut or the Start Menu shortcut. Choose to download either video or audio, and then right click and paste the URL into the prompt. The URL you provide it can be either the URL of a video or the URL of a playlist.
 
-Video files are downloaded to `C:\Users\%USERNAME%\Videos\Youtube-dl` and audio files are downloaded to `C:\Users\%USERNAME%\Music\Youtube-dl`. Playlists will be downloaded into their own subfolders within these two folders.
+When running the script while it's installed, video files are downloaded to `C:\Users\%USERNAME%\Videos\Youtube-dl` and audio files are downloaded to `C:\Users\%USERNAME%\Music\Youtube-dl` by default. Playlists will be downloaded into their own subfolders within these two folders. If running the portable version, video and audio files will be downloaded to the same folder as the script.
 
-Upon being ran for the first time, the script will generate the `DownloadArchive.txt` and `PlaylistFile.txt` files in the `\config` folder. To use option `3  - Download from playlist files` of the main menu, list playlist URL's in the PlaylistFile.txt file under their respective sections, save the file, and then run option 3 of the script.
+Upon being ran for the first time, the script will generate the `DownloadVideoArchive.txt`, `DownloadAudioArchive.txt`, and `PlaylistFile.txt` files in the `\config` folder. To use option `3  - Download from playlist files` of the main menu, list playlist URL's in the PlaylistFile.txt file under their respective sections, save the file, and then run option 3 of the script.
 
-The `DownloadArchive.txt` file keeps a record of videos that have been downloaded from playlists. The URL of any video that the user downloads from a playlist will be added to this file and will be skipped if the playlist is downloaded again. This can be toggled by editing the `$UseArchiveFile = ` setting variable witin the script file (see the Script File Settings section of [Advanced Usage](#advanced-usage) for details)
+The `DownloadVideoArchive.txt` and `DownloadAudioArchive.txt` files keep a record of videos that have been downloaded from playlists. The URL of any video that is downloaded from a playlist will be added to these files and will be skipped if the playlist is downloaded again. This can be toggled by editing the `$UseArchiveFile = ` setting variable witin the script file (see the Script File Settings section of [Advanced Usage](#advanced-usage) for details)
 
 
 # ADVANCED USAGE
@@ -70,7 +70,7 @@ Additonally, videos that are downloaded can be automatically converted using ffm
 
 This option prompts the user for the URL of a video who's audio will be extracted and converted to an MP3 file. This URL can be a single video or a playlist and doesn't necessarily have to be from Youtube.com since Youtube-dl supports a wide range of websites. If a playlist URL is provided, the entire playlist will be downloaded. The script will also attempt to insert the correct artist and title metadata into the MP3 file, provided that there is a hyphen character `-` seperating the artist and song name in the video title. The `2   - Download audio` option can be run from the command line using the `-Audio -URL <UserProvidedURL>` parameter options. 
 
-The ffmpeg video conversion settings found in the script file settings variables of `\scripts\youtube-dl.ps1` have no effect when downloading audio.
+The ffmpeg video conversion settings found in the script file settings variables of `\youtube-dl.ps1` have no effect when downloading audio.
 
 #
 
@@ -119,6 +119,13 @@ In the youtube-dl.ps1 script file from lines 80 to 100, there are some settings 
 				This value can still be overridden by the -OutputPath parameter when running
 				the script via the command line.
 				
+	'$PortableSaveLocation = '
+		Default:	"$PSScriptRoot"
+		Description:	By default, this setting is set to download video and audio files to the same
+				folder as the script when running the script in portable mode (portable mode
+				is running the script anywhere but C:\Users\%USERNAME%\Scripts\Youtube-dl).
+				This location will override the two previous variables.
+				
 	'$UseArchiveFile = '
 		Default:	$True
 		Description:	This setting will toggle whether or not to use the downloadarchive.txt file.
@@ -141,6 +148,15 @@ In the youtube-dl.ps1 script file from lines 80 to 100, there are some settings 
 		Default:	$False
 		Description:	This setting toggles whether to display extra information when downloading
 				video or audio. Setting this to $True can be used to debug issues.
+				
+	'$CheckForUpdates = '
+		Default:	$True
+		Description:	This setting toggles whether or not to automatically check for updates on
+				script startup. If the script is up-to-date, no message will be displayed.
+				
+				
+				
+				
 				
 	'$ConvertFile = '
 		Default:	$False
@@ -209,6 +225,10 @@ For advanced users, the youtube-dl.ps1 script, which is found in the folder `C:\
 	-Convert
 		Tells the script to use the ffmpeg options located within the youtube-dl.ps1 script file.
 		
+	-DownloadOptions <youtube-dl parameters>
+		Specify any additional parameters for Youtube-dl to use when downloading. Don't forget to surround
+		the provided parameters in quotation marks (" ").
+		
 	-Install
 		Installs the script to "C:\Users\%USERNAME%\Scripts\Youtube-dl", creates a desktop shortcut, and a
 		start menu shortcut.
@@ -221,6 +241,17 @@ For advanced users, the youtube-dl.ps1 script, which is found in the folder `C:\
 
 
 # CHANGE LOG
+
+	2.0.3	May 7th, 2018
+		!!! FULL RE-INSTALL IS REQUIRED FOR THIS VERSION !!! Just updating the script file won't cut it.
+		\scripts folder has been removed and youtube-dl.ps1 file moved to root folder.
+		DownloadArchive.txt split up into two separate files. One for video and one for audio.
+		Changes and fixes to updating and installing.
+		Any cache data that is downloaded is now downloaded to the new \cache folder.
+		Script automatically checks for updates on startup by default. Can be toggled in script file settings.
+		Video and audio are now downloaded to the same folder as the script when running in portable mode.
+		Added update notes feature when updating the script file.
+		Newest stable version of ffmpeg is now automatically chosen when downloaded.
 
 	2.0.2	April 3rd, 2018
 		Fixed some issues with the shortcuts.
