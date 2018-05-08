@@ -46,7 +46,7 @@
 	Downloads the video at the specified URL and utilizes the provided youtube-dl parameters.
 	
 .NOTES 
-	Requires Windows 7 or higher and PowerShell 5.0 or greater.
+	Requires Windows 7 or higher, PowerShell 5.0 or greater, and Microsoft Visual C++ 2010 Redistributable Package (x86).
 	Author: mpb10
 	Updated: May 7th, 2018
 	Version: 2.0.3
