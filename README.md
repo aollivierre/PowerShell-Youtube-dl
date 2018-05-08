@@ -24,16 +24,16 @@ A PowerShell script used to operate the youtube-dl command line program.
 
 **Script download link:** https://github.com/mpb10/PowerShell-Youtube-dl/releases/download/v2.0.3/PowerShell-Youtube-dl-v2.0.3.zip
 
-**Requires:** PowerShell 5.0 or greater* and Python 2.6, 2.7, or 3.2+**
+**Requires:** PowerShell 5.0 or greater* and Microsoft Visual C++ 2010 Redistributable Package (x86)**
 
 	*Version 5.0 of PowerShell comes pre-installed with Windows 10 but otherwise can be downloaded here: https://www.microsoft.com/en-us/download/details.aspx?id=50395
-	**Python 2.6, 2.7, or 3.2+ can be downloaded here: https://www.python.org/ftp/python/3.6.4/python-3.6.4.exe
+	**Microsoft Visual C++ 2010 Redistributable Package (x86) can be downloaded here: https://www.microsoft.com/en-US/download/details.aspx?id=5555
 
 #
 
 **To Install:** 
 
-1. Ensure that you have PowerShell Version 5.0 or greater installed and Python 2.6, 2.7, or 3.2+ installed.
+1. Ensure that you have PowerShell Version 5.0 or greater installed.
 2. Download the release .zip file and extract it to a folder.
 3. Run the 'Installer' shortcut located in the `\install` folder (or run the the script with the 'Youtube-dl - Portable Version' shortcut, navigate to the settings menu, and choose the `3 -  Install script to:` option).
 
