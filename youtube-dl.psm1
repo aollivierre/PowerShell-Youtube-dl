@@ -85,12 +85,19 @@ function Get-YoutubeDl {
     param(
         [Parameter(
             Mandatory = $false,
-            HelpMessage = 'Download youtube-dl.exe to this location.')]
+            HelpMessage = 'Download youtube-dl.exe to this directory.')]
         [string]
-        $Path = "$MyInvocation.PSScriptRoot\youtube-dl.exe"
+        $Path = $MyInvocation.PSScriptRoot
     )
 
-    Get-Download -Url 'http://yt-dl.org/downloads/latest/youtube-dl.exe' -Path $Path
+    if ((Test-Path -Path $Path -PathType 'Leaf') -eq $false) {
+        return Write-Log -Console -Severity 'Error' -Message "Provided download path either does not exist or is not a directory."
+    }
+    else {
+        $TempFile = "$Path\youtube-dl.exe"
+    }
+
+    Get-Download -Url 'http://yt-dl.org/downloads/latest/youtube-dl.exe' -Path $TempFile
 }
 
 function Get-Ffmpeg {
