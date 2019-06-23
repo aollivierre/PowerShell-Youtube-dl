@@ -6,10 +6,17 @@ function Wait-Script {
             Mandatory = $false,
             HelpMessage = 'If present, do not wait for user input.')]
         [switch]
-        $NoWait = $false
+        $NoUserInput = $false,
+        [Parameter(
+            Mandatory = $false,
+            HelpMessage = 'Number of seconds to wait.')]
+        [int]
+        $Seconds = 1
     )
 
-    If ($NoWait -eq $false) {
+    Start-Sleep -Seconds $Seconds
+
+    if ($NoUserInput -eq $false) {
 		Write-Host "Press any key to continue ...`n" -ForegroundColor "Gray"
 		return $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp")
 	}
