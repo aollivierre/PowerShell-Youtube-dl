@@ -41,7 +41,7 @@ function Write-Log {
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Location of the log file.')]
-        [ParameterType]
+        [string]
         $FilePath = "$PSScriptRoot\powershell-youtube-dl.log",
         [Parameter(
             Mandatory = $false,
@@ -123,7 +123,7 @@ function Get-Download {
         $Path = "$MyInvocation.PSScriptRoot\downloadfile"
     )
 
-    # Check if the provided '-Path' parameter is a valid directory.
+    # Check if the provided '-Path' parameter is a valid file path.
     if (Test-Path -Path $Path -PathType 'Container') {
         return Write-Log -Console -Severity 'Error' -Message "Provided download path cannot be a directory."
     }
@@ -132,9 +132,17 @@ function Get-Download {
     }
 
     # Download the file to a temporary file, then move that file to its permanent location.
-    (New-Object System.Net.WebClient).DownloadFile("$URL", $TempFile)
+    (New-Object System.Net.WebClient).DownloadFile("$Url", $TempFile)
     Move-Item -Path $TempFile -Destination $Path -Force
-    Write-Log -Severity 'Info' -Message "Downloaded file to '$Path'."
+    if ($?) {
+        Write-Log -Severity 'Info' -Message "Downloaded file to '$Path'."
+    }
+    else {
+        if (Test-Path -Path $TempFile) {
+            Remove-Item -Path $TempFile
+        }
+        Write-Log -Console -Severity 'Error' -Message "failed to download file to '$Path'"
+    }
 }
 
 # Function for downloading the youtube-dl.exe executable file.
