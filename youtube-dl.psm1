@@ -22,7 +22,7 @@ function Wait-Script {
 		Write-Host "Press any key to continue ...`n" -ForegroundColor "Gray"
 		return $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp")
 	}
-}
+} # End Wait-Script function
 
 # Function for writing messages to a log file.
 function Write-Log {
@@ -52,10 +52,10 @@ function Write-Log {
 
     # Set the severity level formatting based on the user input.
     $SeverityLevel = switch ($Severity) {
-        'Info' { 'INFO:    '; break }
-        'Warning' { 'WARNING: '; break }
-        'Error' { 'ERROR:   '; break }
-        default { 'WARNING: '; break }
+        'Info' { 'INFO:   '; break }
+        'Warning' { 'WARNING:'; break }
+        'Error' { 'ERROR:  '; break }
+        default { 'WARNING:'; break }
     }
 
     # If the '-Console' parameter is provided, tee the output to both the console and log file.
@@ -66,7 +66,7 @@ function Write-Log {
     else {
         Out-File -Append -FilePath $FilePath -InputObject "$(Get-Date -Format 's') $SeverityLevel $Message"
     }
-}
+} # End Write-Log function
 
 # Function for creating shortcuts.
 function New-Shortcut {
@@ -75,7 +75,7 @@ function New-Shortcut {
             Mandatory = $false,
             HelpMessage = 'The directory and name of the shortcut to create.')]
         [string]
-        $Path = "$MyInvocation.PSScriptRoot\newshortcut.lnk",
+        $Path = "$($MyInvocation.PSScriptRoot)\newshortcut.lnk",
         [Parameter(
             Mandatory = $true,
             HelpMessage = 'The target path of the shortcut.')]
@@ -99,14 +99,14 @@ function New-Shortcut {
     )
 
     # Create the WScript.Shell object, assign it a file path, target path, and other optional settings.
-    $WScriptShell = New-Object -ComObject WScript.Shell
+    $WScriptShell = New-Object -ComObject WScript.Shell ### Look into if there is a way to load an already existing shortcut and edit it.
     $Shortcut = $WScriptShell.CreateShortcut($Path)
     $Shortcut.TargetPath = $TargetPath
     $Shortcut.Arguments = $Arguments
     $Shortcut.WorkingDirectory = $RunningPath
     $Shortcut.IconLocation = $IconPath
     $Shortcut.Save()
-}
+} # End New-Shortcut function
 
 # Function for downloading files from the internet.
 function Get-Download {
@@ -120,11 +120,11 @@ function Get-Download {
             Mandatory = $false,
             HelpMessage = 'Download the file to this location.')]
         [string]
-        $Path = "$MyInvocation.PSScriptRoot\downloadfile"
+        $Path = "$($MyInvocation.PSScriptRoot)\downloadfile"
     )
 
     # Check if the provided '-Path' parameter is a valid file path.
-    if (Test-Path -Path $Path -PathType 'Container') {
+    if (Test-Path -Path $Path -PathType 'Container') { ### Need to check this logic.
         return Write-Log -Console -Severity 'Error' -Message "Provided download path cannot be a directory."
     }
     else {
@@ -141,9 +141,9 @@ function Get-Download {
         if (Test-Path -Path $TempFile) {
             Remove-Item -Path $TempFile
         }
-        Write-Log -Console -Severity 'Error' -Message "failed to download file to '$Path'"
+        Write-Log -Console -Severity 'Error' -Message "Failed to download file to '$Path'"
     }
-}
+} # End Get-Download function
 
 # Function for downloading the youtube-dl.exe executable file.
 function Get-YoutubeDl {
@@ -165,7 +165,8 @@ function Get-YoutubeDl {
 
     # Use the 'Get-Download' function to download the youtube-dl.exe executable file.
     Get-Download -Url 'http://yt-dl.org/downloads/latest/youtube-dl.exe' -Path $TempFile
-}
+    Write-Log -Console -Severity 'Info' -Message "Downloaded the youtube-dl executable to '$Path'"
+} # End Get-YoutubeDl function
 
 # Function for downloading the ffmpeg executable files.
 function Get-Ffmpeg {
@@ -213,7 +214,8 @@ function Get-Ffmpeg {
     Expand-Archive -Path $TempFile -Path $Path
     Copy-Item -Path "$Path\ffmpeg-*-win*-static\bin\*" -Destination $Path -Filter "*.exe" -Force
     Remove-Item -Path $TempFile, "$Path\ffmpeg-*-win*-static" -Recurse
-}
+    Write-Log -Console -Severity 'Info' -Message "Downloaded and extracted the ffmpeg executables to '$Path'"
+} # End Get-Ffmpeg function
 
 # Function for downloading and installing the youtube-dl.ps1 script file and creating shortcuts to run it.
 function Install-Script {
@@ -227,7 +229,7 @@ function Install-Script {
             Mandatory = $false,
             HelpMessage = 'Directory to which the youtube-dl.exe and ffmpeg.exe executable files will be installed.')]
         [string]
-        $ExecutablePath = $MyInvocation.PSScriptRoot,
+        $ExecutablePath = $Path,
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Whether to create a local shortcut that is used to run the youtube-dl.ps1 script.')]
@@ -253,8 +255,8 @@ function Install-Script {
     # Download the youtube-dl.ps1 script file, license, and readme.
     Write-Log -Console -Severity 'Info' -Message "Installing the youtube-dl.ps1 script file to '$Path'"
     $InstallFileList = @('youtube-dl.ps1', 'LICENSE.txt', 'README.md')
-    ForEach-Object -InputObject $InstallFileList -Process {
-        Get-Download -Url "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/$_" -Path "$Path\$_"
+    foreach ($Item in $InstallFileList) {
+        Get-Download -Url "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/$Item" -Path "$Path\$Item"
     }
 
     # Download the youtube-dl.exe and ffmpeg executable files.
@@ -295,4 +297,119 @@ function Install-Script {
         New-Shortcut -Path "${ENV:APPDATA}\Microsoft\Windows\Start Menu\Programs\Youtube-dl\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe | Select-Object -Property 'Source') -Arguments "-ExecutionPolicy Bypass -File ""$Path\youtube-dl.ps1""" -RunningPath $Path
         Write-Log -Console -Severity 'Info' -Message "Created a start menu folder and shortcut for running youtube-dl.ps1 at: '${ENV:APPDATA}\Microsoft\Windows\Start Menu\Programs\Youtube-dl\Youtube-dl.lnk'"
     }
-}
+} # End Install-Script function
+
+function Get-Video {
+    param (
+        [Parameter(
+            Mandatory = $true,
+            HelpMessage = 'The URL of the video to download.')]
+        [string]
+        $Url,
+        [Parameter(
+            Mandatory = $false,
+            HelpMessage = 'Download the video to this directory.')]
+        [string]
+        $Path = $MyInvocation.PSScriptRoot,
+        [Parameter(
+            Mandatory = $false,
+            HelpMessage = 'Additional youtube-dl options to pass to the download command.')]
+        [string]
+        $YoutubeDlOptions = "--console-title --ignore-errors --cache-dir $PSScriptRoot --no-mtime --no-playlist"
+    )
+
+    $Url = $Url.Trim()
+    $YoutubeDlOptions = $YoutubeDlOptions.Trim()
+
+    # Check if the provided '-Path' parameter is a valid directory.
+    if ((Test-Path -Path $Path -PathType 'Container') -eq $false) {
+        return Write-Log -Console -Severity 'Error' -Message 'Provided path either does not exist or is not a directory.'
+    }
+
+#    if ($YoutubeDlOptions -contains '--yes-playlist') {
+#        $FileName = '%(playlist)s\%(title)s.%(ext)s'
+#    }
+#    else {
+#        $FileName = '%(title)s.%(ext)s'
+#    }
+
+#    $DownloadCommand = "youtube-dl -o ""$Path\$FileName"" $YoutubeDlOptions ""$Url"""
+
+    Write-Log -Console -Severity 'Info' -Message "Downloading video from URL '$Url' to '$Path' using youtube-dl options of '$YoutubeDlOptions'." ### Might need to add more to $Path so that it includes the file name too.
+    Invoke-Expression $DownloadCommand
+} # End Get-Video function
+
+function Get-Audio {
+    param (
+        [Parameter(
+            Mandatory = $true,
+            HelpMessage = 'The URL of the video to download audio from.')]
+        [string]
+        $Url,
+        [Parameter(
+            Mandatory = $false,
+            HelpMessage = 'Download the video''s audio to this directory.')]
+        [string]
+        $Path = $MyInvocation.PSScriptRoot,
+        [Parameter(
+            Mandatory = $false,
+            HelpMessage = 'Additional youtube-dl options to pass to the download command.')]
+        [string]
+        $YoutubeDlOptions = "--console-title --ignore-errors --cache-dir $PSScriptRoot --no-mtime --no-playlist"
+    )
+
+    $Url = $Url.Trim()
+    $YoutubeDlOptions = $YoutubeDlOptions.Trim()
+
+    # Check if the provided '-Path' parameter is a valid directory.
+    if ((Test-Path -Path $Path -PathType 'Container') -eq $false) {
+        return Write-Log -Console -Severity 'Error' -Message 'Provided path either does not exist or is not a directory.'
+    }
+
+#    if ($YoutubeDlOptions -contains '--yes-playlist') {
+#        $FileName = '%(playlist)s\%(title)s.%(ext)s'
+#    }
+#    else {
+#        $FileName = '%(title)s.%(ext)s'
+#    }
+
+#    $DownloadCommand = "youtube-dl -o ""$Path\$FileName"" $YoutubeDlOptions ""$Url"""
+
+    Write-Log -Console -Severity 'Info' -Message "Downloading audio from URL of '$Url' to '$Path' using youtube-dl options of '$YoutubeDlOptions'." ### Might need to add more to $Path so that it includes the file name too.
+    Invoke-Expression $DownloadCommand
+} # End Get-Audio function
+
+function Get-Playlist {
+    param (
+        [Parameter(
+            Mandatory = $false,
+            HelpMessage = 'Path to the file containing a list of playlist URLs to download.')]
+        [string]
+        $Path,
+        [Parameter(
+            Mandatory = $false,
+            HelpMessage = 'Array object containing a list of playlist URLs to download.')]
+        [array]
+        $UrlList = @()
+    )
+
+    # If the '-Path' parameter was provided, check if it is a valid file.
+    # Otherwise, check whether the value of the '-UrlList' parameter is an array.
+    if ($Path.Length -gt 0 -and (Test-Path -Path $Path -PathType 'Leaf') -eq $false) {
+        Write-Log -Console -Severity 'Error' -Message 'Provided path either does not exist or is not a file.'
+        return @()
+    }
+    elseif ($UrlList -isnot [array]) {
+        return Write-Log -Console -Severity 'Error' -Message 'Provided -UrlList parameter is not an array.'
+        return @()
+    }
+
+    # If the '-Path' parameter was provided, get an array of string objects from that file.
+    if ($Path.Length -gt 0) {
+        $UrlList = Get-Content -Path $Path | Where-Object { $_.Trim() -ne '' -and $_.Trim() -notmatch '^#.*' }
+    }
+
+    # Return an array of playlist URL string objects.
+    Write-Log -Console -Severity 'Info' -Message "Returning $($UrlList.Count) playlist URLs."
+    return $UrlList
+} # End Get-Playlist function
