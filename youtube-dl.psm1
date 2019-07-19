@@ -211,7 +211,7 @@ function Get-Ffmpeg {
 
     # Download the ffmpeg zip file and extract the ffmpeg executable files from it.
     Get-Download -Url $DownloadUrl -Path $TempFile
-    Expand-Archive -Path $TempFile -Path $Path
+    Expand-Archive -Path $TempFile -DestinationPath $Path
     Copy-Item -Path "$Path\ffmpeg-*-win*-static\bin\*" -Destination $Path -Filter "*.exe" -Force
     Remove-Item -Path $TempFile, "$Path\ffmpeg-*-win*-static" -Recurse
     Write-Log -Console -Severity 'Info' -Message "Downloaded and extracted the ffmpeg executables to '$Path'"
