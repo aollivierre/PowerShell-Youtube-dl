@@ -232,12 +232,22 @@ function Get-Ffmpeg {
         Default { 'http://ffmpeg.zeranoe.com/builds/win32/static/ffmpeg-latest-win32-static.zip'; break }
     }
 
-    # Download the ffmpeg zip file and extract the ffmpeg executable files from it.
+    # Download the ffmpeg zip file.
     Get-Download -Url $DownloadUrl -Path $TempFile
+    if (Test-Path -Path $TempFile) {
+        return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to download and extract the ffmpeg executables."
+    }
+
+    # Extract the ffmpeg executable files from the downloaded zip file.
     Expand-Archive -Path $TempFile -DestinationPath $Path
     Copy-Item -Path "$Path\ffmpeg-*-win*-static\bin\*" -Destination $Path -Filter "*.exe" -Force
     Remove-Item -Path $TempFile, "$Path\ffmpeg-*-win*-static" -Recurse
-    Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloaded and extracted the ffmpeg executables to '$Path'"
+    if ((Test-Path -Path "$Path\ffmpeg.exe") -and (Test-Path -Path "$Path\ffplay.exe") -and (Test-Path -Path "$Path\ffprobe.exe")) {
+        Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloaded and extracted the ffmpeg executables."
+    }
+    else {
+        return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to download and extract the ffmpeg executables."
+    }
 } # End Get-Ffmpeg function
 
 # Function for downloading and installing the youtube-dl.ps1 script file and creating shortcuts to run it.
@@ -303,14 +313,18 @@ function Install-Script {
     # youtube-dl.ps1 script that is used to run it.
     if ($LocalShortcut) {
         New-Shortcut -Path "$Path\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe | Select-Object -Property 'Source') -Arguments "-ExecutionPolicy Bypass -File ""$Path\youtube-dl.ps1""" -RunningPath $Path
-        Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a shortcut for running youtube-dl.ps1 at: '$Path\Youtube-dl.lnk'"
+        if (Test-Path -Path "$Path\Youtube-dl.lnk") {
+            Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a shortcut for running youtube-dl.ps1 at: '$Path\Youtube-dl.lnk'"
+        }
     }
 
     # If the '-DesktopShortcut' parameter is provided, create a shortcut on the desktop that is used
     # to run the youtube-dl.ps1 script.
     if ($DesktopShortcut -eq $true) {
         New-Shortcut -Path "${ENV:USERPROFILE}\Desktop\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe | Select-Object -Property 'Source') -Arguments "-ExecutionPolicy Bypass -File ""$Path\youtube-dl.ps1""" -RunningPath $Path
-        Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a shortcut for running youtube-dl.ps1 at: '${ENV:USERPROFILE}\Desktop\Youtube-dl.lnk'"
+        if (Test-Path -Path "${ENV:USERPROFILE}\Desktop\Youtube-dl.lnk") {
+            Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a shortcut for running youtube-dl.ps1 at: '${ENV:USERPROFILE}\Desktop\Youtube-dl.lnk'"
+        }
     }
 
     # If the '-StartMenuShortcut' parameter is provided, create a start menu folder containing a shortcut
@@ -321,7 +335,9 @@ function Install-Script {
         }
 
         New-Shortcut -Path "${ENV:APPDATA}\Microsoft\Windows\Start Menu\Programs\Youtube-dl\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe | Select-Object -Property 'Source') -Arguments "-ExecutionPolicy Bypass -File ""$Path\youtube-dl.ps1""" -RunningPath $Path
-        Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a start menu folder and shortcut for running youtube-dl.ps1 at: '${ENV:APPDATA}\Microsoft\Windows\Start Menu\Programs\Youtube-dl\Youtube-dl.lnk'"
+        if (Test-Path -Path "${ENV:APPDATA}\Microsoft\Windows\Start Menu\Programs\Youtube-dl\Youtube-dl.lnk") {
+            Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a start menu folder and shortcut for running youtube-dl.ps1 at: '${ENV:APPDATA}\Microsoft\Windows\Start Menu\Programs\Youtube-dl\Youtube-dl.lnk'"
+        }
     }
 } # End Install-Script function
 
@@ -341,7 +357,7 @@ function Get-Video {
             Mandatory = $false,
             HelpMessage = 'Additional youtube-dl options to pass to the download command.')]
         [string]
-        $YoutubeDlOptions = "-o ""$Path\%(title)s.%(ext)s""--console-title --ignore-errors --cache-dir ""$(Get-Location)"" --no-mtime --no-playlist"
+        $YoutubeDlOptions = "-o ""$Path\%(title)s.%(ext)s"" --console-title --ignore-errors --cache-dir ""$(Get-Location)"" --no-mtime --no-playlist"
     )
 
     $Path = Resolve-Path $Path
@@ -352,15 +368,6 @@ function Get-Video {
     if ((Test-Path -Path $Path -PathType 'Container') -eq $false) {
         return Write-Log -ConsoleOnly -Severity 'Error' -Message 'Provided path either does not exist or is not a directory.'
     }
-
-#    if ($YoutubeDlOptions -contains '--yes-playlist') {
-#        $FileName = '%(playlist)s\%(title)s.%(ext)s'
-#    }
-#    else {
-#        $FileName = '%(title)s.%(ext)s'
-#    }
-
-#    $DownloadCommand = "youtube-dl -o ""$Path\$FileName"" $YoutubeDlOptions ""$Url"""
 
     Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloading video from URL '$Url' to '$Path' using youtube-dl options of '$YoutubeDlOptions'." ### Might need to add more to $Path so that it includes the file name too.
     Invoke-Expression $DownloadCommand
@@ -382,7 +389,7 @@ function Get-Audio {
             Mandatory = $false,
             HelpMessage = 'Additional youtube-dl options to pass to the download command.')]
         [string]
-        $YoutubeDlOptions = "-o ""$Path\%(title)s.%(ext)s""--console-title --ignore-errors --cache-dir ""$(Get-Location)"" --no-mtime --no-playlist"
+        $YoutubeDlOptions = "-o ""$Path\%(title)s.%(ext)s"" --console-title --ignore-errors --cache-dir ""$(Get-Location)"" --no-mtime --no-playlist"
     )
 
     $Path = Resolve-Path $Path
@@ -393,15 +400,6 @@ function Get-Audio {
     if ((Test-Path -Path $Path -PathType 'Container') -eq $false) {
         return Write-Log -ConsoleOnly -Severity 'Error' -Message 'Provided path either does not exist or is not a directory.'
     }
-
-#    if ($YoutubeDlOptions -contains '--yes-playlist') {
-#        $FileName = '%(playlist)s\%(title)s.%(ext)s'
-#    }
-#    else {
-#        $FileName = '%(title)s.%(ext)s'
-#    }
-
-#    $DownloadCommand = "youtube-dl -o ""$Path\$FileName"" $YoutubeDlOptions ""$Url"""
 
     Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloading audio from URL of '$Url' to '$Path' using youtube-dl options of '$YoutubeDlOptions'." ### Might need to add more to $Path so that it includes the file name too.
     Invoke-Expression $DownloadCommand
@@ -430,7 +428,7 @@ function Get-Playlist {
         return @()
     }
     elseif ($UrlList -isnot [array]) {
-        return Write-Log -ConsoleOnly -Severity 'Error' -Message 'Provided -UrlList parameter is not an array.'
+        return Write-Log -ConsoleOnly -Severity 'Error' -Message 'Provided ''-UrlList'' parameter value is not an array.'
         return @()
     }
 
