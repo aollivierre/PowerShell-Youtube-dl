@@ -110,10 +110,18 @@ function New-Shortcut {
     # Create the WScript.Shell object, assign it a file path, target path, and other optional settings.
     $WScriptShell = New-Object -ComObject WScript.Shell ### Look into if there is a way to load an already existing shortcut and edit it.
     $Shortcut = $WScriptShell.CreateShortcut($Path)
-    $Shortcut.TargetPath = $TargetPath
-    $Shortcut.Arguments = $Arguments
-    $Shortcut.WorkingDirectory = $RunningPath
-    $Shortcut.IconLocation = $IconPath
+    if ($TargetPath.Length -gt 0) {
+        $Shortcut.TargetPath = $TargetPath
+    }
+    if ($Arguments.Length -gt 0) {
+        $Shortcut.Arguments = $Arguments
+    }
+    if ($RunningPath.Length -gt 0) {
+        $Shortcut.WorkingDirectory = $RunningPath
+    }
+    if ($IconPath.Length -gt 0) {
+        $Shortcut.IconLocation = $IconPath
+    }
     $Shortcut.Save()
 } # End New-Shortcut function
 
