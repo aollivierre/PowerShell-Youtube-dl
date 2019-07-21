@@ -218,11 +218,11 @@ function Get-Ffmpeg {
     $Path = Resolve-Path -Path $Path
 
     # Check if the provided '-Path' parameter is a valid directory.
-    if ((Test-Path -Path $Path -PathType 'Container') -eq $false) {
-        return Write-Log -ConsoleOnly -Severity 'Error' -Message 'Provided download path either does not exist or is not a directory.'
+    if (Test-Path -Path $Path -PathType 'Container') {
+        $TempFile = "$Path\ffmpeg-download.zip"
     }
     else {
-        $TempFile = "$Path\ffmpeg-download.zip"
+        return Write-Log -ConsoleOnly -Severity 'Error' -Message 'Provided download path either does not exist or is not a directory.'
     }
 
     # If the '-OsType' parameter wasn't provided, determine the OS type (whether its x86 or x64).
@@ -291,7 +291,7 @@ function Install-Script {
     )
 
     $Path = Resolve-Path -Path $Path
-    $ExecutablePath = Resolve-Path $Path
+    $ExecutablePath = Resolve-Path $ExecutablePath
 
     # Check if the provided '-Path' parameter is a valid directory.
     if ((Test-Path -Path $Path -PathType 'Container') -eq $false) {
