@@ -107,6 +107,8 @@ function New-Shortcut {
         $IconPath
     )
 
+    $TargetPath = Resolve-Path -Path $TargetPath
+
     # Create the WScript.Shell object, assign it a file path, target path, and other optional settings.
     $WScriptShell = New-Object -ComObject WScript.Shell ### Look into if there is a way to load an already existing shortcut and edit it.
     $Shortcut = $WScriptShell.CreateShortcut($Path)
@@ -176,7 +178,7 @@ function Get-YoutubeDl {
         $Path = (Get-Location)
     )
 
-    $Path = Resolve-Path $Path
+    $Path = Resolve-Path -Path $Path
 
     # Check if the provided '-Path' parameter is a valid directory.
     if ((Test-Path -Path $Path -PathType 'Container') -eq $false) {
@@ -213,7 +215,7 @@ function Get-Ffmpeg {
         $OsType
     )
 
-    $Path = Resolve-Path $Path
+    $Path = Resolve-Path -Path $Path
 
     # Check if the provided '-Path' parameter is a valid directory.
     if ((Test-Path -Path $Path -PathType 'Container') -eq $false) {
@@ -288,7 +290,7 @@ function Install-Script {
         $StartMenuShortcut = $false
     )
 
-    $Path = Resolve-Path $Path
+    $Path = Resolve-Path -Path $Path
     $ExecutablePath = Resolve-Path $Path
 
     # Check if the provided '-Path' parameter is a valid directory.
@@ -368,7 +370,7 @@ function Get-Video {
         $YoutubeDlOptions = "-o ""$Path\%(title)s.%(ext)s"" --console-title --ignore-errors --cache-dir ""$(Get-Location)"" --no-mtime --no-playlist"
     )
 
-    $Path = Resolve-Path $Path
+    $Path = Resolve-Path -Path $Path
     $Url = $Url.Trim()
     $YoutubeDlOptions = $YoutubeDlOptions.Trim()
 
@@ -400,7 +402,7 @@ function Get-Audio {
         $YoutubeDlOptions = "-o ""$Path\%(title)s.%(ext)s"" --console-title --ignore-errors --cache-dir ""$(Get-Location)"" --no-mtime --no-playlist"
     )
 
-    $Path = Resolve-Path $Path
+    $Path = Resolve-Path -Path $Path
     $Url = $Url.Trim()
     $YoutubeDlOptions = $YoutubeDlOptions.Trim()
 
@@ -427,7 +429,7 @@ function Get-Playlist {
         $UrlList = @()
     )
 
-    $Path = Resolve-Path $Path
+    $Path = Resolve-Path -Path $Path
 
     # If the '-Path' parameter was provided, check if it is a valid file.
     # Otherwise, check whether the value of the '-UrlList' parameter is an array.
