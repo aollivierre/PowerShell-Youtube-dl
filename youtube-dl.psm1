@@ -42,12 +42,17 @@ function Write-Log {
             Mandatory = $false,
             HelpMessage = 'Location of the log file.')]
         [string]
-        $FilePath = "$PSScriptRoot\powershell-youtube-dl.log",
+        $FilePath = "$(Get-Location)\powershell-youtube-dl.log",
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Whether to output to the console in addition to the log file.')]
         [switch]
-        $Console = $false
+        $Console = $false,
+        [Parameter(
+            Mandatory = $false,
+            HelpMessage = 'Whether to output only to the console.')]
+        [switch]
+        $ConsoleOnly = $false
     )
 
     # Set the severity level formatting based on the user input.
@@ -59,9 +64,13 @@ function Write-Log {
     }
 
     # If the '-Console' parameter is provided, tee the output to both the console and log file.
+    # If the '-ConsoleOnly' parameter is provided, only write the output to the console.
     # Otherwise, only save the output to the log file.
     if ($Console) {
         Tee-Object -Append -FilePath $FilePath -InputObject "$(Get-Date -Format 's') $SeverityLevel $Message"
+    }
+    elseif ($ConsoleOnly) {
+        Write-Host "$(Get-Date -Format 's') $SeverityLevel $Message"
     }
     else {
         Out-File -Append -FilePath $FilePath -InputObject "$(Get-Date -Format 's') $SeverityLevel $Message"
@@ -73,9 +82,9 @@ function New-Shortcut {
     param (
         [Parameter(
             Mandatory = $false,
-            HelpMessage = 'The directory and name of the shortcut to create.')]
+            HelpMessage = 'The full path of the shortcut to create.')]
         [string]
-        $Path = "$($MyInvocation.PSScriptRoot)\newshortcut.lnk",
+        $Path = "$(Get-Location)\newshortcut.lnk",
         [Parameter(
             Mandatory = $true,
             HelpMessage = 'The target path of the shortcut.')]
@@ -118,30 +127,34 @@ function Get-Download {
         $Url,
         [Parameter(
             Mandatory = $false,
-            HelpMessage = 'Download the file to this location.')]
+            HelpMessage = 'The full path of the file to download to.')]
         [string]
-        $Path = "$($MyInvocation.PSScriptRoot)\downloadfile"
+        $Path = "$(Get-Location)\downloadfile"
     )
 
     # Check if the provided '-Path' parameter is a valid file path.
     if (Test-Path -Path $Path -PathType 'Container') { ### Need to check this logic.
-        return Write-Log -Console -Severity 'Error' -Message "Provided download path cannot be a directory."
+        return Write-Log -ConsoleOnly -Severity 'Error' -Message "Provided download path cannot be a directory."
     }
     else {
         $TempFile = "$(Split-Path -Path $Path -Parent)\download.tmp"
     }
 
-    # Download the file to a temporary file, then move that file to its permanent location.
+    # Download the file to a temporary file.
     (New-Object System.Net.WebClient).DownloadFile("$Url", $TempFile)
-    Move-Item -Path $TempFile -Destination $Path -Force
-    if ($?) {
-        Write-Log -Severity 'Info' -Message "Downloaded file to '$Path'."
+
+    # Rename and move the downloaded temporary file to its permanent location.
+    if (Test-Path -Path $TempFile) {
+        Move-Item -Path $TempFile -Destination $Path -Force
+        Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloaded file to '$Path'."
     }
     else {
-        if (Test-Path -Path $TempFile) {
-            Remove-Item -Path $TempFile
-        }
-        Write-Log -Console -Severity 'Error' -Message "Failed to download file to '$Path'"
+        return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to download file to '$Path'"
+    }
+
+    # Remove the temporary file if it still exists.
+    if (Test-Path -Path $TempFile) {
+        Remove-Item -Path $TempFile
     }
 } # End Get-Download function
 
@@ -152,12 +165,14 @@ function Get-YoutubeDl {
             Mandatory = $false,
             HelpMessage = 'Download youtube-dl.exe to this directory.')]
         [string]
-        $Path = $MyInvocation.PSScriptRoot
+        $Path = (Get-Location)
     )
+
+    $Path = Resolve-Path $Path
 
     # Check if the provided '-Path' parameter is a valid directory.
     if ((Test-Path -Path $Path -PathType 'Container') -eq $false) {
-        return Write-Log -Console -Severity 'Error' -Message 'Provided download path either does not exist or is not a directory.'
+        return Write-Log -ConsoleOnly -Severity 'Error' -Message 'Provided download path either does not exist or is not a directory.'
     }
     else {
         $TempFile = "$Path\youtube-dl.exe"
@@ -165,7 +180,13 @@ function Get-YoutubeDl {
 
     # Use the 'Get-Download' function to download the youtube-dl.exe executable file.
     Get-Download -Url 'http://yt-dl.org/downloads/latest/youtube-dl.exe' -Path $TempFile
-    Write-Log -Console -Severity 'Info' -Message "Downloaded the youtube-dl executable to '$Path'"
+    if (Test-Path -Path "$Path\youtube-dl.exe") {
+        Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloaded the youtube-dl executable."
+    }
+    else {
+        return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to download the youtube-dl executable."
+    }
+    
 } # End Get-YoutubeDl function
 
 # Function for downloading the ffmpeg executable files.
@@ -175,7 +196,7 @@ function Get-Ffmpeg {
             Mandatory = $false,
             HelpMessage = 'Download ffmpeg to this directory.')]
         [string]
-        $Path = $MyInvocation.PSScriptRoot,
+        $Path = (Get-Location),
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Whether the OS is 32 bit (x86) or 64 bit (x64).')]
@@ -184,9 +205,11 @@ function Get-Ffmpeg {
         $OsType
     )
 
+    $Path = Resolve-Path $Path
+
     # Check if the provided '-Path' parameter is a valid directory.
     if ((Test-Path -Path $Path -PathType 'Container') -eq $false) {
-        return Write-Log -Console -Severity 'Error' -Message 'Provided download path either does not exist or is not a directory.'
+        return Write-Log -ConsoleOnly -Severity 'Error' -Message 'Provided download path either does not exist or is not a directory.'
     }
     else {
         $TempFile = "$Path\ffmpeg-download.zip"
@@ -214,7 +237,7 @@ function Get-Ffmpeg {
     Expand-Archive -Path $TempFile -DestinationPath $Path
     Copy-Item -Path "$Path\ffmpeg-*-win*-static\bin\*" -Destination $Path -Filter "*.exe" -Force
     Remove-Item -Path $TempFile, "$Path\ffmpeg-*-win*-static" -Recurse
-    Write-Log -Console -Severity 'Info' -Message "Downloaded and extracted the ffmpeg executables to '$Path'"
+    Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloaded and extracted the ffmpeg executables to '$Path'"
 } # End Get-Ffmpeg function
 
 # Function for downloading and installing the youtube-dl.ps1 script file and creating shortcuts to run it.
@@ -224,7 +247,7 @@ function Install-Script {
             Mandatory = $false,
             HelpMessage = 'Directory to which the script will be installed.')]
         [string]
-        $Path = $MyInvocation.PSScriptRoot,
+        $Path = (Get-Location),
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Directory to which the youtube-dl.exe and ffmpeg.exe executable files will be installed.')]
@@ -247,20 +270,23 @@ function Install-Script {
         $StartMenuShortcut = $false
     )
 
+    $Path = Resolve-Path $Path
+    $ExecutablePath = Resolve-Path $Path
+
     # Check if the provided '-Path' parameter is a valid directory.
     if ((Test-Path -Path $Path -PathType 'Container') -eq $false) {
-        return Write-Log -Console -Severity 'Error' -Message 'Provided install path either does not exist or is not a directory.'
+        return Write-Log -ConsoleOnly -Severity 'Error' -Message 'Provided install path either does not exist or is not a directory.'
     }
 
     # Download the youtube-dl.ps1 script file, license, and readme.
-    Write-Log -Console -Severity 'Info' -Message "Installing the youtube-dl.ps1 script file to '$Path'"
+    Write-Log -ConsoleOnly -Severity 'Info' -Message "Installing the youtube-dl.ps1 script file to '$Path'"
     $InstallFileList = @('youtube-dl.ps1', 'LICENSE.txt', 'README.md')
     foreach ($Item in $InstallFileList) {
         Get-Download -Url "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/$Item" -Path "$Path\$Item"
     }
 
     # Download the youtube-dl.exe and ffmpeg executable files.
-    Write-Log -Console -Severity 'Info' -Message "Installing the youtube-dl.exe and ffmpeg.exe executable files to '$ExecutablePath'"
+    Write-Log -ConsoleOnly -Severity 'Info' -Message "Installing the youtube-dl.exe and ffmpeg.exe executable files to '$ExecutablePath'"
     Get-YoutubeDl -Path $ExecutablePath
     Get-Ffmpeg -Path $ExecutablePath
 
@@ -271,20 +297,20 @@ function Install-Script {
     else {
         $ENV:PATH += ";$ExecutablePath"
     }
-    Write-Log -Console -Severity 'Info' -Message "Appended the system PATH variable with: '$ExecutablePath'"
+    Write-Log -ConsoleOnly -Severity 'Info' -Message "Appended the system PATH variable with: '$ExecutablePath'"
 
     # If the '-LocalShortcut' parameter is provided, create a shortcut in the same directory as the
     # youtube-dl.ps1 script that is used to run it.
     if ($LocalShortcut) {
         New-Shortcut -Path "$Path\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe | Select-Object -Property 'Source') -Arguments "-ExecutionPolicy Bypass -File ""$Path\youtube-dl.ps1""" -RunningPath $Path
-        Write-Log -Console -Severity 'Info' -Message "Created a shortcut for running youtube-dl.ps1 at: '$Path\Youtube-dl.lnk'"
+        Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a shortcut for running youtube-dl.ps1 at: '$Path\Youtube-dl.lnk'"
     }
 
     # If the '-DesktopShortcut' parameter is provided, create a shortcut on the desktop that is used
     # to run the youtube-dl.ps1 script.
     if ($DesktopShortcut -eq $true) {
         New-Shortcut -Path "${ENV:USERPROFILE}\Desktop\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe | Select-Object -Property 'Source') -Arguments "-ExecutionPolicy Bypass -File ""$Path\youtube-dl.ps1""" -RunningPath $Path
-        Write-Log -Console -Severity 'Info' -Message "Created a shortcut for running youtube-dl.ps1 at: '${ENV:USERPROFILE}\Desktop\Youtube-dl.lnk'"
+        Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a shortcut for running youtube-dl.ps1 at: '${ENV:USERPROFILE}\Desktop\Youtube-dl.lnk'"
     }
 
     # If the '-StartMenuShortcut' parameter is provided, create a start menu folder containing a shortcut
@@ -295,7 +321,7 @@ function Install-Script {
         }
 
         New-Shortcut -Path "${ENV:APPDATA}\Microsoft\Windows\Start Menu\Programs\Youtube-dl\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe | Select-Object -Property 'Source') -Arguments "-ExecutionPolicy Bypass -File ""$Path\youtube-dl.ps1""" -RunningPath $Path
-        Write-Log -Console -Severity 'Info' -Message "Created a start menu folder and shortcut for running youtube-dl.ps1 at: '${ENV:APPDATA}\Microsoft\Windows\Start Menu\Programs\Youtube-dl\Youtube-dl.lnk'"
+        Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a start menu folder and shortcut for running youtube-dl.ps1 at: '${ENV:APPDATA}\Microsoft\Windows\Start Menu\Programs\Youtube-dl\Youtube-dl.lnk'"
     }
 } # End Install-Script function
 
@@ -310,20 +336,21 @@ function Get-Video {
             Mandatory = $false,
             HelpMessage = 'Download the video to this directory.')]
         [string]
-        $Path = $MyInvocation.PSScriptRoot,
+        $Path = (Get-Location),
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Additional youtube-dl options to pass to the download command.')]
         [string]
-        $YoutubeDlOptions = "--console-title --ignore-errors --cache-dir $PSScriptRoot --no-mtime --no-playlist"
+        $YoutubeDlOptions = "-o ""$Path\%(title)s.%(ext)s""--console-title --ignore-errors --cache-dir ""$(Get-Location)"" --no-mtime --no-playlist"
     )
 
+    $Path = Resolve-Path $Path
     $Url = $Url.Trim()
     $YoutubeDlOptions = $YoutubeDlOptions.Trim()
 
     # Check if the provided '-Path' parameter is a valid directory.
     if ((Test-Path -Path $Path -PathType 'Container') -eq $false) {
-        return Write-Log -Console -Severity 'Error' -Message 'Provided path either does not exist or is not a directory.'
+        return Write-Log -ConsoleOnly -Severity 'Error' -Message 'Provided path either does not exist or is not a directory.'
     }
 
 #    if ($YoutubeDlOptions -contains '--yes-playlist') {
@@ -335,7 +362,7 @@ function Get-Video {
 
 #    $DownloadCommand = "youtube-dl -o ""$Path\$FileName"" $YoutubeDlOptions ""$Url"""
 
-    Write-Log -Console -Severity 'Info' -Message "Downloading video from URL '$Url' to '$Path' using youtube-dl options of '$YoutubeDlOptions'." ### Might need to add more to $Path so that it includes the file name too.
+    Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloading video from URL '$Url' to '$Path' using youtube-dl options of '$YoutubeDlOptions'." ### Might need to add more to $Path so that it includes the file name too.
     Invoke-Expression $DownloadCommand
 } # End Get-Video function
 
@@ -350,20 +377,21 @@ function Get-Audio {
             Mandatory = $false,
             HelpMessage = 'Download the video''s audio to this directory.')]
         [string]
-        $Path = $MyInvocation.PSScriptRoot,
+        $Path = (Get-Location),
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Additional youtube-dl options to pass to the download command.')]
         [string]
-        $YoutubeDlOptions = "--console-title --ignore-errors --cache-dir $PSScriptRoot --no-mtime --no-playlist"
+        $YoutubeDlOptions = "-o ""$Path\%(title)s.%(ext)s""--console-title --ignore-errors --cache-dir ""$(Get-Location)"" --no-mtime --no-playlist"
     )
 
+    $Path = Resolve-Path $Path
     $Url = $Url.Trim()
     $YoutubeDlOptions = $YoutubeDlOptions.Trim()
 
     # Check if the provided '-Path' parameter is a valid directory.
     if ((Test-Path -Path $Path -PathType 'Container') -eq $false) {
-        return Write-Log -Console -Severity 'Error' -Message 'Provided path either does not exist or is not a directory.'
+        return Write-Log -ConsoleOnly -Severity 'Error' -Message 'Provided path either does not exist or is not a directory.'
     }
 
 #    if ($YoutubeDlOptions -contains '--yes-playlist') {
@@ -375,7 +403,7 @@ function Get-Audio {
 
 #    $DownloadCommand = "youtube-dl -o ""$Path\$FileName"" $YoutubeDlOptions ""$Url"""
 
-    Write-Log -Console -Severity 'Info' -Message "Downloading audio from URL of '$Url' to '$Path' using youtube-dl options of '$YoutubeDlOptions'." ### Might need to add more to $Path so that it includes the file name too.
+    Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloading audio from URL of '$Url' to '$Path' using youtube-dl options of '$YoutubeDlOptions'." ### Might need to add more to $Path so that it includes the file name too.
     Invoke-Expression $DownloadCommand
 } # End Get-Audio function
 
@@ -393,14 +421,16 @@ function Get-Playlist {
         $UrlList = @()
     )
 
+    $Path = Resolve-Path $Path
+
     # If the '-Path' parameter was provided, check if it is a valid file.
     # Otherwise, check whether the value of the '-UrlList' parameter is an array.
     if ($Path.Length -gt 0 -and (Test-Path -Path $Path -PathType 'Leaf') -eq $false) {
-        Write-Log -Console -Severity 'Error' -Message 'Provided path either does not exist or is not a file.'
+        Write-Log -ConsoleOnly -Severity 'Error' -Message 'Provided path either does not exist or is not a file.'
         return @()
     }
     elseif ($UrlList -isnot [array]) {
-        return Write-Log -Console -Severity 'Error' -Message 'Provided -UrlList parameter is not an array.'
+        return Write-Log -ConsoleOnly -Severity 'Error' -Message 'Provided -UrlList parameter is not an array.'
         return @()
     }
 
@@ -410,6 +440,6 @@ function Get-Playlist {
     }
 
     # Return an array of playlist URL string objects.
-    Write-Log -Console -Severity 'Info' -Message "Returning $($UrlList.Count) playlist URLs."
+    Write-Log -ConsoleOnly -Severity 'Info' -Message "Returning $($UrlList.Count) playlist URLs."
     return $UrlList
 } # End Get-Playlist function
