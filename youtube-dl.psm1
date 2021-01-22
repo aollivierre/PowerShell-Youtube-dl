@@ -1,28 +1,32 @@
 
+
+
 # Function for simulating the 'pause' command of the Windows command line.
 function Wait-Script {
     param(
         [Parameter(
             Mandatory = $false,
-            HelpMessage = 'If present, do not wait for user input.')]
+            HelpMessage = 'If true, do not wait for user input.')]
         [switch]
-        $NoUserInput = $false,
+        $NonInteractive = $false,
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Number of seconds to wait.')]
         [int]
-        $Seconds = 1
+        $Seconds = 0
     )
 
-    # Wait for the specified number of seconds.
+    # Wait for a specified number of seconds.
     Start-Sleep -Seconds $Seconds
 
-    # If the '-NoUserInput' parameter is not specified, wait for the user to press a key before continuing.
-    if ($NoUserInput -eq $false) {
+    # If the '-NonInteractive' parameter is false, wait for the user to press a key before continuing.
+    if ($NonInteractive -eq $false) {
 		Write-Host "Press any key to continue ...`n" -ForegroundColor "Gray"
-		return $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp")
+	    $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp")
 	}
 } # End Wait-Script function
+
+
 
 # Function for writing messages to a log file.
 function Write-Log {
@@ -60,11 +64,11 @@ function Write-Log {
         'Info' { 'INFO:   '; break }
         'Warning' { 'WARNING:'; break }
         'Error' { 'ERROR:  '; break }
-        default { 'WARNING:'; break }
+        default { 'INFO:   '; break }
     }
 
-    # If the '-Console' parameter is provided, tee the output to both the console and log file.
-    # If the '-ConsoleOnly' parameter is provided, only write the output to the console.
+    # If the '-Console' parameter is true, tee the output to both the console and log file.
+    # If the '-ConsoleOnly' parameter is true, only write the output to the console.
     # Otherwise, only save the output to the log file.
     if ($Console) {
         Tee-Object -Append -FilePath $FilePath -InputObject "$(Get-Date -Format 's') $SeverityLevel $Message"
@@ -76,6 +80,8 @@ function Write-Log {
         Out-File -Append -FilePath $FilePath -InputObject "$(Get-Date -Format 's') $SeverityLevel $Message"
     }
 } # End Write-Log function
+
+
 
 # Function for creating shortcuts.
 function New-Shortcut {
@@ -99,7 +105,7 @@ function New-Shortcut {
             Mandatory = $false,
             HelpMessage = 'The directory from which to run the target path.')]
         [string]
-        $RunningPath,
+        $StartPath,
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Path to the file used as the icon.')]
@@ -110,7 +116,7 @@ function New-Shortcut {
     $TargetPath = Resolve-Path -Path $TargetPath
 
     # Create the WScript.Shell object, assign it a file path, target path, and other optional settings.
-    $WScriptShell = New-Object -ComObject WScript.Shell ### Look into if there is a way to load an already existing shortcut and edit it.
+    $WScriptShell = New-Object -ComObject WScript.Shell
     $Shortcut = $WScriptShell.CreateShortcut($Path)
     if ($TargetPath.Length -gt 0) {
         $Shortcut.TargetPath = $TargetPath
@@ -118,14 +124,16 @@ function New-Shortcut {
     if ($Arguments.Length -gt 0) {
         $Shortcut.Arguments = $Arguments
     }
-    if ($RunningPath.Length -gt 0) {
-        $Shortcut.WorkingDirectory = $RunningPath
+    if ($StartPath.Length -gt 0) {
+        $Shortcut.WorkingDirectory = $StartPath
     }
     if ($IconPath.Length -gt 0) {
         $Shortcut.IconLocation = $IconPath
     }
     $Shortcut.Save()
 } # End New-Shortcut function
+
+
 
 # Function for downloading files from the internet.
 function Get-Download {
@@ -137,13 +145,13 @@ function Get-Download {
         $Url,
         [Parameter(
             Mandatory = $false,
-            HelpMessage = 'The full path of the file to download to.')]
+            HelpMessage = 'The full path of where to download the file to.')]
         [string]
         $Path = "$(Get-Location)\downloadfile"
     )
 
     # Check if the provided '-Path' parameter is a valid file path.
-    if (Test-Path -Path $Path -PathType 'Container') { ### Need to check this logic.
+    if (Test-Path -Path $Path -PathType 'Container') {
         return Write-Log -ConsoleOnly -Severity 'Error' -Message "Provided download path cannot be a directory."
     }
     else {
@@ -167,6 +175,8 @@ function Get-Download {
         Remove-Item -Path $TempFile
     }
 } # End Get-Download function
+
+
 
 # Function for downloading the youtube-dl.exe executable file.
 function Get-YoutubeDl {
@@ -196,8 +206,9 @@ function Get-YoutubeDl {
     else {
         return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to download the youtube-dl executable."
     }
-    
 } # End Get-YoutubeDl function
+
+
 
 # Function for downloading the ffmpeg executable files.
 function Get-Ffmpeg {
@@ -237,7 +248,7 @@ function Get-Ffmpeg {
 
     # Based off the value of '-OsType' determine which ffmpeg download link to use.
     $DownloadUrl = switch ($OsType) {
-        'x64' { 'http://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-latest-win64-static.zip'; break }
+        'x64' { 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip'; break }
         'x86' { 'http://ffmpeg.zeranoe.com/builds/win32/static/ffmpeg-latest-win32-static.zip'; break }
         Default { 'http://ffmpeg.zeranoe.com/builds/win32/static/ffmpeg-latest-win32-static.zip'; break }
     }
@@ -245,13 +256,13 @@ function Get-Ffmpeg {
     # Download the ffmpeg zip file.
     Get-Download -Url $DownloadUrl -Path $TempFile
     if (Test-Path -Path $TempFile) {
-        return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to download and extract the ffmpeg executables."
+        return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to download the ffmpeg executables."
     }
 
     # Extract the ffmpeg executable files from the downloaded zip file.
     Expand-Archive -Path $TempFile -DestinationPath $Path
-    Copy-Item -Path "$Path\ffmpeg-*-win*-static\bin\*" -Destination $Path -Filter "*.exe" -Force
-    Remove-Item -Path $TempFile, "$Path\ffmpeg-*-win*-static" -Recurse
+    Copy-Item -Path "$Path\ffmpeg-*\bin\*" -Destination $Path -Filter "*.exe" -Force
+    Remove-Item -Path $TempFile, "$Path\ffmpeg-*" -Recurse
     if ((Test-Path -Path "$Path\ffmpeg.exe") -and (Test-Path -Path "$Path\ffplay.exe") -and (Test-Path -Path "$Path\ffprobe.exe")) {
         Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloaded and extracted the ffmpeg executables."
     }
@@ -259,6 +270,8 @@ function Get-Ffmpeg {
         return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to download and extract the ffmpeg executables."
     }
 } # End Get-Ffmpeg function
+
+
 
 # Function for downloading and installing the youtube-dl.ps1 script file and creating shortcuts to run it.
 function Install-Script {
@@ -322,7 +335,7 @@ function Install-Script {
     # If the '-LocalShortcut' parameter is provided, create a shortcut in the same directory as the
     # youtube-dl.ps1 script that is used to run it.
     if ($LocalShortcut) {
-        New-Shortcut -Path "$Path\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe | Select-Object -Property 'Source') -Arguments "-ExecutionPolicy Bypass -File ""$Path\youtube-dl.ps1""" -RunningPath $Path
+        New-Shortcut -Path "$Path\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe | Select-Object -Property 'Source') -Arguments "-ExecutionPolicy Bypass -File ""$Path\youtube-dl.ps1""" -StartPath $Path
         if (Test-Path -Path "$Path\Youtube-dl.lnk") {
             Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a shortcut for running youtube-dl.ps1 at: '$Path\Youtube-dl.lnk'"
         }
@@ -331,7 +344,7 @@ function Install-Script {
     # If the '-DesktopShortcut' parameter is provided, create a shortcut on the desktop that is used
     # to run the youtube-dl.ps1 script.
     if ($DesktopShortcut -eq $true) {
-        New-Shortcut -Path "${ENV:USERPROFILE}\Desktop\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe | Select-Object -Property 'Source') -Arguments "-ExecutionPolicy Bypass -File ""$Path\youtube-dl.ps1""" -RunningPath $Path
+        New-Shortcut -Path "${ENV:USERPROFILE}\Desktop\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe | Select-Object -Property 'Source') -Arguments "-ExecutionPolicy Bypass -File ""$Path\youtube-dl.ps1""" -StartPath $Path
         if (Test-Path -Path "${ENV:USERPROFILE}\Desktop\Youtube-dl.lnk") {
             Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a shortcut for running youtube-dl.ps1 at: '${ENV:USERPROFILE}\Desktop\Youtube-dl.lnk'"
         }
@@ -344,12 +357,14 @@ function Install-Script {
             New-Item -Type 'Directory' -Path "${ENV:APPDATA}\Microsoft\Windows\Start Menu\Programs\Youtube-dl" | Out-Null
         }
 
-        New-Shortcut -Path "${ENV:APPDATA}\Microsoft\Windows\Start Menu\Programs\Youtube-dl\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe | Select-Object -Property 'Source') -Arguments "-ExecutionPolicy Bypass -File ""$Path\youtube-dl.ps1""" -RunningPath $Path
+        New-Shortcut -Path "${ENV:APPDATA}\Microsoft\Windows\Start Menu\Programs\Youtube-dl\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe | Select-Object -Property 'Source') -Arguments "-ExecutionPolicy Bypass -File ""$Path\youtube-dl.ps1""" -StartPath $Path
         if (Test-Path -Path "${ENV:APPDATA}\Microsoft\Windows\Start Menu\Programs\Youtube-dl\Youtube-dl.lnk") {
             Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a start menu folder and shortcut for running youtube-dl.ps1 at: '${ENV:APPDATA}\Microsoft\Windows\Start Menu\Programs\Youtube-dl\Youtube-dl.lnk'"
         }
     }
 } # End Install-Script function
+
+
 
 function Get-Video {
     param (
@@ -383,6 +398,8 @@ function Get-Video {
     Invoke-Expression $DownloadCommand
 } # End Get-Video function
 
+
+
 function Get-Audio {
     param (
         [Parameter(
@@ -414,6 +431,8 @@ function Get-Audio {
     Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloading audio from URL of '$Url' to '$Path' using youtube-dl options of '$YoutubeDlOptions'." ### Might need to add more to $Path so that it includes the file name too.
     Invoke-Expression $DownloadCommand
 } # End Get-Audio function
+
+
 
 function Get-Playlist {
     param (
@@ -451,3 +470,5 @@ function Get-Playlist {
     Write-Log -ConsoleOnly -Severity 'Info' -Message "Returning $($UrlList.Count) playlist URLs."
     return $UrlList
 } # End Get-Playlist function
+
+
