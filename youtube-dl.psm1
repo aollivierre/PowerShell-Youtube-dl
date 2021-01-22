@@ -249,13 +249,13 @@ function Get-Ffmpeg {
     # Based off the value of '-OsType' determine which ffmpeg download link to use.
     $DownloadUrl = switch ($OsType) {
         'x64' { 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip'; break }
-        'x86' { 'http://ffmpeg.zeranoe.com/builds/win32/static/ffmpeg-latest-win32-static.zip'; break }
-        Default { 'http://ffmpeg.zeranoe.com/builds/win32/static/ffmpeg-latest-win32-static.zip'; break }
+        'x86' { 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip'; break }
+        Default { 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip'; break }
     }
 
     # Download the ffmpeg zip file.
     Get-Download -Url $DownloadUrl -Path $TempFile
-    if (Test-Path -Path $TempFile) {
+    if (-Not (Test-Path -Path $TempFile)) {
         return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to download the ffmpeg executables."
     }
 
