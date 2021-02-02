@@ -118,16 +118,14 @@ function New-Shortcut {
     # Create the WScript.Shell object, assign it a file path, target path, and other optional settings.
     $WScriptShell = New-Object -ComObject WScript.Shell
     $Shortcut = $WScriptShell.CreateShortcut($Path)
-    if ($TargetPath.Length -gt 0) {
-        $Shortcut.TargetPath = $TargetPath
-    }
-    if ($Arguments.Length -gt 0) {
+    $Shortcut.TargetPath = $TargetPath
+    if (Test-Path Variable:Arguments) {
         $Shortcut.Arguments = $Arguments
     }
-    if ($StartPath.Length -gt 0) {
+    if (Test-Path Variable:StartPath) {
         $Shortcut.WorkingDirectory = $StartPath
     }
-    if ($IconPath.Length -gt 0) {
+    if (Test-Path Variable:IconPath) {
         $Shortcut.IconLocation = $IconPath
     }
     $Shortcut.Save()
@@ -217,13 +215,7 @@ function Get-Ffmpeg {
             Mandatory = $false,
             HelpMessage = 'Download ffmpeg to this directory.')]
         [string]
-        $Path = (Get-Location),
-        [Parameter(
-            Mandatory = $false,
-            HelpMessage = 'Whether the OS is 32 bit (x86) or 64 bit (x64).')]
-        [ValidateSet('x64', 'x86')]
-        [string]
-        $OsType
+        $Path = (Get-Location)
     )
 
     $Path = Resolve-Path -Path $Path
@@ -236,25 +228,8 @@ function Get-Ffmpeg {
         return Write-Log -ConsoleOnly -Severity 'Error' -Message 'Provided download path either does not exist or is not a directory.'
     }
 
-    # If the '-OsType' parameter wasn't provided, determine the OS type (whether its x86 or x64).
-    if ($OsType.Length -eq 0) {
-        if ([environment]::Is64BitOperatingSystem) {
-            $OsType = 'x64'
-        }
-        else {
-            $OsType = 'x86'
-        }
-    }
-
-    # Based off the value of '-OsType' determine which ffmpeg download link to use.
-    $DownloadUrl = switch ($OsType) {
-        'x64' { 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip'; break }
-        'x86' { 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip'; break }
-        Default { 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip'; break }
-    }
-
     # Download the ffmpeg zip file.
-    Get-Download -Url $DownloadUrl -Path $TempFile
+    Get-Download -Url 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip' -Path $TempFile
     if (-Not (Test-Path -Path $TempFile)) {
         return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to download the ffmpeg executables."
     }
@@ -490,21 +465,28 @@ function Get-Playlist {
         $UrlList = @()
     )
 
-    $Path = Resolve-Path -Path $Path
-
-    # If the '-Path' parameter was provided, check if it is a valid file.
-    # Otherwise, check whether the value of the '-UrlList' parameter is an array.
-    if ($Path.Length -gt 0 -and (Test-Path -Path $Path -PathType 'Leaf') -eq $false) {
-        Write-Log -ConsoleOnly -Severity 'Error' -Message 'Provided path either does not exist or is not a file.'
-        return @()
+    if (Test-Path Variable:Path) {
+        $Path = Resolve-Path -Path $Path
     }
-    elseif ($UrlList -isnot [array]) {
-        return Write-Log -ConsoleOnly -Severity 'Error' -Message 'Provided ''-UrlList'' parameter value is not an array.'
+
+    # If the '-Path' parameter was provided, check if it is a valid file and get its contents.
+    # Otherwise, check whether the value of the '-UrlList' parameter is an array.
+    if (Test-Path Variable:Path) {
+        if ((Test-Path -Path $Path -PathType 'Leaf') -eq $false) {
+            return Write-Log -ConsoleOnly -Severity 'Error' -Message 'Provided path either does not exist or is not a file.'
+            return @()
+        }
+        else {
+            $UrlList = Get-Content -Path $Path | Where-Object { $_.Trim() -ne '' -and $_.Trim() -notmatch '^#.*' }
+        }
+    }
+    elseif ($UrlList -isnot [array] -or $UrlList.Length -eq 0) {
+        return Write-Log -ConsoleOnly -Severity 'Error' -Message 'Provided ''-UrlList'' parameter value is not an array or is empty.'
         return @()
     }
 
     # If the '-Path' parameter was provided, get an array of string objects from that file.
-    if ($Path.Length -gt 0) {
+    if (Test-Path Variable:Path) {
         $UrlList = Get-Content -Path $Path | Where-Object { $_.Trim() -ne '' -and $_.Trim() -notmatch '^#.*' }
     }
 
