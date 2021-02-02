@@ -339,27 +339,38 @@ function Install-Script {
         if (Test-Path -Path "$Path\Youtube-dl.lnk") {
             Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a shortcut for running youtube-dl.ps1 at: '$Path\Youtube-dl.lnk'"
         }
+        else {
+            return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to create a shortcut at: '$Path\Youtube-dl.lnk'"
+        }
     }
 
     # If the '-DesktopShortcut' parameter is provided, create a shortcut on the desktop that is used
     # to run the youtube-dl.ps1 script.
     if ($DesktopShortcut -eq $true) {
-        New-Shortcut -Path "${ENV:USERPROFILE}\Desktop\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe | Select-Object -Property 'Source') -Arguments "-ExecutionPolicy Bypass -File ""$Path\youtube-dl.ps1""" -StartPath $Path
-        if (Test-Path -Path "${ENV:USERPROFILE}\Desktop\Youtube-dl.lnk") {
-            Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a shortcut for running youtube-dl.ps1 at: '${ENV:USERPROFILE}\Desktop\Youtube-dl.lnk'"
+        $DesktopPath = [environment]::GetFolderPath('Desktop')
+        New-Shortcut -Path "$DesktopPath\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe | Select-Object -Property 'Source') -Arguments "-ExecutionPolicy Bypass -File ""$Path\youtube-dl.ps1""" -StartPath $Path
+        if (Test-Path -Path "$DesktopPath\Youtube-dl.lnk") {
+            Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a shortcut for running youtube-dl.ps1 at: '$DesktopPath\Youtube-dl.lnk'"
+        }
+        else {
+            return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to create a shortcut at: '$DesktopPath\Youtube-dl.lnk'"
         }
     }
 
     # If the '-StartMenuShortcut' parameter is provided, create a start menu folder containing a shortcut
     # used to run the youtube-dl.ps1 script.
     if ($StartMenuShortcut -eq $true) {
-        if ((Test-Path -Path "${ENV:APPDATA}\Microsoft\Windows\Start Menu\Programs\Youtube-dl" -PathType 'Container') -eq $false) {
-            New-Item -Type 'Directory' -Path "${ENV:APPDATA}\Microsoft\Windows\Start Menu\Programs\Youtube-dl" | Out-Null
+        $AppDataPath = [Environment]::GetFolderPath('ApplicationData')
+        if ((Test-Path -Path "$AppDataPath\Microsoft\Windows\Start Menu\Programs\Youtube-dl" -PathType 'Container') -eq $false) {
+            New-Item -Type 'Directory' -Path "$AppDataPath\Microsoft\Windows\Start Menu\Programs\Youtube-dl" | Out-Null
         }
 
-        New-Shortcut -Path "${ENV:APPDATA}\Microsoft\Windows\Start Menu\Programs\Youtube-dl\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe | Select-Object -Property 'Source') -Arguments "-ExecutionPolicy Bypass -File ""$Path\youtube-dl.ps1""" -StartPath $Path
-        if (Test-Path -Path "${ENV:APPDATA}\Microsoft\Windows\Start Menu\Programs\Youtube-dl\Youtube-dl.lnk") {
-            Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a start menu folder and shortcut for running youtube-dl.ps1 at: '${ENV:APPDATA}\Microsoft\Windows\Start Menu\Programs\Youtube-dl\Youtube-dl.lnk'"
+        New-Shortcut -Path "$AppDataPath\Microsoft\Windows\Start Menu\Programs\Youtube-dl\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe | Select-Object -Property 'Source') -Arguments "-ExecutionPolicy Bypass -File ""$Path\youtube-dl.ps1""" -StartPath $Path
+        if (Test-Path -Path "$AppDataPath\Microsoft\Windows\Start Menu\Programs\Youtube-dl\Youtube-dl.lnk") {
+            Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a start menu folder and shortcut for running youtube-dl.ps1 at: '$AppDataPath\Microsoft\Windows\Start Menu\Programs\Youtube-dl\Youtube-dl.lnk'"
+        }
+        else {
+            return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to create a shortcut at: '$AppDataPath\Microsoft\Windows\Start Menu\Programs\Youtube-dl\Youtube-dl.lnk'"
         }
     }
 } # End Install-Script function
