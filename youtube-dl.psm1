@@ -393,16 +393,34 @@ function Get-Video {
             Mandatory = $false,
             HelpMessage = 'Additional youtube-dl options to pass to the download command.')]
         [string]
-        $YoutubeDlOptions = "-o ""$Path\%(title)s.%(ext)s"" --console-title --ignore-errors --cache-dir ""$(Get-Location)"" --no-mtime --no-playlist"
+        $YoutubeDlOptions = "-o ""$Path\%(title)s.%(ext)s"" --console-title --ignore-errors --cache-dir ""$(Get-Location)"" --no-mtime --no-playlist",
+        [Parameter(
+            Mandatory = $false,
+            HelpMessage = 'The path to the directory containing the youtube-dl and ffmpeg executable files.')]
+        [string]
+        $ExecutablePath = (Get-Location)
     )
 
     $Path = Resolve-Path -Path $Path
     $Url = $Url.Trim()
     $YoutubeDlOptions = $YoutubeDlOptions.Trim()
+    $DownloadCommand = "youtube-dl $YoutubeDlOptions"
 
     # Check if the provided '-Path' parameter is a valid directory.
     if ((Test-Path -Path $Path -PathType 'Container') -eq $false) {
         return Write-Log -ConsoleOnly -Severity 'Error' -Message 'Provided path either does not exist or is not a directory.'
+    }
+
+    # Check whether the 'youtube-dl' command is in the system's PATH variable
+    if ($null -eq (Get-Command "youtube-dl" -ErrorAction SilentlyContinue)) 
+    { 
+        return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to find 'youtube-dl' in the system PATH variable."
+    }
+
+    # Check whether the 'ffmpeg' command is in the system's PATH variable
+    if ($null -eq (Get-Command "ffmpeg" -ErrorAction SilentlyContinue)) 
+    { 
+        return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to find 'ffmpeg' in the system PATH variable."
     }
 
     Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloading video from URL '$Url' to '$Path' using youtube-dl options of '$YoutubeDlOptions'." ### Might need to add more to $Path so that it includes the file name too.
@@ -433,10 +451,23 @@ function Get-Audio {
     $Path = Resolve-Path -Path $Path
     $Url = $Url.Trim()
     $YoutubeDlOptions = $YoutubeDlOptions.Trim()
+    $DownloadCommand = "youtube-dl $YoutubeDlOptions"
 
     # Check if the provided '-Path' parameter is a valid directory.
     if ((Test-Path -Path $Path -PathType 'Container') -eq $false) {
         return Write-Log -ConsoleOnly -Severity 'Error' -Message 'Provided path either does not exist or is not a directory.'
+    }
+
+    # Check whether the 'youtube-dl' command is in the system's PATH variable
+    if ($null -eq (Get-Command "youtube-dl" -ErrorAction SilentlyContinue)) 
+    { 
+        return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to find 'youtube-dl' in the system PATH variable."
+    }
+
+    # Check whether the 'ffmpeg' command is in the system's PATH variable
+    if ($null -eq (Get-Command "ffmpeg" -ErrorAction SilentlyContinue)) 
+    { 
+        return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to find 'ffmpeg' in the system PATH variable."
     }
 
     Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloading audio from URL of '$Url' to '$Path' using youtube-dl options of '$YoutubeDlOptions'." ### Might need to add more to $Path so that it includes the file name too.
