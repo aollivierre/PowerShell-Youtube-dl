@@ -368,18 +368,24 @@ function Get-Video {
             Mandatory = $false,
             HelpMessage = 'Additional youtube-dl options to pass to the download command.')]
         [string]
-        $YoutubeDlOptions = "-o ""$Path\%(title)s.%(ext)s"" --console-title --ignore-errors --cache-dir ""$(Get-Location)"" --no-mtime --no-playlist",
+        $YoutubeDlOptions = "-o ""$Path\%(title)s.%(ext)s"" --console-title --ignore-errors --cache-dir ""$Path"" --no-mtime --no-playlist",
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'The path to the directory containing the youtube-dl and ffmpeg executable files.')]
         [string]
-        $ExecutablePath = (Get-Location)
+        $ExecutablePath
     )
 
     $Path = Resolve-Path -Path $Path
     $Url = $Url.Trim()
     $YoutubeDlOptions = $YoutubeDlOptions.Trim()
-    $DownloadCommand = "youtube-dl $YoutubeDlOptions"
+    
+    if (Test-Path Variable:ExecutablePath) {
+        $ExecutablePath = $ExecutablePath.Trim()
+        $DownloadCommand = "$ExecutablePath\youtube-dl $YoutubeDlOptions $Url"
+    } else {
+        $DownloadCommand = "youtube-dl $YoutubeDlOptions $Url"
+    }
 
     # Check if the provided '-Path' parameter is a valid directory.
     if ((Test-Path -Path $Path -PathType 'Container') -eq $false) {
@@ -420,13 +426,24 @@ function Get-Audio {
             Mandatory = $false,
             HelpMessage = 'Additional youtube-dl options to pass to the download command.')]
         [string]
-        $YoutubeDlOptions = "-o ""$Path\%(title)s.%(ext)s"" --console-title --ignore-errors --cache-dir ""$(Get-Location)"" --no-mtime --no-playlist"
+        $YoutubeDlOptions = "-o ""$Path\%(title)s.%(ext)s"" --console-title --ignore-errors --cache-dir ""$Path"" --no-mtime --no-playlist",
+        [Parameter(
+            Mandatory = $false,
+            HelpMessage = 'The path to the directory containing the youtube-dl and ffmpeg executable files.')]
+        [string]
+        $ExecutablePath
     )
 
     $Path = Resolve-Path -Path $Path
     $Url = $Url.Trim()
     $YoutubeDlOptions = $YoutubeDlOptions.Trim()
-    $DownloadCommand = "youtube-dl $YoutubeDlOptions"
+
+    if (Test-Path Variable:ExecutablePath) {
+        $ExecutablePath = $ExecutablePath.Trim()
+        $DownloadCommand = "$ExecutablePath\youtube-dl $YoutubeDlOptions $Url"
+    } else {
+        $DownloadCommand = "youtube-dl $YoutubeDlOptions $Url"
+    }
 
     # Check if the provided '-Path' parameter is a valid directory.
     if ((Test-Path -Path $Path -PathType 'Container') -eq $false) {
@@ -485,9 +502,9 @@ function Get-Playlist {
         return @()
     }
 
-    # If the '-Path' parameter was provided, get an array of string objects from that file.
+    # If the '-Path' parameter was provided, get an array of string objects from that file and append it to '$UrlList'.
     if (Test-Path Variable:Path) {
-        $UrlList = Get-Content -Path $Path | Where-Object { $_.Trim() -ne '' -and $_.Trim() -notmatch '^#.*' }
+        $UrlList += , (Get-Content -Path $Path | Where-Object { $_.Trim() -ne '' -and $_.Trim() -notmatch '^#.*' })
     }
 
     # Return an array of playlist URL string objects.
@@ -496,3 +513,60 @@ function Get-Playlist {
 } # End Get-Playlist function
 
 
+
+function Get-VideoPlaylist {
+    param (
+        [Parameter(
+            Mandatory = $false,
+            HelpMessage = 'Path to the file containing a list of playlist URLs to download.')]
+        [string]
+        $PlaylistFilePath,
+        [Parameter(
+            Mandatory = $false,
+            HelpMessage = 'Array object containing a list of playlist URLs to download.')]
+        [array]
+        $UrlList = @(),
+        [Parameter(
+            Mandatory = $false,
+            HelpMessage = 'Download the video to this directory.')]
+        [string]
+        $Path = (Get-Location),
+        [Parameter(
+            Mandatory = $false,
+            HelpMessage = 'Additional youtube-dl options to pass to the download command.')]
+        [string]
+        $YoutubeDlOptions = "-o ""$Path\%(title)s.%(ext)s"" --console-title --ignore-errors --cache-dir ""$Path""",
+        [Parameter(
+            Mandatory = $false,
+            HelpMessage = 'The path to the directory containing the youtube-dl and ffmpeg executable files.')]
+        [string]
+        $ExecutablePath
+    )
+
+    # Ensure that one of the 'Get-Playlist' options was provided to the command and then run it.
+    $GetPlaylistOptions = ''
+    if (Test-Path Variable:PlaylistFilePath) {
+        $GetPlaylistOptions = "-Path $PlaylistFilePath"
+    } elseif (Test-Path Variable:UrlList) {
+        $GetPlaylistOptions = "-UrlList $UrlList"
+    } else {
+        return Write-Log -ConsoleOnly -Severity 'Error' -Message 'Neither ''-UrlList'' or ''-PlaylistFilePath'' parameters were provided.'
+    }
+    $PlaylistUrls = Get-Playlist $GetPlaylistOptions
+    
+    # Ensure that the '$YoutubeDlOptions parameter contains the '--yes-playlist' youtube-dl option.
+    if ($YoutubeDlOptions -notcontains 'yes-playlist') {
+        $YoutubeDlOptions = $YoutubeDlOptions + ' --yes-playlist'
+    }
+
+    # Download each playlist URL.
+    foreach ($UrlItem in $PlaylistUrls ) {
+        if (Test-Path Variable:ExecutablePath) {
+            Get-Video -Path $Path -Url $UrlItem -YoutubeDlOptions $YoutubeDlOptions -ExecutablePath $ExecutablePath
+        } else {
+            Get-Video -Path $Path -Url $UrlItem -YoutubeDlOptions $YoutubeDlOptions
+        }
+    }
+
+    Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloaded videos from $($PlaylistUrls.Count) playlists to '$Path'."
+}
