@@ -319,7 +319,7 @@ function Install-Script {
 	}
 
 	# Ensure that the 'bin' directory containing the executable files is in the system PATH variable.
-	if ($ENV:PATH -notlike "*;$Path\bin*") {
+	if ($ENV:PATH.Split(';') -notcontains "$Path\bin") {
 		Write-Log -ConsoleOnly -Severity 'Warning' -Message "The '$Path\bin' directory was not found in the system PATH variable."
 
 		# Add the bin directory to the system PATH variable.
@@ -331,7 +331,7 @@ function Install-Script {
 		}
 
 		# Check that the bin directory was actually added to the system PATH variable.
-		if ($ENV:PATH -like "*;$Path\bin*") {
+		if ($ENV:PATH.Split(';') -contains "$Path\bin") {
 			Write-Log -ConsoleOnly -Severity 'Info' -Message "Added the '$Path\bin' directory to the system PATH variable."
 		} else {
 			return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to add the '$Path\bin' directory to the system PATH variable."
