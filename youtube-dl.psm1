@@ -39,7 +39,7 @@ function Write-Log {
         [Parameter(
             Mandatory = $true,
             HelpMessage = 'The severity level of the message to log.')]
-        [ValidateSet('Info','Warning','Error')]
+        [ValidateSet('Info','Warning','Error','Prompt')]
         [string]
         $Severity,
         [Parameter(
@@ -64,7 +64,13 @@ function Write-Log {
         'Info' { 'INFO:   '; break }
         'Warning' { 'WARNING:'; break }
         'Error' { 'ERROR:  '; break }
+        'Prompt' { 'PROMPT: '; break }
         default { 'INFO:   '; break }
+    }
+
+    # Return the user provided value if the $Severity is 'Prompt'
+    if ($Severity -eq 'Prompt') {
+        return (Read-Host "$(Get-Date -Format 's') $SeverityLevel $Message").Trim()
     }
 
     # If the '-Console' parameter is true, tee the output to both the console and log file.
@@ -199,7 +205,7 @@ function Get-YoutubeDl {
     # Use the 'Get-Download' function to download the youtube-dl.exe executable file.
     Get-Download -Url 'http://yt-dl.org/downloads/latest/youtube-dl.exe' -Path $TempFile
     if (Test-Path -Path "$Path\youtube-dl.exe") {
-        Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloaded the youtube-dl executable."
+        Write-Log -ConsoleOnly -Severity 'Info' -Message "Finished downloading the youtube-dl executable."
     }
     else {
         return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to download the youtube-dl executable."
@@ -239,7 +245,7 @@ function Get-Ffmpeg {
     Copy-Item -Path "$Path\ffmpeg-*\bin\*" -Destination $Path -Filter "*.exe" -Force
     Remove-Item -Path $TempFile, "$Path\ffmpeg-*" -Recurse
     if ((Test-Path -Path "$Path\ffmpeg.exe") -and (Test-Path -Path "$Path\ffplay.exe") -and (Test-Path -Path "$Path\ffprobe.exe")) {
-        Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloaded and extracted the ffmpeg executables."
+        Write-Log -ConsoleOnly -Severity 'Info' -Message "Finished downloading the ffmpeg executables."
     }
     else {
         return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to download and extract the ffmpeg executables."
@@ -252,100 +258,127 @@ function Get-Ffmpeg {
 function Install-Script {
     param (
         [Parameter(
-            Mandatory = $false,
-            HelpMessage = 'Directory to which the script will be installed.')]
+            Mandatory = $true,
+            HelpMessage = 'The directory to install the ''PowerShell-Youtube-dl'' script and executables to.')]
         [string]
-        $Path = (Get-Location),
+        $Path,
         [Parameter(
             Mandatory = $false,
-            HelpMessage = 'Directory to which the youtube-dl.exe and ffmpeg.exe executable files will be installed.')]
+            HelpMessage = 'The branch of the ''PowerShell-Youtube-dl'' GitHub repository to download from.')]
         [string]
-        $ExecutablePath = $Path,
+        $Branch = 'master',
         [Parameter(
             Mandatory = $false,
-            HelpMessage = 'Whether to create a local shortcut that is used to run the youtube-dl.ps1 script.')]
+            HelpMessage = 'Whether to create a local shortcut that is used to run the ''youtube-dl-gui.ps1'' script.')]
         [switch]
         $LocalShortcut = $false,
         [Parameter(
             Mandatory = $false,
-            HelpMessage = 'Whether to create a desktop shortcut for the script.')]
+            HelpMessage = 'Whether to create a desktop shortcut that is used to run the ''youtube-dl-gui.ps1'' script.')]
         [switch]
         $DesktopShortcut = $false,
         [Parameter(
             Mandatory = $false,
-            HelpMessage = 'Whether to create a start menu shortcut for the script.')]
+            HelpMessage = 'Whether to create a start menu shortcut that is used to run the ''youtube-dl-gui.ps1'' script.')]
         [switch]
         $StartMenuShortcut = $false
     )
 
-    $Path = Resolve-Path -Path $Path
-    $ExecutablePath = Resolve-Path $ExecutablePath
+	# Ensure that the install directory is present.
+	if ((Test-Path -Path $Path -PathType 'Container') -eq $false) {
+		New-Item -Type 'Directory' -Path $Path | Out-Null
+	}
 
-    # Check if the provided '-Path' parameter is a valid directory.
-    if ((Test-Path -Path $Path -PathType 'Container') -eq $false) {
-        return Write-Log -ConsoleOnly -Severity 'Error' -Message 'Provided install path either does not exist or is not a directory.'
-    }
+	# Ensure that the 'bin' directory is present.
+	if ((Test-Path -Path "$Path\bin" -PathType 'Container') -eq $false) {
+		New-Item -Type 'Directory' -Path "$Path\bin" | Out-Null
+	}
 
-    # Download the youtube-dl.ps1 script file, license, and readme.
-    Write-Log -ConsoleOnly -Severity 'Info' -Message "Installing the youtube-dl.ps1 script file to '$Path'"
-    $InstallFileList = @('youtube-dl.ps1', 'LICENSE.txt', 'README.md')
-    foreach ($Item in $InstallFileList) {
-        Get-Download -Url "https://github.com/mpb10/PowerShell-Youtube-dl/raw/master/$Item" -Path "$Path\$Item"
-    }
+	# Ensure that 'youtube-dl' is installed.
+	if ((Test-Path "$Path\bin\youtube-dl.exe") -eq $False) {
+		Write-Log -ConsoleOnly -Severity 'Warning' -Message "The youtube-dl executable was not found at '$Path\bin\youtube-dl.exe'."
 
-    # Download the youtube-dl.exe and ffmpeg executable files.
-    Write-Log -ConsoleOnly -Severity 'Info' -Message "Installing the youtube-dl.exe and ffmpeg.exe executable files to '$ExecutablePath'"
-    Get-YoutubeDl -Path $ExecutablePath
-    Get-Ffmpeg -Path $ExecutablePath
+		Get-YoutubeDl -Path "$Path\bin"
+	}
 
-    # Add the directory containing the executable files to the system path variable.
-    if ($ENV:PATH.LastIndexOf(';') -eq ($ENV:PATH.Length - 1)) {
-        $ENV:PATH += $ExecutablePath
-    }
-    else {
-        $ENV:PATH += ";$ExecutablePath"
-    }
-    Write-Log -ConsoleOnly -Severity 'Info' -Message "Appended the system PATH variable with: '$ExecutablePath'"
+	# Ensure that 'ffmpeg' is installed.
+	if ((Test-Path -Path "$Path\bin\ffmpeg.exe") -eq $false -or (Test-Path -Path "$Path\bin\ffplay.exe") -eq $false -or (Test-Path -Path "$Path\bin\ffprobe.exe") -eq $false) {
+		Write-Log -ConsoleOnly -Severity 'Warning' -Message "One or more of the ffmpeg executables were not found in '$Path\bin\'."
 
-    # If the '-LocalShortcut' parameter is provided, create a shortcut in the same directory as the
-    # youtube-dl.ps1 script that is used to run it.
+		Get-Ffmpeg -Path "$Path\bin"
+	}
+
+	# Ensure that the script files are installed.
+	if ((Test-Path -Path "$Path\bin\youtube-dl.psm1") -eq $false -or (Test-Path -Path "$Path\bin\youtube-dl-gui.ps1") -eq $false) {
+		Write-Log -ConsoleOnly -Severity 'Warning' -Message "One or more of the PowerShell script files were not found in '$Path\bin\'."
+
+		$InstallFileList = @('youtube-dl.psm1', 'youtube-dl-gui.ps1', 'LICENSE.txt', 'README.md')
+		foreach ($Item in $InstallFileList) {
+			Get-Download -Url "https://github.com/mpb10/PowerShell-Youtube-dl/raw/$Branch/$Item" -Path "$Path\bin\$Item"
+		}
+	}
+
+	# Ensure that the 'bin' directory containing the executable files is in the system PATH variable.
+	if ($ENV:PATH -notcontains "$Path\bin") {
+		Write-Log -ConsoleOnly -Severity 'Warning' -Message "The '$Path\bin\' directory was not found in the system PATH variable."
+
+		# Add the bin directory to the system PATH variable.
+		if ($ENV:PATH.LastIndexOf(';') -eq ($ENV:PATH.Length - 1)) {
+			$ENV:PATH += "$Path\bin"
+		}
+		else {
+			$ENV:PATH += ";$Path\bin"
+		}
+
+		# Check that the bin directory was actually added to the system PATH variable.
+		if ($ENV:PATH -contains "$Path\bin") {
+			Write-Log -ConsoleOnly -Severity 'Info' -Message "Added the '$Path\bin\' directory to the system PATH variable."
+		} else {
+			return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to add the '$Path\bin\' directory to the system PATH variable."
+		}
+	}
+	
+	# If the '-LocalShortcut' parameter is provided, create a shortcut in the same directory as
+	# the 'youtube-dl-gui.ps1' script that is used to run it.
     if ($LocalShortcut) {
-        New-Shortcut -Path "$Path\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe | Select-Object -Property 'Source') -Arguments "-ExecutionPolicy Bypass -File ""$Path\youtube-dl.ps1""" -StartPath $Path
-        if (Test-Path -Path "$Path\Youtube-dl.lnk") {
-            Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a shortcut for running youtube-dl.ps1 at: '$Path\Youtube-dl.lnk'"
+        New-Shortcut -Path "$Path\PowerShell-Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe | Select-Object -Property 'Source') -Arguments "-ExecutionPolicy Bypass -File ""$Path\bin\youtube-dl-gui.ps1""" -StartPath "$Path\bin"
+        
+		if (Test-Path -Path "$Path\PowerShell-Youtube-dl.lnk") {
+            Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a shortcut for running youtube-dl-gui.ps1 at: '$Path\PowerShell-Youtube-dl.lnk'"
         }
         else {
-            return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to create a shortcut at: '$Path\Youtube-dl.lnk'"
+            return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to create a shortcut at: '$Path\PowerShell-Youtube-dl.lnk'"
         }
     }
 
     # If the '-DesktopShortcut' parameter is provided, create a shortcut on the desktop that is used
-    # to run the youtube-dl.ps1 script.
-    if ($DesktopShortcut -eq $true) {
+    # to run the 'youtube-dl-gui.ps1' script.
+    if ($DesktopShortcut) {
         $DesktopPath = [environment]::GetFolderPath('Desktop')
-        New-Shortcut -Path "$DesktopPath\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe | Select-Object -Property 'Source') -Arguments "-ExecutionPolicy Bypass -File ""$Path\youtube-dl.ps1""" -StartPath $Path
-        if (Test-Path -Path "$DesktopPath\Youtube-dl.lnk") {
-            Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a shortcut for running youtube-dl.ps1 at: '$DesktopPath\Youtube-dl.lnk'"
+        New-Shortcut -Path "$DesktopPath\PowerShell-Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe | Select-Object -Property 'Source') -Arguments "-ExecutionPolicy Bypass -File ""$Path\bin\youtube-dl-gui.ps1""" -StartPath "$Path\bin"
+        
+		if (Test-Path -Path "$DesktopPath\PowerShell-Youtube-dl.lnk") {
+            Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a shortcut for running youtube-dl-gui.ps1 at: '$DesktopPath\PowerShell-Youtube-dl.lnk'"
         }
         else {
-            return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to create a shortcut at: '$DesktopPath\Youtube-dl.lnk'"
+            return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to create a shortcut at: '$DesktopPath\PowerShell-Youtube-dl.lnk'"
         }
     }
 
-    # If the '-StartMenuShortcut' parameter is provided, create a start menu folder containing a shortcut
-    # used to run the youtube-dl.ps1 script.
-    if ($StartMenuShortcut -eq $true) {
+    # If the '-StartMenuShortcut' parameter is provided, create a start menu directory containing a shortcut
+    # used to run the 'youtube-dl-gui.ps1' script.
+    if ($StartMenuShortcut) {
         $AppDataPath = [Environment]::GetFolderPath('ApplicationData')
-        if ((Test-Path -Path "$AppDataPath\Microsoft\Windows\Start Menu\Programs\Youtube-dl" -PathType 'Container') -eq $false) {
-            New-Item -Type 'Directory' -Path "$AppDataPath\Microsoft\Windows\Start Menu\Programs\Youtube-dl" | Out-Null
+        if ((Test-Path -Path "$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl" -PathType 'Container') -eq $false) {
+            New-Item -Type 'Directory' -Path "$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl" | Out-Null
         }
-
-        New-Shortcut -Path "$AppDataPath\Microsoft\Windows\Start Menu\Programs\Youtube-dl\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe | Select-Object -Property 'Source') -Arguments "-ExecutionPolicy Bypass -File ""$Path\youtube-dl.ps1""" -StartPath $Path
-        if (Test-Path -Path "$AppDataPath\Microsoft\Windows\Start Menu\Programs\Youtube-dl\Youtube-dl.lnk") {
-            Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a start menu folder and shortcut for running youtube-dl.ps1 at: '$AppDataPath\Microsoft\Windows\Start Menu\Programs\Youtube-dl\Youtube-dl.lnk'"
+        New-Shortcut -Path "$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl\PowerShell-Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe | Select-Object -Property 'Source') -Arguments "-ExecutionPolicy Bypass -File ""$Path\bin\youtube-dl-gui.ps1""" -StartPath "$Path\bin"
+        
+		if (Test-Path -Path "$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl\PowerShell-Youtube-dl.lnk") {
+            Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a start menu folder and shortcut for running youtube-dl-gui.ps1 at: '$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl\PowerShell-Youtube-dl.lnk'"
         }
         else {
-            return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to create a shortcut at: '$AppDataPath\Microsoft\Windows\Start Menu\Programs\Youtube-dl\Youtube-dl.lnk'"
+            return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to create a shortcut at: '$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl\PowerShell-Youtube-dl.lnk'"
         }
     }
 } # End Install-Script function
@@ -535,7 +568,7 @@ function Get-VideoPlaylist {
             Mandatory = $false,
             HelpMessage = 'Additional youtube-dl options to pass to the download command.')]
         [string]
-        $YoutubeDlOptions = "-o ""$Path\%(title)s.%(ext)s"" --console-title --ignore-errors --cache-dir ""$Path""",
+        $YoutubeDlOptions = "-o ""$Path\%(title)s.%(ext)s"" --console-title --ignore-errors --cache-dir ""$Path"" --no-mtime --yes-playlist",
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'The path to the directory containing the youtube-dl and ffmpeg executable files.')]
@@ -569,4 +602,63 @@ function Get-VideoPlaylist {
     }
 
     Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloaded videos from $($PlaylistUrls.Count) playlists to '$Path'."
+}
+
+
+
+function Get-AudioPlaylist {
+    param (
+        [Parameter(
+            Mandatory = $false,
+            HelpMessage = 'Path to the file containing a list of playlist URLs to download.')]
+        [string]
+        $PlaylistFilePath,
+        [Parameter(
+            Mandatory = $false,
+            HelpMessage = 'Array object containing a list of playlist URLs to download.')]
+        [array]
+        $UrlList = @(),
+        [Parameter(
+            Mandatory = $false,
+            HelpMessage = 'Download the video''s audio to this directory.')]
+        [string]
+        $Path = (Get-Location),
+        [Parameter(
+            Mandatory = $false,
+            HelpMessage = 'Additional youtube-dl options to pass to the download command.')]
+        [string]
+        $YoutubeDlOptions = "-o ""$Path\%(title)s.%(ext)s"" --console-title --ignore-errors --cache-dir ""$Path"" --no-mtime --yes-playlist",
+        [Parameter(
+            Mandatory = $false,
+            HelpMessage = 'The path to the directory containing the youtube-dl and ffmpeg executable files.')]
+        [string]
+        $ExecutablePath
+    )
+
+    # Ensure that one of the 'Get-Playlist' options was provided to the command and then run it.
+    $GetPlaylistOptions = ''
+    if (Test-Path Variable:PlaylistFilePath) {
+        $GetPlaylistOptions = "-Path $PlaylistFilePath"
+    } elseif (Test-Path Variable:UrlList) {
+        $GetPlaylistOptions = "-UrlList $UrlList"
+    } else {
+        return Write-Log -ConsoleOnly -Severity 'Error' -Message 'Neither ''-UrlList'' or ''-PlaylistFilePath'' parameters were provided.'
+    }
+    $PlaylistUrls = Get-Playlist $GetPlaylistOptions
+    
+    # Ensure that the '$YoutubeDlOptions parameter contains the '--yes-playlist' youtube-dl option.
+    if ($YoutubeDlOptions -notcontains 'yes-playlist') {
+        $YoutubeDlOptions = $YoutubeDlOptions + ' --yes-playlist'
+    }
+
+    # Download each playlist URL.
+    foreach ($UrlItem in $PlaylistUrls ) {
+        if (Test-Path Variable:ExecutablePath) {
+            Get-Audio -Path $Path -Url $UrlItem -YoutubeDlOptions $YoutubeDlOptions -ExecutablePath $ExecutablePath
+        } else {
+            Get-Audio -Path $Path -Url $UrlItem -YoutubeDlOptions $YoutubeDlOptions
+        }
+    }
+
+    Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloaded video audio from $($PlaylistUrls.Count) playlists to '$Path'."
 }
