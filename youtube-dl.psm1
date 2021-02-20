@@ -22,7 +22,7 @@ function Wait-Script {
     # If the '-NonInteractive' parameter is false, wait for the user to press a key before continuing.
     if ($NonInteractive -eq $false) {
 		Write-Host "Press any key to continue ...`n" -ForegroundColor "Gray"
-	    $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp")
+	    $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp") | Out-Null
 	}
 } # End Wait-Script function
 
@@ -347,7 +347,7 @@ function Install-Script {
             
             # Ensure that the shortcut was created.
             if (Test-Path -Path "$Path\Youtube-dl.lnk") {
-                Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a shortcut for running youtube-dl-gui.ps1 at: '$Path\Youtube-dl.lnk'"
+                Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a shortcut for running 'youtube-dl-gui.ps1' at: '$Path\Youtube-dl.lnk'"
             }
             else {
                 return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to create a shortcut at: '$Path\Youtube-dl.lnk'"
@@ -369,7 +369,7 @@ function Install-Script {
             
             # Ensure that the shortcut was created.
             if (Test-Path -Path "$DesktopPath\Youtube-dl.lnk") {
-                Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a shortcut for running youtube-dl-gui.ps1 at: '$DesktopPath\Youtube-dl.lnk'"
+                Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a shortcut for running 'youtube-dl-gui.ps1' at: '$DesktopPath\Youtube-dl.lnk'"
             }
             else {
                 return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to create a shortcut at: '$DesktopPath\Youtube-dl.lnk'"
@@ -397,7 +397,7 @@ function Install-Script {
             
             # Ensure that the shortcut was created.
             if (Test-Path -Path "$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl\Youtube-dl.lnk") {
-                Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a start menu directory and shortcut for running youtube-dl-gui.ps1 at: '$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl\Youtube-dl.lnk'"
+                Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a start menu directory and shortcut for running 'youtube-dl-gui.ps1' at: '$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl\Youtube-dl.lnk'"
             }
             else {
                 return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to create a shortcut at: '$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl\Youtube-dl.lnk'"
