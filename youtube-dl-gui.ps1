@@ -65,9 +65,9 @@ if (Test-Path -Path "$PSScriptRoot\youtube-dl.psm1") {
 # Install the script, executables, and shortcuts.
 Install-Script -Path $DefaultScriptInstallLocation -Branch $DefaultRepositoryBranch -LocalShortcut -StartMenuShortcut
 
-# If the 'youtube-dl' PowerShell module was not imported before running this script, then remove the module.
-if ($null -eq $CheckModuleState) { Remove-Module 'youtube-dl' }
-
-Write-Host "script complete"
+Write-Log -ConsoleOnly -Severity 'Info' -Message "Script complete."
 
 Wait-Script
+
+# If the 'youtube-dl' PowerShell module was not imported before running this script, then remove the module.
+if ($null -eq $CheckModuleState) { Remove-Module 'youtube-dl' }
