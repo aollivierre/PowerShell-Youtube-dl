@@ -119,19 +119,19 @@ function New-Shortcut {
         $IconPath
     )
 
-    $TargetPath = Resolve-Path -Path $TargetPath
+    $FullTargetPath = Resolve-Path -Path $TargetPath
 
     # Create the WScript.Shell object, assign it a file path, target path, and other optional settings.
     $WScriptShell = New-Object -ComObject WScript.Shell
     $Shortcut = $WScriptShell.CreateShortcut($Path)
-    $Shortcut.TargetPath = $TargetPath
-    if (Test-Path Variable:Arguments) {
+    $Shortcut.TargetPath = $FullTargetPath.Path
+    if ($Arguments) {
         $Shortcut.Arguments = $Arguments
     }
-    if (Test-Path Variable:StartPath) {
+    if ($StartPath) {
         $Shortcut.WorkingDirectory = $StartPath
     }
-    if (Test-Path Variable:IconPath) {
+    if ($IconPath) {
         $Shortcut.IconLocation = $IconPath
     }
     $Shortcut.Save()
@@ -309,18 +309,18 @@ function Install-Script {
 	}
 
 	# Ensure that the script files are installed.
-	if ((Test-Path -Path "$Path\bin\youtube-dl.psm1") -eq $false -or (Test-Path -Path "$Path\bin\youtube-dl-gui.ps1") -eq $false) {
-		Write-Log -ConsoleOnly -Severity 'Warning' -Message "One or more of the PowerShell script files were not found in '$Path\bin\'."
+	if ((Test-Path -Path "$Path\bin\youtube-dl.psm1") -eq $false -or (Test-Path -Path "$Path\bin\youtube-dl-gui.ps1") -eq $false -or (Test-Path -Path "$Path\README.md") -eq $false -or (Test-Path -Path "$Path\LICENSE") -eq $false) {
+		Write-Log -ConsoleOnly -Severity 'Warning' -Message "One or more of the PowerShell script files were not found in '$Path\'."
 
-		$InstallFileList = @('youtube-dl.psm1', 'youtube-dl-gui.ps1', 'LICENSE.txt', 'README.md')
-		foreach ($Item in $InstallFileList) {
-			Get-Download -Url "https://github.com/mpb10/PowerShell-Youtube-dl/raw/$Branch/$Item" -Path "$Path\bin\$Item"
-		}
+		Get-Download -Url "https://github.com/mpb10/PowerShell-Youtube-dl/raw/$Branch/youtube-dl.psm1" -Path "$Path\bin\youtube-dl.psm1"
+		Get-Download -Url "https://github.com/mpb10/PowerShell-Youtube-dl/raw/$Branch/youtube-dl-gui.ps1" -Path "$Path\bin\youtube-dl-gui.ps1"
+		Get-Download -Url "https://github.com/mpb10/PowerShell-Youtube-dl/raw/$Branch/README.md" -Path "$Path\README.md"
+		Get-Download -Url "https://github.com/mpb10/PowerShell-Youtube-dl/raw/$Branch/LICENSE" -Path "$Path\LICENSE"        
 	}
 
 	# Ensure that the 'bin' directory containing the executable files is in the system PATH variable.
-	if ($ENV:PATH -notcontains "$Path\bin") {
-		Write-Log -ConsoleOnly -Severity 'Warning' -Message "The '$Path\bin\' directory was not found in the system PATH variable."
+	if ($ENV:PATH -notlike "*;$Path\bin*") {
+		Write-Log -ConsoleOnly -Severity 'Warning' -Message "The '$Path\bin' directory was not found in the system PATH variable."
 
 		# Add the bin directory to the system PATH variable.
 		if ($ENV:PATH.LastIndexOf(';') -eq ($ENV:PATH.Length - 1)) {
@@ -331,55 +331,81 @@ function Install-Script {
 		}
 
 		# Check that the bin directory was actually added to the system PATH variable.
-		if ($ENV:PATH -contains "$Path\bin") {
-			Write-Log -ConsoleOnly -Severity 'Info' -Message "Added the '$Path\bin\' directory to the system PATH variable."
+		if ($ENV:PATH -like "*;$Path\bin*") {
+			Write-Log -ConsoleOnly -Severity 'Info' -Message "Added the '$Path\bin' directory to the system PATH variable."
 		} else {
-			return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to add the '$Path\bin\' directory to the system PATH variable."
+			return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to add the '$Path\bin' directory to the system PATH variable."
 		}
 	}
 	
 	# If the '-LocalShortcut' parameter is provided, create a shortcut in the same directory as
 	# the 'youtube-dl-gui.ps1' script that is used to run it.
     if ($LocalShortcut) {
-        New-Shortcut -Path "$Path\PowerShell-Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe | Select-Object -Property 'Source') -Arguments "-ExecutionPolicy Bypass -File ""$Path\bin\youtube-dl-gui.ps1""" -StartPath "$Path\bin"
-        
-		if (Test-Path -Path "$Path\PowerShell-Youtube-dl.lnk") {
-            Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a shortcut for running youtube-dl-gui.ps1 at: '$Path\PowerShell-Youtube-dl.lnk'"
+        if ((Test-Path -Path "$Path\Youtube-dl.lnk") -eq $false) {
+            # Create the shortcut.
+            New-Shortcut -Path "$Path\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe).Source -Arguments "-ExecutionPolicy Bypass -File ""$Path\bin\youtube-dl-gui.ps1""" -StartPath "$Path\bin"
+            
+            # Ensure that the shortcut was created.
+            if (Test-Path -Path "$Path\Youtube-dl.lnk") {
+                Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a shortcut for running youtube-dl-gui.ps1 at: '$Path\Youtube-dl.lnk'"
+            }
+            else {
+                return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to create a shortcut at: '$Path\Youtube-dl.lnk'"
+            }
         }
-        else {
-            return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to create a shortcut at: '$Path\PowerShell-Youtube-dl.lnk'"
-        }
+
+        # Recreate the shortcut so that its values are up-to-date.
+        New-Shortcut -Path "$Path\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe).Source -Arguments "-ExecutionPolicy Bypass -File ""$Path\bin\youtube-dl-gui.ps1""" -StartPath "$Path\bin"
     }
 
     # If the '-DesktopShortcut' parameter is provided, create a shortcut on the desktop that is used
     # to run the 'youtube-dl-gui.ps1' script.
     if ($DesktopShortcut) {
         $DesktopPath = [environment]::GetFolderPath('Desktop')
-        New-Shortcut -Path "$DesktopPath\PowerShell-Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe | Select-Object -Property 'Source') -Arguments "-ExecutionPolicy Bypass -File ""$Path\bin\youtube-dl-gui.ps1""" -StartPath "$Path\bin"
-        
-		if (Test-Path -Path "$DesktopPath\PowerShell-Youtube-dl.lnk") {
-            Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a shortcut for running youtube-dl-gui.ps1 at: '$DesktopPath\PowerShell-Youtube-dl.lnk'"
+
+        if ((Test-Path -Path "$DesktopPath\Youtube-dl.lnk") -eq $false) {
+            # Create the shortcut.
+            New-Shortcut -Path "$DesktopPath\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe).Source -Arguments "-ExecutionPolicy Bypass -File ""$Path\bin\youtube-dl-gui.ps1""" -StartPath "$Path\bin"
+            
+            # Ensure that the shortcut was created.
+            if (Test-Path -Path "$DesktopPath\Youtube-dl.lnk") {
+                Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a shortcut for running youtube-dl-gui.ps1 at: '$DesktopPath\Youtube-dl.lnk'"
+            }
+            else {
+                return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to create a shortcut at: '$DesktopPath\Youtube-dl.lnk'"
+            }
         }
-        else {
-            return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to create a shortcut at: '$DesktopPath\PowerShell-Youtube-dl.lnk'"
-        }
+
+        # Recreate the shortcut so that its values are up-to-date.
+        New-Shortcut -Path "$DesktopPath\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe).Source -Arguments "-ExecutionPolicy Bypass -File ""$Path\bin\youtube-dl-gui.ps1""" -StartPath "$Path\bin"
     }
 
     # If the '-StartMenuShortcut' parameter is provided, create a start menu directory containing a shortcut
     # used to run the 'youtube-dl-gui.ps1' script.
     if ($StartMenuShortcut) {
         $AppDataPath = [Environment]::GetFolderPath('ApplicationData')
-        if ((Test-Path -Path "$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl" -PathType 'Container') -eq $false) {
-            New-Item -Type 'Directory' -Path "$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl" | Out-Null
+
+        if ((Test-Path -Path "$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl\Youtube-dl.lnk") -eq $false) {
+
+            # Ensure the start menu directory exists.
+            if ((Test-Path -Path "$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl" -PathType 'Container') -eq $false) {
+                New-Item -Type 'Directory' -Path "$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl" | Out-Null
+            }
+
+            # Create the shortcut.
+            New-Shortcut -Path "$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe).Source -Arguments "-ExecutionPolicy Bypass -File ""$Path\bin\youtube-dl-gui.ps1""" -StartPath "$Path\bin"
+            
+            # Ensure that the shortcut was created.
+            if (Test-Path -Path "$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl\Youtube-dl.lnk") {
+                Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a start menu directory and shortcut for running youtube-dl-gui.ps1 at: '$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl\Youtube-dl.lnk'"
+            }
+            else {
+                return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to create a shortcut at: '$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl\Youtube-dl.lnk'"
+            }
         }
-        New-Shortcut -Path "$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl\PowerShell-Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe | Select-Object -Property 'Source') -Arguments "-ExecutionPolicy Bypass -File ""$Path\bin\youtube-dl-gui.ps1""" -StartPath "$Path\bin"
-        
-		if (Test-Path -Path "$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl\PowerShell-Youtube-dl.lnk") {
-            Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a start menu folder and shortcut for running youtube-dl-gui.ps1 at: '$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl\PowerShell-Youtube-dl.lnk'"
-        }
-        else {
-            return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to create a shortcut at: '$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl\PowerShell-Youtube-dl.lnk'"
-        }
+
+        # Recreate the shortcut so that its values are up-to-date.
+        New-Shortcut -Path "$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe).Source -Arguments "-ExecutionPolicy Bypass -File ""$Path\bin\youtube-dl-gui.ps1""" -StartPath "$Path\bin"
     }
 } # End Install-Script function
 

@@ -48,13 +48,26 @@ $DefaultRepositoryBranch = 'version-2.1.0'
 # MAIN FUNCTION
 # ======================================================================================================= #
 
-$CheckModule = Get-Command -Module 'youtube-dl'
-Import-Module -Force ".\youtube-dl.psm1"
+# Save whether the 'youtube-dl' PowerShell module was already imported or not.
+$CheckModuleState = Get-Command -Module 'youtube-dl'
 
-Clear-Host
+# Import the 'youtube-dl.psm1' PowerShell module.
+if (Test-Path -Path "$PSScriptRoot\youtube-dl.psm1") {
+	Import-Module -Force "$PSScriptRoot\youtube-dl.psm1"
+} elseif (Test-Path -Path "$(Get-Location)\youtube-dl.psm1") {
+	Import-Module -Force "$(Get-Location)\youtube-dl.psm1"
+} elseif (Test-Path -Path "$DefaultScriptInstallLocation\bin\youtube-dl.psm1") {
+	Import-Module -Force "$DefaultScriptInstallLocation\bin\youtube-dl.psm1"
+} else {
+	return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to find and import the 'youtube-dl.psm1' PowerShell module."
+}
 
+# Install the script, executables, and shortcuts.
 Install-Script -Path $DefaultScriptInstallLocation -Branch $DefaultRepositoryBranch -LocalShortcut -StartMenuShortcut
 
-if ($null -eq $CheckModule) { Remove-Module 'youtube-dl' }
+# If the 'youtube-dl' PowerShell module was not imported before running this script, then remove the module.
+if ($null -eq $CheckModuleState) { Remove-Module 'youtube-dl' }
 
 Write-Host "script complete"
+
+Wait-Script
