@@ -102,6 +102,7 @@ function New-Shortcut {
             HelpMessage = 'The full path of the shortcut to create.')]
         [string]
         $Path = "$(Get-Location)\newshortcut.lnk",
+
         [Parameter(
             Mandatory = $true,
             HelpMessage = 'The target path of the shortcut.')]
@@ -263,7 +264,7 @@ function Get-Ffmpeg {
 
 
 
-# Function for downloading and installing the youtube-dl.ps1 script file and creating shortcuts to run it.
+# Function for downloading and installing PowerShell-Youtube-dl script files and executables.
 function Install-Script {
     param (
         [Parameter(
@@ -271,6 +272,7 @@ function Install-Script {
             HelpMessage = 'The directory to install the ''PowerShell-Youtube-dl'' script and executables to.')]
         [string]
         $Path,
+
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'The branch of the ''PowerShell-Youtube-dl'' GitHub repository to download from.')]
@@ -433,7 +435,7 @@ function Install-Script {
 
 
 
-# Function for downloading and installing the youtube-dl.ps1 script file and creating shortcuts to run it.
+# Function for uninstalling the PowerShell-Youtube-dl script files and directories.
 function Uninstall-Script {
     param (
         [Parameter(
@@ -441,6 +443,7 @@ function Uninstall-Script {
             HelpMessage = 'The directory where the ''PowerShell-Youtube-dl'' script and executables are currently installed to.')]
         [string]
         $Path,
+
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Whether to remove all files that reside in the ''PowerShell-Youtube-dl'' install directory.')]
@@ -495,7 +498,7 @@ function Uninstall-Script {
     }
 
     Write-Log -ConsoleOnly -Severity 'Info' -Message 'Finished uninstalling ''PowerShell-Youtube-dl''.'
-} # End Install-Script function
+} # End Uninstall-Script function
 
 
 
@@ -506,6 +509,7 @@ function Get-Video {
             HelpMessage = 'The URL of the video to download.')]
         [string]
         $Url,
+
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Download the video to this directory.')]
@@ -526,10 +530,10 @@ function Get-Video {
     )
 
     $Path = Resolve-Path -Path $Path
-    $Url = $Url.Trim()
+    $Url = "'$($Url.Trim())'"
     $YoutubeDlOptions = $YoutubeDlOptions.Trim()
     
-    if (Test-Path Variable:ExecutablePath) {
+    if ($ExecutablePath) {
         $ExecutablePath = $ExecutablePath.Trim()
         $DownloadCommand = "$ExecutablePath\youtube-dl $YoutubeDlOptions $Url"
     } else {
@@ -553,7 +557,7 @@ function Get-Video {
         return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to find 'ffmpeg' in the system PATH variable."
     }
 
-    Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloading video from URL '$Url' to '$Path' using youtube-dl options of '$YoutubeDlOptions'." ### Might need to add more to $Path so that it includes the file name too.
+    Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloading video from URL $Url to '$Path' using youtube-dl options of '$YoutubeDlOptions'."
     Invoke-Expression $DownloadCommand
 } # End Get-Video function
 
@@ -566,16 +570,19 @@ function Get-Audio {
             HelpMessage = 'The URL of the video to download audio from.')]
         [string]
         $Url,
+
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Download the video''s audio to this directory.')]
         [string]
         $Path = (Get-Location),
+
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Additional youtube-dl options to pass to the download command.')]
         [string]
         $YoutubeDlOptions = "-o ""$Path\%(title)s.%(ext)s"" --console-title --ignore-errors --cache-dir ""$Path"" --no-mtime --no-playlist",
+
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'The path to the directory containing the youtube-dl and ffmpeg executable files.')]
@@ -584,10 +591,10 @@ function Get-Audio {
     )
 
     $Path = Resolve-Path -Path $Path
-    $Url = $Url.Trim()
+    $Url = "'$($Url.Trim())'"
     $YoutubeDlOptions = $YoutubeDlOptions.Trim()
 
-    if (Test-Path Variable:ExecutablePath) {
+    if ($ExecutablePath) {
         $ExecutablePath = $ExecutablePath.Trim()
         $DownloadCommand = "$ExecutablePath\youtube-dl $YoutubeDlOptions $Url"
     } else {
@@ -611,7 +618,7 @@ function Get-Audio {
         return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to find 'ffmpeg' in the system PATH variable."
     }
 
-    Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloading audio from URL of '$Url' to '$Path' using youtube-dl options of '$YoutubeDlOptions'." ### Might need to add more to $Path so that it includes the file name too.
+    Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloading audio from URL of $Url to '$Path' using youtube-dl options of '$YoutubeDlOptions'."
     Invoke-Expression $DownloadCommand
 } # End Get-Audio function
 
