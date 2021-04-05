@@ -9,6 +9,7 @@ function Wait-Script {
             HelpMessage = 'If true, do not wait for user input.')]
         [switch]
         $NonInteractive = $false,
+        
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Number of seconds to wait.')]
@@ -36,22 +37,26 @@ function Write-Log {
             HelpMessage = 'The message to output to the log.')]
         [string]
         $Message,
+
         [Parameter(
             Mandatory = $true,
             HelpMessage = 'The severity level of the message to log.')]
         [ValidateSet('Info','Warning','Error','Prompt')]
         [string]
         $Severity,
+
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Location of the log file.')]
         [string]
         $FilePath = "$(Get-Location)\powershell-youtube-dl.log",
+
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Whether to output to the console in addition to the log file.')]
         [switch]
         $Console = $false,
+
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Whether to output only to the console.')]
@@ -102,16 +107,19 @@ function New-Shortcut {
             HelpMessage = 'The target path of the shortcut.')]
         [string]
         $TargetPath,
+
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Arguments to pass to the target path when the shortcut is ran.')]
         [string]
         $Arguments,
+
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'The directory from which to run the target path.')]
         [string]
         $StartPath,
+        
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Path to the file used as the icon.')]
@@ -147,6 +155,7 @@ function Get-Download {
             HelpMessage = 'Web URL of the file to download.')]
         [string]
         $Url,
+
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'The full path of where to download the file to.')]
@@ -267,16 +276,19 @@ function Install-Script {
             HelpMessage = 'The branch of the ''PowerShell-Youtube-dl'' GitHub repository to download from.')]
         [string]
         $Branch = 'master',
+
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Whether to create a local shortcut that is used to run the ''youtube-dl-gui.ps1'' script.')]
         [switch]
         $LocalShortcut = $false,
+        
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Whether to create a desktop shortcut that is used to run the ''youtube-dl-gui.ps1'' script.')]
         [switch]
         $DesktopShortcut = $false,
+        
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Whether to create a start menu shortcut that is used to run the ''youtube-dl-gui.ps1'' script.')]
@@ -292,6 +304,16 @@ function Install-Script {
 	# Ensure that the 'bin' directory is present.
 	if ((Test-Path -Path "$Path\bin" -PathType 'Container') -eq $false) {
 		New-Item -Type 'Directory' -Path "$Path\bin" | Out-Null
+	}
+
+	# Ensure that the 'var' directory is present.
+	if ((Test-Path -Path "$Path\var" -PathType 'Container') -eq $false) {
+		New-Item -Type 'Directory' -Path "$Path\var" | Out-Null
+	}
+
+	# Ensure that the 'etc' directory is present.
+	if ((Test-Path -Path "$Path\etc" -PathType 'Container') -eq $false) {
+		New-Item -Type 'Directory' -Path "$Path\etc" | Out-Null
 	}
 
 	# Ensure that 'youtube-dl' is installed.
@@ -411,6 +433,72 @@ function Install-Script {
 
 
 
+# Function for downloading and installing the youtube-dl.ps1 script file and creating shortcuts to run it.
+function Uninstall-Script {
+    param (
+        [Parameter(
+            Mandatory = $true,
+            HelpMessage = 'The directory where the ''PowerShell-Youtube-dl'' script and executables are currently installed to.')]
+        [string]
+        $Path,
+        [Parameter(
+            Mandatory = $false,
+            HelpMessage = 'Whether to remove all files that reside in the ''PowerShell-Youtube-dl'' install directory.')]
+        [switch]
+        $Force = $false
+    )
+    $DesktopPath = [environment]::GetFolderPath('Desktop')
+    $AppDataPath = [Environment]::GetFolderPath('ApplicationData')
+
+    # Remove the script files, executables, and shortcuts
+    $FileList = @(
+        "$Path\bin\youtube-dl.exe",
+        "$Path\bin\ffmpeg.exe",
+        "$Path\bin\ffplay.exe",
+        "$Path\bin\ffprobe.exe",
+        "$Path\bin\youtube-dl.psm1",
+        "$Path\bin\youtube-dl-gui.ps1",
+        "$Path\README.md",
+        "$Path\LICENSE",
+        "$Path\Youtube-dl.lnk",
+        "$DesktopPath\Youtube-dl.lnk",
+        "$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl\Youtube-dl.lnk"
+    )
+    foreach ($Item in $FileList) {
+        try { 
+            Remove-Item -Path $Item -ErrorAction Stop
+        } catch [System.Management.Automation.ItemNotFoundException] {
+            Write-Log -ConsoleOnly -Severity 'Info' -Message "$_"
+        } catch {
+            return Write-Log -ConsoleOnly -Severity 'Error' -Message "$_"
+        }
+    }
+
+    # Remove the directories that were created by the script only if they are empty.
+    $FileListDirectories = @(
+        "$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl",
+        "$Path\bin",
+        "$Path\var",
+        "$Path\etc",
+        "$Path"
+    )
+    foreach ($Item in $FileListDirectories) {
+        if ((Get-ChildItem -Path $Item -Recurse | Measure-Object).Count -eq 0 -or $Force) {
+            try { 
+                Remove-Item -Path $Item -ErrorAction Stop
+            } catch [System.Management.Automation.ItemNotFoundException] {
+                Write-Log -ConsoleOnly -Severity 'Info' -Message "$_"
+            } catch {
+                return Write-Log -ConsoleOnly -Severity 'Error' -Message "$_"
+            }
+        }
+    }
+
+    Write-Log -ConsoleOnly -Severity 'Info' -Message 'Finished uninstalling ''PowerShell-Youtube-dl''.'
+} # End Install-Script function
+
+
+
 function Get-Video {
     param (
         [Parameter(
@@ -423,11 +511,13 @@ function Get-Video {
             HelpMessage = 'Download the video to this directory.')]
         [string]
         $Path = (Get-Location),
+
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Additional youtube-dl options to pass to the download command.')]
         [string]
         $YoutubeDlOptions = "-o ""$Path\%(title)s.%(ext)s"" --console-title --ignore-errors --cache-dir ""$Path"" --no-mtime --no-playlist",
+
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'The path to the directory containing the youtube-dl and ffmpeg executable files.')]
@@ -534,6 +624,7 @@ function Get-Playlist {
             HelpMessage = 'Path to the file containing a list of playlist URLs to download.')]
         [string]
         $Path,
+
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Array object containing a list of playlist URLs to download.')]
@@ -580,21 +671,25 @@ function Get-VideoPlaylist {
             HelpMessage = 'Path to the file containing a list of playlist URLs to download.')]
         [string]
         $PlaylistFilePath,
+
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Array object containing a list of playlist URLs to download.')]
         [array]
         $UrlList = @(),
+
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Download the video to this directory.')]
         [string]
         $Path = (Get-Location),
+
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Additional youtube-dl options to pass to the download command.')]
         [string]
         $YoutubeDlOptions = "-o ""$Path\%(title)s.%(ext)s"" --console-title --ignore-errors --cache-dir ""$Path"" --no-mtime --yes-playlist",
+
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'The path to the directory containing the youtube-dl and ffmpeg executable files.')]
@@ -639,21 +734,25 @@ function Get-AudioPlaylist {
             HelpMessage = 'Path to the file containing a list of playlist URLs to download.')]
         [string]
         $PlaylistFilePath,
+
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Array object containing a list of playlist URLs to download.')]
         [array]
         $UrlList = @(),
+
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Download the video''s audio to this directory.')]
         [string]
         $Path = (Get-Location),
+
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Additional youtube-dl options to pass to the download command.')]
         [string]
         $YoutubeDlOptions = "-o ""$Path\%(title)s.%(ext)s"" --console-title --ignore-errors --cache-dir ""$Path"" --no-mtime --yes-playlist",
+        
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'The path to the directory containing the youtube-dl and ffmpeg executable files.')]
