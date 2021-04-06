@@ -529,11 +529,13 @@ function Get-Video {
         $ExecutablePath
     )
 
-    $Path = Resolve-Path -Path $Path
+    if (Test-Path -Path $Path) {
+        $Path = Resolve-Path -Path $Path
+    }
     $Url = "'$($Url.Trim())'"
     $YoutubeDlOptions = $YoutubeDlOptions.Trim()
     
-    if ($ExecutablePath) {
+    if ($ExecutablePath.Length -gt 0) {
         $ExecutablePath = $ExecutablePath.Trim()
         $DownloadCommand = "$ExecutablePath\youtube-dl $YoutubeDlOptions $Url"
     } else {
@@ -590,11 +592,13 @@ function Get-Audio {
         $ExecutablePath
     )
 
-    $Path = Resolve-Path -Path $Path
+    if (Test-Path -Path $Path) {
+        $Path = Resolve-Path -Path $Path
+    }
     $Url = "'$($Url.Trim())'"
     $YoutubeDlOptions = $YoutubeDlOptions.Trim()
 
-    if ($ExecutablePath) {
+    if ($ExecutablePath.Length -gt 0) {
         $ExecutablePath = $ExecutablePath.Trim()
         $DownloadCommand = "$ExecutablePath\youtube-dl $YoutubeDlOptions $Url"
     } else {
@@ -624,6 +628,7 @@ function Get-Audio {
 
 
 
+# Function for retrieving an array of Youtube playlist URLs.
 function Get-Playlist {
     param (
         [Parameter(
@@ -638,34 +643,28 @@ function Get-Playlist {
         [array]
         $UrlList = @()
     )
-
-    if (Test-Path Variable:Path) {
+    
+    # If the '-UrlList' parameter was provided, check if it's a valid array.
+    if ($UrlList.Length -gt 0 -and $UrlList -isnot [array]) {
+        return Write-Log -ConsoleOnly -Severity 'Error' -Message 'Provided ''-UrlList'' parameter value is not an array or is empty.'
+        return @()
+    } 
+    
+    # If the '-Path' parameter was provided, check if it's a valid file and add its contents to the '$UrlList' variable.
+    if ($Path.Length -gt 0) {
         $Path = Resolve-Path -Path $Path
-    }
 
-    # If the '-Path' parameter was provided, check if it is a valid file and get its contents.
-    # Otherwise, check whether the value of the '-UrlList' parameter is an array.
-    if (Test-Path Variable:Path) {
         if ((Test-Path -Path $Path -PathType 'Leaf') -eq $false) {
             return Write-Log -ConsoleOnly -Severity 'Error' -Message 'Provided path either does not exist or is not a file.'
             return @()
         }
         else {
-            $UrlList = Get-Content -Path $Path | Where-Object { $_.Trim() -ne '' -and $_.Trim() -notmatch '^#.*' }
+            $UrlList += (Get-Content -Path $Path | Where-Object { $_.Trim() -ne '' -and $_.Trim() -notmatch '^#.*' })
         }
-    }
-    elseif ($UrlList -isnot [array] -or $UrlList.Length -eq 0) {
-        return Write-Log -ConsoleOnly -Severity 'Error' -Message 'Provided ''-UrlList'' parameter value is not an array or is empty.'
-        return @()
-    }
-
-    # If the '-Path' parameter was provided, get an array of string objects from that file and append it to '$UrlList'.
-    if (Test-Path Variable:Path) {
-        $UrlList += , (Get-Content -Path $Path | Where-Object { $_.Trim() -ne '' -and $_.Trim() -notmatch '^#.*' })
     }
 
     # Return an array of playlist URL string objects.
-    Write-Log -ConsoleOnly -Severity 'Info' -Message "Returning $($UrlList.Count) playlist URLs."
+    Write-Log -ConsoleOnly -Severity 'Info' -Message "Returning $($UrlList.Length) playlist URLs."
     return $UrlList
 } # End Get-Playlist function
 
