@@ -465,7 +465,8 @@ function Uninstall-Script {
         "$Path\LICENSE",
         "$Path\Youtube-dl.lnk",
         "$DesktopPath\Youtube-dl.lnk",
-        "$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl\Youtube-dl.lnk"
+        "$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl\Youtube-dl.lnk",
+        "$Path\var\cache\*.*"
     )
     foreach ($Item in $FileList) {
         try { 
@@ -477,18 +478,27 @@ function Uninstall-Script {
         }
     }
 
+    # Remove the '$Path\var\cache\' directory.
+    try { 
+        Remove-Item -Path "$Path\var\cache" -Recurse -Force -ErrorAction Stop
+    } catch [System.Management.Automation.ItemNotFoundException] {
+        Write-Log -ConsoleOnly -Severity 'Info' -Message "$_"
+    } catch {
+        return Write-Log -ConsoleOnly -Severity 'Error' -Message "$_"
+    }
+
     # Remove the directories that were created by the script only if they are empty.
     $FileListDirectories = @(
         "$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl",
         "$Path\bin",
-        "$Path\var",
         "$Path\etc",
+        "$Path\var",
         "$Path"
     )
     foreach ($Item in $FileListDirectories) {
         if ((Get-ChildItem -Path $Item -Recurse | Measure-Object).Count -eq 0 -or $Force) {
             try { 
-                Remove-Item -Path $Item -ErrorAction Stop
+                Remove-Item -Path $Item -Force -ErrorAction Stop
             } catch [System.Management.Automation.ItemNotFoundException] {
                 Write-Log -ConsoleOnly -Severity 'Info' -Message "$_"
             } catch {
