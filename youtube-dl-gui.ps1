@@ -32,16 +32,16 @@ $DefaultScriptInstallLocation = [environment]::GetFolderPath('UserProfile') + '\
 $DefaultPlaylistFileLocation = $DefaultScriptInstallLocation + '\etc\playlist-file.ini'
 $DefaultDownloadArchiveFileLocation = $DefaultScriptInstallLocation + '\var\download-archive.ini'
 
-$YoutubeDlOptionsList = @{
-    DefaultVideo = "-o ""$DefaultVideoSaveLocation\%(title)s.%(ext)s"" --cache-dir ""$DefaultScriptInstallLocation\var\cache"" --console-title --ignore-errors --no-mtime --no-playlist"
+$YoutubeDlOptionsList = [ordered]@{
+    DefaultVideo = "-o ""$DefaultVideoSaveLocation\%(title)s.%(ext)s"" --cache-dir ""$DefaultScriptInstallLocation\var\cache"" --console-title --ignore-errors --no-mtime --no-playlist -f best"
 	DefaultAudio = "-o ""$DefaultAudioSaveLocation\%(title)s.%(ext)s"" --cache-dir ""$DefaultScriptInstallLocation\var\cache"" --console-title --ignore-errors --no-mtime --no-playlist -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg"
     DefaultVideoPlaylist = "-o ""$VideoSaveLocation\%(playlist)s\%(title)s.%(ext)s"" --cache-dir ""$DefaultScriptInstallLocation\var\cache"" --console-title --ignore-errors --no-mtime --yes-playlist"
     DefaultAudioPlaylist = "-o ""$VideoSaveLocation\%(playlist)s\%(title)s.%(ext)s"" --cache-dir ""$DefaultScriptInstallLocation\var\cache"" --console-title --ignore-errors --no-mtime --yes-playlist -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg"
     DefaultVideoPlaylistFile = "-o ""$VideoSaveLocation\%(playlist)s\%(title)s.%(ext)s"" --cache-dir ""$DefaultScriptInstallLocation\var\cache"" --download-archive ""$DefaultDownloadArchiveFileLocation"" --console-title --ignore-errors --no-mtime --yes-playlist"
     DefaultAudioPlaylistFile = "-o ""$VideoSaveLocation\%(playlist)s\%(title)s.%(ext)s"" --cache-dir ""$DefaultScriptInstallLocation\var\cache"" --download-archive ""$DefaultDownloadArchiveFileLocation"" --console-title --ignore-errors --no-mtime --yes-playlist -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg"
-	Mp4 = ""
-    Webm = ""
-    Mp3 = ""
+	Mp4 = "-o ""$DefaultVideoSaveLocation\%(title)s.%(ext)s"" --cache-dir ""$DefaultScriptInstallLocation\var\cache"" --console-title --ignore-errors --no-mtime --no-playlist -f mp4"
+    Webm = "-o ""$DefaultVideoSaveLocation\%(title)s.%(ext)s"" --cache-dir ""$DefaultScriptInstallLocation\var\cache"" --console-title --ignore-errors --no-mtime --no-playlist -f webm"
+    Mp3 = "-o ""$DefaultAudioSaveLocation\%(title)s.%(ext)s"" --cache-dir ""$DefaultScriptInstallLocation\var\cache"" --console-title --ignore-errors --no-mtime --no-playlist -x --audio-format mp3 --audio-quality 0 --prefer-ffmpeg"
 }
 
 $DefaultRepositoryBranch = 'version-3.0.0'
@@ -64,7 +64,7 @@ Function Get-MainMenu {
 		Write-Host "`nPlease select an option:" -ForegroundColor "Yellow"
 		Write-Host "  1 - Download video"
 		Write-Host "  2 - Download audio"
-		Write-Host "  3 - Update executables, uninstall script, etc."
+		Write-Host "  3 - Update executables, open documentation, uninstall script, etc."
 		Write-Host "`n  0 - Exit`n" -ForegroundColor "Gray"
 		$MenuOption = Read-Host "Option"
 		
@@ -81,7 +81,7 @@ Function Get-MainMenu {
 			}
 			3 {
 				Clear-Host
-				Wait-Script
+				Get-MiscMenu
 				$MenuOption = $null
 			}
 			0 {
@@ -129,7 +129,7 @@ Function Get-DownloadMenu {
 	$MenuOption = $null
 	$DownloadFunction = "Get-$Type"
 
-	While ($MenuOption -notin @(1, 2, 3, 4, 0)) {
+	While ($MenuOption -notin @(1, 2, 3, 4, 5, 6, 0)) {
 		Clear-Host
 		Write-Host "================================================================================"
 		Write-Host "                                 Download $Type" -ForegroundColor "Yellow"
@@ -142,7 +142,8 @@ Function Get-DownloadMenu {
 		Write-Host "  2 - Configure URL"
 		Write-Host "  3 - Configure output path"
 		Write-Host "  4 - Configure youtube-dl options"
-		Write-Host "  5 - Get playlist URLs from file"
+		Write-Host "  5 - Configure format to download"
+		Write-Host "  6 - Get playlist URLs from file"
 		Write-Host "`n  0 - Cancel`n" -ForegroundColor "Gray"
 		$MenuOption = Read-Host 'Option'
 		
@@ -151,7 +152,7 @@ Function Get-DownloadMenu {
 				if ($Url -is [array]) {
 					Write-Host ""
 					foreach ($Item in $Url) {
-						& $DownloadFunction -Url $Item -Path $Path -YoutubeDlOptions $YoutubeDlOptions
+						& $DownloadFunction -Url $Item -Path $Path -YoutubeDlOptions $YoutubeDlOptions.Trim()
 
 						if ($LastExitCode -eq 0) {
 							Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloaded $Type successfully."
@@ -165,7 +166,7 @@ Function Get-DownloadMenu {
 					Wait-Script
 				} else {
 					Write-Host ""
-					& $DownloadFunction -Url $Url -Path $Path -YoutubeDlOptions $YoutubeDlOptions
+					& $DownloadFunction -Url $Url -Path $Path -YoutubeDlOptions $YoutubeDlOptions.Trim()
 
 					if ($LastExitCode -eq 0) {
 						Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloaded $Type successfully."
@@ -190,7 +191,7 @@ Function Get-DownloadMenu {
 				$MenuOption = $null
 			}
 			4 {
-				Write-Host "`nEnter the name of the youtube-dl options preset or the youtube-dl options themselves ([Enter] to display presets)."
+				Write-Host "`nEnter the name of the youtube-dl options preset or the youtube-dl options themselves ([Enter] to display presets).`n"
 				$DownloadOptions = Read-Host 'youtube-dl options'
 
 				while ($DownloadOptions.Length -eq 0) {
@@ -206,6 +207,50 @@ Function Get-DownloadMenu {
 				$MenuOption = $null
 			}
 			5 {
+				if ($Url -is [string] -and $Url -isnot [array] -and $Url.Length -gt 0) {
+					Write-Host ""
+					$TestUrlValidity = youtube-dl.exe -F "$URL"
+					if ($LastExitCode -ne 0) {
+						Write-Host "$TestUrlValidity" -ForegroundColor "Red"
+						Wait-Script
+					} else {
+						$AvailableFormats = youtube-dl.exe -F "$URL" | Where-Object { ! $_.StartsWith('[') -and ! $_.StartsWith('format code') -and $_ -match '^[0-9]{3}' } | ForEach-Object {
+							[PSCustomObject]@{
+								'FormatCode' = $_.Substring(0, 13).Trim() -as [Int]
+								'Extension' = $_.Substring(13, 11).Trim()
+								'Resolution' = $_.Substring(24, 11).Trim()
+								'ResolutionPixels' = $_.Substring(35, 6).Trim()
+								'Codec' = $_.Substring(41, $_.Length - 41).Trim() -replace '^.*, ([.\a-zA-Z0-9]+)@.*$', '$1'
+								'Description' = $_.Substring(41, $_.Length - 41).Trim()
+							}
+						}
+						$AvailableFormats | Format-Table
+						Write-Host "Enter the format code that you wish to download ([Enter] to cancel).`n"
+						$FormatOption = Read-Host 'Format code'
+		
+						while ($FormatOption.Trim() -notin $AvailableFormats.FormatCode -and $FormatOption.Trim() -ne '') {
+							Write-Host "`nPlease enter a valid option from the 'FormatCode' column.`n" -ForegroundColor "Red"
+							Wait-Script
+							$AvailableFormats | Format-Table
+							Write-Host "Enter the format code that you wish to download ([Enter] to cancel).`n"
+							$FormatOption = Read-Host 'Format code'	
+						}
+						
+						if ($FormatOption.Length -gt 0) {
+							if ($YoutubeDlOptions -clike '*-f*') {
+								$YoutubeDlOptions = ($YoutubeDlOptions + ' ') -replace '-f ([a-zA-Z0-9]+) ', "-f $FormatOption "
+							} else {
+								$YoutubeDlOptions = $YoutubeDlOptions + " -f $FormatOption"
+							}
+						}
+					}
+				} else {
+					Write-Host "`nCannot display the format options for multiple URLs. Please set only one URL first.`n" -ForegroundColor "Red"
+					Wait-Script
+				}
+				$MenuOption = $null
+			}
+			6 {
 				Write-Host ""
 				$Url = Get-Playlist -Path $DefaultPlaylistFileLocation
 
@@ -231,6 +276,94 @@ Function Get-DownloadMenu {
 		} # End Switch statement
 	} # End While loop
 } # End Get-DownloadMenu function
+
+
+
+# Display the main menu of the script.
+Function Get-MiscMenu {
+	$MenuOption = $null
+	While ($MenuOption -notin @(1, 2, 3, 4, 5, 6, 7, 0)) {
+		Clear-Host
+		Write-Host "================================================================================"
+		Write-Host "                             Miscellaneous Options" -ForegroundColor "Yellow"
+		Write-Host "================================================================================"
+		Write-Host "`nPlease select an option:" -ForegroundColor "Yellow"
+		Write-Host "  1 - Update the youtube-dl executable"
+		Write-Host "  2 - Update the ffmpeg executables"
+		Write-Host "  3 - Create a desktop shortcut"
+		Write-Host "  4 - Open PowerShell-Youtube-dl documentation"
+		Write-Host "  5 - Open youtube-dl documentation"
+		Write-Host "  6 - Open ffmpeg documentation"
+		Write-Host "  7 - Uninstall PowerShell-Youtube-dl"
+		Write-Host "`n  0 - Cancel`n" -ForegroundColor "Gray"
+		$MenuOption = Read-Host "Option"
+		
+		Switch ($MenuOption.Trim()) {
+			1 {
+				Write-Host ""
+				Get-YoutubeDl -Path ($DefaultScriptInstallLocation + '\bin')
+				Write-Host ""
+				Wait-Script
+				$MenuOption = $null
+			}
+			2 {
+				Write-Host ""
+				Get-Ffmpeg -Path ($DefaultScriptInstallLocation + '\bin')
+				Write-Host ""
+				Wait-Script
+				$MenuOption = $null
+			}
+			3 {
+				Write-Host ""
+				$DesktopPath = [environment]::GetFolderPath('Desktop')
+
+				# Recreate the shortcut so that its values are up-to-date.
+				New-Shortcut -Path "$DesktopPath\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe).Source -Arguments "-ExecutionPolicy Bypass -File ""$DefaultScriptInstallLocation\bin\youtube-dl-gui.ps1""" -StartPath "$DefaultScriptInstallLocation\bin"
+
+				# Ensure that the shortcut was created.
+				if (Test-Path -Path "$DesktopPath\Youtube-dl.lnk") {
+					Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a shortcut for running 'youtube-dl-gui.ps1' at: '$DesktopPath\Youtube-dl.lnk'"
+				}
+				else {
+					return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to create a shortcut at: '$DesktopPath\Youtube-dl.lnk'"
+				}
+				Write-Host ""
+				Wait-Script
+				$MenuOption = $null
+			}
+			4 {
+				Write-Host ""
+				Start-Process "https://github.com/mpb10/PowerShell-Youtube-dl/blob/$DefaultRepositoryBranch/README.md#readme"
+				$MenuOption = $null
+			}
+			5 {
+				Write-Host ""
+				Start-Process "https://github.com/ytdl-org/youtube-dl/blob/master/README.md#readme"
+				$MenuOption = $null
+			}
+			6 {
+				Write-Host ""
+				Start-Process "https://www.ffmpeg.org/ffmpeg.html"
+				$MenuOption = $null
+			}
+			7 {
+				Write-Host ""
+				Uninstall-Script -Path $DefaultScriptInstallLocation
+				Write-Host ""
+				Wait-Script
+				Exit
+			}
+			0 {
+				Clear-Host
+				break
+			}
+			Default {
+				Write-Host "`nPlease enter a valid option.`n" -ForegroundColor "Red"
+				Wait-Script
+			}
+		} # End Switch statement
+	} # End While loop
+} # End Get-MainMenu function
 
 
 
