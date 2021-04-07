@@ -376,10 +376,10 @@ function Install-Script {
             else {
                 return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to create a shortcut at: '$Path\Youtube-dl.lnk'"
             }
+        } else {
+            # Recreate the shortcut so that its values are up-to-date.
+            New-Shortcut -Path "$Path\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe).Source -Arguments "-ExecutionPolicy Bypass -File ""$Path\bin\youtube-dl-gui.ps1""" -StartPath "$Path\bin"
         }
-
-        # Recreate the shortcut so that its values are up-to-date.
-        New-Shortcut -Path "$Path\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe).Source -Arguments "-ExecutionPolicy Bypass -File ""$Path\bin\youtube-dl-gui.ps1""" -StartPath "$Path\bin"
     }
 
     # If the '-DesktopShortcut' parameter is provided, create a shortcut on the desktop that is used
@@ -398,10 +398,10 @@ function Install-Script {
             else {
                 return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to create a shortcut at: '$DesktopPath\Youtube-dl.lnk'"
             }
+        } else {
+            # Recreate the shortcut so that its values are up-to-date.
+            New-Shortcut -Path "$DesktopPath\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe).Source -Arguments "-ExecutionPolicy Bypass -File ""$Path\bin\youtube-dl-gui.ps1""" -StartPath "$Path\bin"
         }
-
-        # Recreate the shortcut so that its values are up-to-date.
-        New-Shortcut -Path "$DesktopPath\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe).Source -Arguments "-ExecutionPolicy Bypass -File ""$Path\bin\youtube-dl-gui.ps1""" -StartPath "$Path\bin"
     }
 
     # If the '-StartMenuShortcut' parameter is provided, create a start menu directory containing a shortcut
@@ -426,10 +426,10 @@ function Install-Script {
             else {
                 return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to create a shortcut at: '$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl\Youtube-dl.lnk'"
             }
+        } else {
+            # Recreate the shortcut so that its values are up-to-date.
+            New-Shortcut -Path "$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe).Source -Arguments "-ExecutionPolicy Bypass -File ""$Path\bin\youtube-dl-gui.ps1""" -StartPath "$Path\bin"
         }
-
-        # Recreate the shortcut so that its values are up-to-date.
-        New-Shortcut -Path "$AppDataPath\Microsoft\Windows\Start Menu\Programs\PowerShell-Youtube-dl\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe).Source -Arguments "-ExecutionPolicy Bypass -File ""$Path\bin\youtube-dl-gui.ps1""" -StartPath "$Path\bin"
     }
 } # End Install-Script function
 
@@ -472,19 +472,21 @@ function Uninstall-Script {
         try { 
             Remove-Item -Path $Item -ErrorAction Stop
         } catch [System.Management.Automation.ItemNotFoundException] {
-            Write-Log -ConsoleOnly -Severity 'Info' -Message "$_"
+            Write-Log -ConsoleOnly -Severity 'Warning' -Message "$_"
         } catch {
             return Write-Log -ConsoleOnly -Severity 'Error' -Message "$_"
         }
     }
 
     # Remove the '$Path\var\cache\' directory.
-    try { 
-        Remove-Item -Path "$Path\var\cache" -Recurse -Force -ErrorAction Stop
-    } catch [System.Management.Automation.ItemNotFoundException] {
-        Write-Log -ConsoleOnly -Severity 'Info' -Message "$_"
-    } catch {
-        return Write-Log -ConsoleOnly -Severity 'Error' -Message "$_"
+    if (Test-Path -Path "$Path\var\cache") {
+        try { 
+            Remove-Item -Path "$Path\var\cache" -Recurse -Force -ErrorAction Stop
+        } catch [System.Management.Automation.ItemNotFoundException] {
+            Write-Log -ConsoleOnly -Severity 'Warning' -Message "$_"
+        } catch {
+            return Write-Log -ConsoleOnly -Severity 'Error' -Message "$_"
+        }
     }
 
     # Remove the directories that were created by the script only if they are empty.
@@ -498,9 +500,9 @@ function Uninstall-Script {
     foreach ($Item in $FileListDirectories) {
         if ((Get-ChildItem -Path $Item -Recurse | Measure-Object).Count -eq 0 -or $Force) {
             try { 
-                Remove-Item -Path $Item -Force -ErrorAction Stop
+                Remove-Item -Path $Item -Recurse -Force -ErrorAction Stop
             } catch [System.Management.Automation.ItemNotFoundException] {
-                Write-Log -ConsoleOnly -Severity 'Info' -Message "$_"
+                Write-Log -ConsoleOnly -Severity 'Warning' -Message "$_"
             } catch {
                 return Write-Log -ConsoleOnly -Severity 'Error' -Message "$_"
             }
