@@ -115,7 +115,7 @@ Function Get-MainMenu {
 
 
 
-# Display the menu used to download a single video.
+# Display the menu used to download video or audio.
 Function Get-DownloadMenu {
     param (
         [Parameter(
@@ -171,6 +171,7 @@ Function Get-DownloadMenu {
 				# If the URL value is not an array, download the single URL.
 				if ($Url -is [array]) {
 					foreach ($Item in $Url) {
+						# Call the appropriate download function for each URL in the array.
 						& $DownloadFunction -Url $Item -Path $Path -YoutubeDlOptions $YoutubeDlOptions.Trim()
 
 						# If the URL was successfully downloaded, notified the user.
@@ -181,9 +182,10 @@ Function Get-DownloadMenu {
 							$MenuOption = $null
 							break
 						} # End if ($LastExitCode -eq 0) statement
-					} # End foreach 
+					} # End foreach loop
 					Wait-Script
 				} else {
+					# Call the appropriate download function.
 					& $DownloadFunction -Url $Url -Path $Path -YoutubeDlOptions $YoutubeDlOptions.Trim()
 
 					# If the URL was successfully downloaded, notify the user.
@@ -231,6 +233,7 @@ Function Get-DownloadMenu {
 			5 {
 				# If the URL is a single item (a string), get the formats available for download.
 				if ($Url -is [string] -and $Url -isnot [array] -and $Url.Length -gt 0) {
+					# Save the list of available download formats to a variable.
 					$TestUrlValidity = youtube-dl.exe -F "$URL"
 
 					# If the 'youtube-dl.exe -F $URL' command failed, display the output that it failed with.
@@ -247,8 +250,8 @@ Function Get-DownloadMenu {
 								'ResolutionPixels' = $_.Substring(35, 6).Trim()
 								'Codec' = $_.Substring(41, $_.Length - 41).Trim() -replace '^.*, ([.\a-zA-Z0-9]+)@.*$', '$1'
 								'Description' = $_.Substring(41, $_.Length - 41).Trim()
-							}
-						}
+							} # End [PSCustomObject]
+						} # End $AvailableFormats ForEach-Object loop
 						$AvailableFormats.GetEnumerator() | Sort-Object -Property FormatCode | Format-Table
 						Write-Host "Enter the format code that you wish to download ([Enter] to cancel).`n"
 						$FormatOption = Read-Host 'Format code'
@@ -270,12 +273,12 @@ Function Get-DownloadMenu {
 							} else {
 								$YoutubeDlOptions = $YoutubeDlOptions + " -f $FormatOption"
 							}
-						}
-					}
+						} # End if ($FormatOption.Length -gt 0) statement
+					} # End if ($LastExitCode -ne 0) statement
 				} else {
 					Write-Host "Cannot display the format options for multiple URLs. Please set only one URL first.`n" -ForegroundColor "Red"
 					Wait-Script
-				}
+				} # End if ($Url -is [string] -and $Url -isnot [array] -and $Url.Length -gt 0) statement
 				$MenuOption = $null
 			}
 			6 {
@@ -284,9 +287,13 @@ Function Get-DownloadMenu {
 
 				# Modify the youtube-dl options to support playlist downloading.
 				$YoutubeDlOptions = $YoutubeDlOptions -replace '--no-playlist', '--yes-playlist'
+
+				# Modify the youtube-dl options so that the path to which the playlist will be downloaded to contains the playlist name.
 				if ($YoutubeDlOptions -notlike '*%(playlist)s\*') {
 					$YoutubeDlOptions = $YoutubeDlOptions -replace "\%\(title\)s\.%\(ext\)s""", "%(playlist)s\%(title)s.%(ext)s"""
 				}
+
+				# Modify the youtube-dl options so that the download archive is enabled.
 				if ($YoutubeDlOptions -notlike '*--download-archive*') {
 					$YoutubeDlOptions = $YoutubeDlOptions + " --download-archive ""$DefaultDownloadArchiveFileLocation"""
 				}
@@ -401,7 +408,7 @@ Function Get-MiscMenu {
 
 # ======================================================================================================= #
 # ======================================================================================================= #
-# MAIN FUNCTION
+# MAIN PROCESS
 # ======================================================================================================= #
 
 # Save whether the 'youtube-dl' PowerShell module was already imported or not.
@@ -425,7 +432,6 @@ Wait-Script
 
 # Display the main menu of the script.
 Get-MainMenu
-
 Write-Log -ConsoleOnly -Severity 'Info' -Message "Script complete."
 
 # If the 'youtube-dl' PowerShell module was not imported before running this script, then remove the module.
