@@ -217,14 +217,14 @@ Function Get-DownloadMenu {
 								'Description' = $_.Substring(41, $_.Length - 41).Trim()
 							}
 						}
-						$AvailableFormats | Format-Table
+						$AvailableFormats.GetEnumerator() | Sort-Object -Property FormatCode | Format-Table
 						Write-Host "Enter the format code that you wish to download ([Enter] to cancel).`n"
 						$FormatOption = Read-Host 'Format code'
 		
 						while ($FormatOption.Trim() -notin $AvailableFormats.FormatCode -and $FormatOption.Trim() -ne '') {
 							Write-Host "`nPlease enter a valid option from the 'FormatCode' column.`n" -ForegroundColor "Red"
 							Wait-Script
-							$AvailableFormats | Format-Table
+							$AvailableFormats.GetEnumerator() | Sort-Object -Property FormatCode | Format-Table
 							Write-Host "Enter the format code that you wish to download ([Enter] to cancel).`n"
 							$FormatOption = Read-Host 'Format code'	
 						}
