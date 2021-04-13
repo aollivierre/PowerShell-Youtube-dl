@@ -32,7 +32,7 @@ $DefaultScriptInstallLocation = [environment]::GetFolderPath('UserProfile') + '\
 $DefaultPlaylistFileLocation = $DefaultScriptInstallLocation + '\etc\playlist-file.ini'
 $DefaultDownloadArchiveFileLocation = $DefaultScriptInstallLocation + '\var\download-archive.ini'
 
-$YoutubeDlOptionsList = [ordered]@{
+$YoutubeDlOptionsList = @{
     DefaultVideo = "-o ""$DefaultVideoSaveLocation\%(title)s.%(ext)s"" --cache-dir ""$DefaultScriptInstallLocation\var\cache"" --console-title --ignore-errors --no-mtime --no-playlist -f best"
 	DefaultAudio = "-o ""$DefaultAudioSaveLocation\%(title)s.%(ext)s"" --cache-dir ""$DefaultScriptInstallLocation\var\cache"" --console-title --ignore-errors --no-mtime --no-playlist -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg"
     DefaultVideoPlaylist = "-o ""$VideoSaveLocation\%(playlist)s\%(title)s.%(ext)s"" --cache-dir ""$DefaultScriptInstallLocation\var\cache"" --console-title --ignore-errors --no-mtime --yes-playlist"
@@ -146,57 +146,51 @@ Function Get-DownloadMenu {
 		Write-Host "  6 - Get playlist URLs from file"
 		Write-Host "`n  0 - Cancel`n" -ForegroundColor "Gray"
 		$MenuOption = Read-Host 'Option'
+		Write-Host ""
 		
 		Switch ($MenuOption.Trim()) {
 			1 {
 				if ($Url -is [array]) {
-					Write-Host ""
 					foreach ($Item in $Url) {
 						& $DownloadFunction -Url $Item -Path $Path -YoutubeDlOptions $YoutubeDlOptions.Trim()
 
 						if ($LastExitCode -eq 0) {
-							Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloaded $Type successfully."
-							Write-Host ""
+							Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloaded $Type successfully.`n"
 						} else {
-							Write-Host ""
 							$MenuOption = $null
 							break
 						} # End if ($LastExitCode -eq 0) statement
 					} # End foreach 
 					Wait-Script
 				} else {
-					Write-Host ""
 					& $DownloadFunction -Url $Url -Path $Path -YoutubeDlOptions $YoutubeDlOptions.Trim()
 
 					if ($LastExitCode -eq 0) {
-						Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloaded $Type successfully."
-						Write-Host ""
+						Write-Log -ConsoleOnly -Severity 'Info' -Message "Downloaded $Type successfully.`n"
 						Wait-Script
 						break
 					} else {
-						Write-Host ""
 						Wait-Script
 						$MenuOption = $null
 					} # End if ($LastExitCode -eq 0) statement
 				} # End if ($Url -isnot [string] -and $Url -is [array]) statement
 			}
 			2 {
-				Write-Host ""
 				$Url = Read-Host 'URL'
 				$MenuOption = $null
 			}
 			3 {
-				Write-Host ""
 				$Path = Read-Host 'Output path'
 				$MenuOption = $null
 			}
 			4 {
-				Write-Host "`nEnter the name of the youtube-dl options preset or the youtube-dl options themselves ([Enter] to display presets).`n"
+				Write-Host "Enter the name of the youtube-dl options preset or the youtube-dl options themselves ([Enter] to display presets).`n"
 				$DownloadOptions = Read-Host 'youtube-dl options'
 
 				while ($DownloadOptions.Length -eq 0) {
-					$YoutubeDlOptionsList | Format-Table
-					$DownloadOptions = Read-Host 'youtube-dl options'	
+					$YoutubeDlOptionsList.GetEnumerator() | Sort-Object -Property Name
+					Write-Host "`nEnter the name of the youtube-dl options preset or the youtube-dl options themselves ([Enter] to display presets).`n"
+					$DownloadOptions = Read-Host 'youtube-dl options'
 				}
 
 				if ($YoutubeDlOptionsList.ContainsKey($DownloadOptions)) {
@@ -208,7 +202,6 @@ Function Get-DownloadMenu {
 			}
 			5 {
 				if ($Url -is [string] -and $Url -isnot [array] -and $Url.Length -gt 0) {
-					Write-Host ""
 					$TestUrlValidity = youtube-dl.exe -F "$URL"
 					if ($LastExitCode -ne 0) {
 						Write-Host "$TestUrlValidity" -ForegroundColor "Red"
@@ -245,13 +238,12 @@ Function Get-DownloadMenu {
 						}
 					}
 				} else {
-					Write-Host "`nCannot display the format options for multiple URLs. Please set only one URL first.`n" -ForegroundColor "Red"
+					Write-Host "Cannot display the format options for multiple URLs. Please set only one URL first.`n" -ForegroundColor "Red"
 					Wait-Script
 				}
 				$MenuOption = $null
 			}
 			6 {
-				Write-Host ""
 				$Url = Get-Playlist -Path $DefaultPlaylistFileLocation
 
 				$YoutubeDlOptions = $YoutubeDlOptions -replace '--no-playlist', '--yes-playlist'
@@ -261,7 +253,6 @@ Function Get-DownloadMenu {
 				if ($YoutubeDlOptions -notlike '*--download-archive*') {
 					$YoutubeDlOptions = $YoutubeDlOptions + " --download-archive ""$DefaultDownloadArchiveFileLocation"""
 				}
-				Write-Host ""
 				Wait-Script
 				$MenuOption = $null
 			}
@@ -270,7 +261,7 @@ Function Get-DownloadMenu {
 				break
 			}
 			Default {
-				Write-Host "`nPlease enter a valid option.`n" -ForegroundColor "Red"
+				Write-Host "Please enter a valid option.`n" -ForegroundColor "Red"
 				Wait-Script
 			}
 		} # End Switch statement
@@ -297,24 +288,22 @@ Function Get-MiscMenu {
 		Write-Host "  7 - Uninstall PowerShell-Youtube-dl"
 		Write-Host "`n  0 - Cancel`n" -ForegroundColor "Gray"
 		$MenuOption = Read-Host "Option"
+		Write-Host ""
 		
 		Switch ($MenuOption.Trim()) {
 			1 {
-				Write-Host ""
 				Get-YoutubeDl -Path ($DefaultScriptInstallLocation + '\bin')
 				Write-Host ""
 				Wait-Script
 				$MenuOption = $null
 			}
 			2 {
-				Write-Host ""
 				Get-Ffmpeg -Path ($DefaultScriptInstallLocation + '\bin')
 				Write-Host ""
 				Wait-Script
 				$MenuOption = $null
 			}
 			3 {
-				Write-Host ""
 				$DesktopPath = [environment]::GetFolderPath('Desktop')
 
 				# Recreate the shortcut so that its values are up-to-date.
@@ -332,22 +321,18 @@ Function Get-MiscMenu {
 				$MenuOption = $null
 			}
 			4 {
-				Write-Host ""
 				Start-Process "https://github.com/mpb10/PowerShell-Youtube-dl/blob/$DefaultRepositoryBranch/README.md#readme"
 				$MenuOption = $null
 			}
 			5 {
-				Write-Host ""
 				Start-Process "https://github.com/ytdl-org/youtube-dl/blob/master/README.md#readme"
 				$MenuOption = $null
 			}
 			6 {
-				Write-Host ""
 				Start-Process "https://www.ffmpeg.org/ffmpeg.html"
 				$MenuOption = $null
 			}
 			7 {
-				Write-Host ""
 				Uninstall-Script -Path $DefaultScriptInstallLocation
 				Write-Host ""
 				Wait-Script
@@ -358,7 +343,7 @@ Function Get-MiscMenu {
 				break
 			}
 			Default {
-				Write-Host "`nPlease enter a valid option.`n" -ForegroundColor "Red"
+				Write-Host "Please enter a valid option.`n" -ForegroundColor "Red"
 				Wait-Script
 			}
 		} # End Switch statement
@@ -388,8 +373,7 @@ if (Test-Path -Path "$PSScriptRoot\youtube-dl.psm1") {
 
 # Install the script, executables, and shortcuts.
 Install-Script -Path $DefaultScriptInstallLocation -Branch $DefaultRepositoryBranch -LocalShortcut -StartMenuShortcut
-Write-Log -ConsoleOnly -Severity 'Info' -Message "Script setup complete."
-Write-Host ""
+Write-Log -ConsoleOnly -Severity 'Info' -Message "Script setup complete.`n"
 Wait-Script
 
 # Display the main menu of the script.
