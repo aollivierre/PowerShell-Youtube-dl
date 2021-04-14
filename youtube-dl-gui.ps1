@@ -7,12 +7,12 @@
 
 .EXAMPLE 
 	C:\Users\%USERNAME%\Scripts\Youtube-dl\youtube-dl-gui.ps1
-	Runs the script.
+	    Runs the script and installs the PowerShell-Youtube-dl script.
 	
 .NOTES 
-	Requires Windows 7 or higher, PowerShell 5.0 or greater, and Microsoft Visual C++ 2010 Redistributable Package (x86).
+	Requires Windows 7 or higher and PowerShell 5.0 or greater
 	Author: mpb10
-	Updated: February 18th, 2021
+	Updated: April 13th 2021
 	Version: 3.0.0
 
 .LINK 
@@ -43,6 +43,7 @@ $DefaultPlaylistFileLocation = $DefaultScriptInstallLocation + '\etc\playlist-fi
 $DefaultDownloadArchiveFileLocation = $DefaultScriptInstallLocation + '\var\download-archive.ini'
 
 # A hash table of youtube-dl option presets for various formats and file types.
+# NOTE: Youtube-dl options can be found here: https://github.com/ytdl-org/youtube-dl/blob/master/README.md#readme
 $YoutubeDlOptionsList = @{
     DefaultVideo = "-o ""$DefaultVideoSaveLocation\%(title)s.%(ext)s"" --cache-dir ""$DefaultScriptInstallLocation\var\cache"" --console-title --ignore-errors --no-mtime --no-playlist -f best"
 	DefaultAudio = "-o ""$DefaultAudioSaveLocation\%(title)s.%(ext)s"" --cache-dir ""$DefaultScriptInstallLocation\var\cache"" --console-title --ignore-errors --no-mtime --no-playlist -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg"
@@ -56,6 +57,7 @@ $YoutubeDlOptionsList = @{
 }
 
 # The version of the PowerShell-Youtube-dl script to download and install.
+# NOTE: This value must match the name of a remote branch of the PowerShell-Youtube-dl GitHub repository.
 $DefaultRepositoryBranch = 'version-3.0.0'
 
 
@@ -297,6 +299,7 @@ Function Get-DownloadMenu {
 				if ($YoutubeDlOptions -notlike '*--download-archive*') {
 					$YoutubeDlOptions = $YoutubeDlOptions + " --download-archive ""$DefaultDownloadArchiveFileLocation"""
 				}
+				Write-Host ""
 				Wait-Script
 				$MenuOption = $null
 			}
