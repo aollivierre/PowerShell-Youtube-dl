@@ -1,3 +1,23 @@
+<#
+.SYNOPSIS 
+	A collection of commandlets used to support the PowerShell-Youtube-dl script.
+	
+.DESCRIPTION 
+	This PowerShell module is used to support the PowerShell-Youtube-dl.
+
+.EXAMPLE 
+	Import-Module -Force ".\youtube-dl.psm1"
+	    Imports the module and allows all of the commandlets to be called elsewhere.
+	
+.NOTES 
+	Requires Windows 7 or higher and PowerShell 5.0 or greater
+	Author: mpb10
+	Updated: April 13th 2021
+	Version: 3.0.0
+
+.LINK 
+	https://github.com/mpb10/PowerShell-Youtube-dl
+#>
 
 
 
