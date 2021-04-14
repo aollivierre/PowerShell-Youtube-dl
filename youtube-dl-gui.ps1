@@ -51,9 +51,12 @@ $YoutubeDlOptionsList = @{
     DefaultAudioPlaylist = "-o ""$VideoSaveLocation\%(playlist)s\%(title)s.%(ext)s"" --cache-dir ""$DefaultScriptInstallLocation\var\cache"" --console-title --ignore-errors --no-mtime --yes-playlist -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg"
     DefaultVideoPlaylistFile = "-o ""$VideoSaveLocation\%(playlist)s\%(title)s.%(ext)s"" --cache-dir ""$DefaultScriptInstallLocation\var\cache"" --download-archive ""$DefaultDownloadArchiveFileLocation"" --console-title --ignore-errors --no-mtime --yes-playlist"
     DefaultAudioPlaylistFile = "-o ""$VideoSaveLocation\%(playlist)s\%(title)s.%(ext)s"" --cache-dir ""$DefaultScriptInstallLocation\var\cache"" --download-archive ""$DefaultDownloadArchiveFileLocation"" --console-title --ignore-errors --no-mtime --yes-playlist -x --audio-format mp3 --audio-quality 0 --metadata-from-title ""(?P<artist>.+?) - (?P<title>.+)"" --add-metadata --prefer-ffmpeg"
+    Mp3 = "-o ""$DefaultAudioSaveLocation\%(title)s.%(ext)s"" --cache-dir ""$DefaultScriptInstallLocation\var\cache"" --console-title --ignore-errors --no-mtime --no-playlist -x --audio-format mp3 --audio-quality 0 --prefer-ffmpeg"
 	Mp4 = "-o ""$DefaultVideoSaveLocation\%(title)s.%(ext)s"" --cache-dir ""$DefaultScriptInstallLocation\var\cache"" --console-title --ignore-errors --no-mtime --no-playlist -f mp4"
     Webm = "-o ""$DefaultVideoSaveLocation\%(title)s.%(ext)s"" --cache-dir ""$DefaultScriptInstallLocation\var\cache"" --console-title --ignore-errors --no-mtime --no-playlist -f webm"
-    Mp3 = "-o ""$DefaultAudioSaveLocation\%(title)s.%(ext)s"" --cache-dir ""$DefaultScriptInstallLocation\var\cache"" --console-title --ignore-errors --no-mtime --no-playlist -x --audio-format mp3 --audio-quality 0 --prefer-ffmpeg"
+	WebmNoAudio = "-o ""$DefaultVideoSaveLocation\%(title)s.%(ext)s"" --cache-dir ""$DefaultScriptInstallLocation\var\cache"" --console-title --ignore-errors --no-mtime --no-playlist --recode-video webm --postprocessor-args ""-an"" -f webm"
+	WebmForums = "-o ""$DefaultVideoSaveLocation\%(title)s.%(ext)s"" --cache-dir ""$DefaultScriptInstallLocation\var\cache"" --console-title --ignore-errors --no-mtime --no-playlist --recode-video webm --postprocessor-args ""-b:v 800k -b:a 128k -s 640x360"" -f best"
+	WebmForumsNoAudio = "-o ""$DefaultVideoSaveLocation\%(title)s.%(ext)s"" --cache-dir ""$DefaultScriptInstallLocation\var\cache"" --console-title --ignore-errors --no-mtime --no-playlist --recode-video webm --postprocessor-args ""-b:v 800k -b:a 128k -s 640x360 -an"" -f best"
 }
 
 # The version of the PowerShell-Youtube-dl script to download and install.
