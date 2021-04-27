@@ -8,7 +8,7 @@ A PowerShell module and script used to operate the [youtube-dl](https://github.c
 
 **April 27th 2021**
 
-**v3.0.3**
+**v3.0.4**
 
 #
 
@@ -21,7 +21,7 @@ A PowerShell module and script used to operate the [youtube-dl](https://github.c
 
 # INSTALLATION
 
-**Script download link:** https://github.com/mpb10/PowerShell-Youtube-dl/releases/download/v3.0.3/PowerShell-Youtube-dl-v3.0.3.zip
+**Script download link:** https://github.com/mpb10/PowerShell-Youtube-dl/archive/refs/tags/v3.0.4.zip
 
 **Dependencies:**
 
@@ -53,6 +53,9 @@ Multiple video URLs or playlist URLs can be downloaded in a batch operation via 
 
 
 # CHANGE LOG
+
+	3.0.4   April 27th, 2021
+		Fixed download link for real this time.
 
 	3.0.3   April 27th, 2021
 		Fixed download link
