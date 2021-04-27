@@ -54,6 +54,9 @@ Multiple video URLs or playlist URLs can be downloaded in a batch operation via 
 
 # CHANGE LOG
 
+	3.0.1   April 27th, 2021
+		Fixed mistakes in README.md
+
 	3.0.0   April 27th, 2021
 		!!! FULL RE-INSTALL IS REQUIRED FOR THIS VERSION !!!
 		Previous playlist files and download archive files contents must be copied to the new locations at `%USERPROFILE%\scripts\powershell-youtube-dl\etc\playlist-file.ini` and `%USERPROFILE%\scripts\powershell-youtube-dl\var\download-archive.ini`.
