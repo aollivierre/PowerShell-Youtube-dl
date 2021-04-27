@@ -37,7 +37,7 @@ A PowerShell module and script used to operate the [youtube-dl](https://github.c
 
 #
 
-To uninstall this script and its files, run the script and choose option `3` to display the miscellaneous menu options, and choose option `7` to uninstall the script and its shortcuts. This remove all files created by the script and will leave behind any files in `%USERPROFILE%\scripts\powershell-youtube-dl` that were not created by the script.
+To uninstall this script and its files, run the script and choose option `3` to display the miscellaneous menu options, and choose option `7` to uninstall the script and its shortcuts. This will remove all files created by the script and will leave behind any files in `%USERPROFILE%\scripts\powershell-youtube-dl` that were not created by the script.
 
 # USAGE
 
@@ -54,6 +54,9 @@ Multiple video URLs or playlist URLs can be downloaded in a batch operation via 
 
 # CHANGE LOG
 
+	3.0.1   April 27th, 2021
+		Fixed mistakes in README.md
+
 	3.0.0   April 27th, 2021
 		!!! FULL RE-INSTALL IS REQUIRED FOR THIS VERSION !!!
 		Previous playlist files and download archive files contents must be copied to the new locations at `%USERPROFILE%\scripts\powershell-youtube-dl\etc\playlist-file.ini` and `%USERPROFILE%\scripts\powershell-youtube-dl\var\download-archive.ini`.
@@ -61,6 +64,7 @@ Multiple video URLs or playlist URLs can be downloaded in a batch operation via 
 		Refactored and re-wrote the majority of the `youtube-dl-gui.ps1` GUI script.
 		Added youtube-dl options presets for different file formats.
 		Adjusted the installation path of the script and the different files used by it.
+
 	2.0.3	May 7th, 2018
 		!!! FULL RE-INSTALL IS REQUIRED FOR THIS VERSION !!! Just updating the script file won't cut it.
 		\scripts folder has been removed and youtube-dl.ps1 file moved to root folder.
