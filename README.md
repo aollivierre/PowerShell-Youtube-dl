@@ -21,7 +21,7 @@ A PowerShell module and script used to operate the [youtube-dl](https://github.c
 
 # INSTALLATION
 
-**Script download link:** https://github.com/mpb10/PowerShell-Youtube-dl/releases/download/v3.0.0/PowerShell-Youtube-dl-v3.0.3.zip
+**Script download link:** https://github.com/mpb10/PowerShell-Youtube-dl/releases/download/v3.0.3/PowerShell-Youtube-dl-v3.0.3.zip
 
 **Dependencies:**
 
