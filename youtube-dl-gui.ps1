@@ -362,14 +362,14 @@ Function Get-MiscMenu {
 				$DesktopPath = [environment]::GetFolderPath('Desktop')
 
 				# Create the desktop shortcut for the script.
-				New-Shortcut -Path "$DesktopPath\Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe).Source -Arguments "-ExecutionPolicy Bypass -File ""$DefaultScriptInstallLocation\bin\youtube-dl-gui.ps1""" -StartPath "$DefaultScriptInstallLocation\bin"
+				New-Shortcut -Path "$DesktopPath\PowerShell-Youtube-dl.lnk" -TargetPath (Get-Command powershell.exe).Source -Arguments "-ExecutionPolicy Bypass -File ""$DefaultScriptInstallLocation\bin\youtube-dl-gui.ps1""" -StartPath "$DefaultScriptInstallLocation\bin"
 
 				# Ensure that the desktop shortcut was created.
-				if (Test-Path -Path "$DesktopPath\Youtube-dl.lnk") {
-					Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a shortcut for running 'youtube-dl-gui.ps1' at: '$DesktopPath\Youtube-dl.lnk'`n"
+				if (Test-Path -Path "$DesktopPath\PowerShell-Youtube-dl.lnk") {
+					Write-Log -ConsoleOnly -Severity 'Info' -Message "Created a shortcut for running 'youtube-dl-gui.ps1' at: '$DesktopPath\PowerShell-Youtube-dl.lnk'`n"
 				}
 				else {
-					return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to create a shortcut at: '$DesktopPath\Youtube-dl.lnk'`n"
+					return Write-Log -ConsoleOnly -Severity 'Error' -Message "Failed to create a shortcut at: '$DesktopPath\PowerShell-Youtube-dl.lnk'`n"
 				}
 				Wait-Script
 				$MenuOption = $null
