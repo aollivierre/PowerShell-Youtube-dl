@@ -61,6 +61,7 @@ Multiple video URLs or playlist URLs can be downloaded in a batch operation via 
 		Refactored and re-wrote the majority of the `youtube-dl-gui.ps1` GUI script.
 		Added youtube-dl options presets for different file formats.
 		Adjusted the installation path of the script and the different files used by it.
+		
 	2.0.3	May 7th, 2018
 		!!! FULL RE-INSTALL IS REQUIRED FOR THIS VERSION !!! Just updating the script file won't cut it.
 		\scripts folder has been removed and youtube-dl.ps1 file moved to root folder.
