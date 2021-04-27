@@ -13,7 +13,7 @@
 	Requires Windows 7 or higher and PowerShell 5.0 or greater
 	Author: mpb10
 	Updated: April 27th 2021
-	Version: 3.0.3
+	Version: 3.0.4
 
 .LINK 
 	https://github.com/mpb10/PowerShell-Youtube-dl
