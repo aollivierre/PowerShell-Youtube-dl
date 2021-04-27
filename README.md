@@ -33,7 +33,7 @@ A PowerShell module and script used to operate the [youtube-dl](https://github.c
 **To Install:** 
 
 1. Download the release .zip file and extract it to a folder.
-1. Run the `Youtube-dl Setup` shortcut. This will install the script to `%USERPROFILE%\scripts\powershell-youtube-dl` and create a start menu shortcut named `Youtube-dl`.
+1. Run the `Youtube-dl Setup` shortcut. This will install the script to `%USERPROFILE%\scripts\powershell-youtube-dl` and create a start menu shortcut named `PowerShell-Youtube-dl`.
 1. Either exit the script by providing option `0`.
 
 #
@@ -42,9 +42,9 @@ To uninstall this script and its files, run the script and choose option `3` to 
 
 # USAGE
 
-With the script installed, run the script by using one of the shortcuts that it generates or by opening a PowerShell window and executing the script. The script can also be quickly opened via the `Win+R` shortcut and pasting in the command `C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -File "%USERPROFILE%\scripts\powershell-youtube-dl\bin\youtube-dl-gui.ps1"`.
+Run the script by using one of the shortcuts that were generated upon installation or by opening a PowerShell window and running the `youtube-dl-gui.ps1` file. The script can also be ran via the `Win+R` shortcut and pasting in the command `C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -File "%USERPROFILE%\scripts\powershell-youtube-dl\bin\youtube-dl-gui.ps1"`.
 
-Once at the main menu, select option `1` or `2` to download video or audio. Once on the download menu, choose option `2` and enter the URL of the video that you wish to download. Youtube-dl supports video URLs from a variety of different websites, and the full list can be found [here](https://github.com/ytdl-org/youtube-dl/blob/master/docs/supportedsites.md).
+Once at the main menu of the script, select option `1` or `2` to download video or audio. Once on the download menu, choose option `2` and enter the URL of the video that you wish to download. Youtube-dl supports video URLs from a variety of different websites, and the full list can be found [here](https://github.com/ytdl-org/youtube-dl/blob/master/docs/supportedsites.md).
 
 Once a URL is configured, choose option `1` to download the video. By default, youtube-dl will download the best quality video or audio available, regardless of format. With the URL configured, option `5` of the download menu will display all of the file formats available for download and allow the user to choose a specific one to download.
 
