@@ -61,7 +61,7 @@ $YoutubeDlOptionsList = @{
 
 # The version of the PowerShell-Youtube-dl script to download and install.
 # NOTE: This value must match the name of a remote branch of the PowerShell-Youtube-dl GitHub repository.
-$DefaultRepositoryBranch = 'version-3.0.0'
+$DefaultRepositoryBranch = 'master'
 
 
 
