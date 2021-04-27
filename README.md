@@ -14,7 +14,6 @@ A PowerShell module and script used to operate the [youtube-dl](https://github.c
 
  - [INSTALLATION](#installation)
  - [USAGE](#usage)
- - [ADVANCED USAGE](#advanced-usage)
  - [CHANGE LOG](#change-log)
  - [ADDITIONAL NOTES](#additional-notes)
  
@@ -52,12 +51,16 @@ If attempting to download from Youtube or another website results in an error wh
 
 Multiple video URLs or playlist URLs can be downloaded in a batch operation via the `%USERPROFILE%\scripts\powershell-youtube-dl\etc\playlist-file.ini` file. To do this, create a file named `playlist-file.ini` in the `%USERPROFILE%\scripts\powershell-youtube-dl\etc` directory. List the video or playlist URLs on separate lines within the file and save it. Run the script, navigate to the download menu, and then choose option `6` to retrieve the URLs from the `playlist-file.ini` file. This option will add the `--yes-playlist` and `--download-archive` youtube-dl options to the download command (Note that the `--download-archive` option will cause the script to skip downloading any video that was previously downloaded). With the URLs retrieved from the file, choose option `1` to download each URL in a batch operation.
 
-# ADVANCED USAGE
-
-
 
 # CHANGE LOG
 
+	3.0.0   April 27th, 2021
+		!!! FULL RE-INSTALL IS REQUIRED FOR THIS VERSION !!!
+		Previous playlist files and download archive files contents must be copied to the new locations at `%USERPROFILE%\scripts\powershell-youtube-dl\etc\playlist-file.ini` and `%USERPROFILE%\scripts\powershell-youtube-dl\var\download-archive.ini`.
+		Added a new `youtube-dl.psm1` PowerShell module containing commandlets used to install and operate youtube-dl.
+		Refactored and re-wrote the majority of the `youtube-dl-gui.ps1` GUI script.
+		Added youtube-dl options presets for different file formats.
+		Adjusted the installation path of the script and the different files used by it.
 	2.0.3	May 7th, 2018
 		!!! FULL RE-INSTALL IS REQUIRED FOR THIS VERSION !!! Just updating the script file won't cut it.
 		\scripts folder has been removed and youtube-dl.ps1 file moved to root folder.
