@@ -6,7 +6,7 @@ A PowerShell module and script used to operate the [youtube-dl](https://github.c
 
 **Author: mpb10**
 
-**April 13th 2021**
+**April 27th 2021**
 
 **v3.0.3**
 
